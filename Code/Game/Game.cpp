@@ -15,13 +15,11 @@
 #include "Game/App.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/Player.hpp"
-#include "Game/Prop.hpp"
 
 //----------------------------------------------------------------------------------------------------
 Game::Game()
 {
     SpawnPlayer();
-    SpawnProp();
 
     m_screenCamera = new Camera();
 
@@ -33,10 +31,7 @@ Game::Game()
     m_gameClock = new Clock(Clock::GetSystemClock());
 
     m_player->m_position     = Vec3(-2.f, 0.f, 1.f);
-    m_firstCube->m_position  = Vec3(2.f, 2.f, 0.f);
-    m_secondCube->m_position = Vec3(-2.f, -2.f, 0.f);
-    m_sphere->m_position     = Vec3(10, -5, 1);
-    m_grid->m_position       = Vec3::ZERO;
+
 
     DebugAddWorldBasis(Mat44(), -1.f);
 
@@ -57,18 +52,6 @@ Game::~Game()
 {
     delete m_gameClock;
     m_gameClock = nullptr;
-
-    delete m_grid;
-    m_grid = nullptr;
-
-    delete m_sphere;
-    m_sphere = nullptr;
-
-    delete m_secondCube;
-    m_secondCube = nullptr;
-
-    delete m_firstCube;
-    m_firstCube = nullptr;
 
     delete m_player;
     m_player = nullptr;
@@ -297,22 +280,8 @@ void Game::UpdateFromController()
 void Game::UpdateEntities(float const gameDeltaSeconds, float const systemDeltaSeconds) const
 {
     m_player->Update(systemDeltaSeconds);
-    m_firstCube->Update(gameDeltaSeconds);
-    m_secondCube->Update(gameDeltaSeconds);
-    m_sphere->Update(gameDeltaSeconds);
-    m_grid->Update(gameDeltaSeconds);
-
-    m_firstCube->m_orientation.m_pitchDegrees += 30.f * gameDeltaSeconds;
-    m_firstCube->m_orientation.m_rollDegrees += 30.f * gameDeltaSeconds;
 
     float const time       = static_cast<float>(m_gameClock->GetTotalSeconds());
-    float const colorValue = (sinf(time) + 1.0f) * 0.5f * 255.0f;
-
-    m_secondCube->m_color.r = static_cast<unsigned char>(colorValue);
-    m_secondCube->m_color.g = static_cast<unsigned char>(colorValue);
-    m_secondCube->m_color.b = static_cast<unsigned char>(colorValue);
-
-    m_sphere->m_orientation.m_yawDegrees += 45.f * gameDeltaSeconds;
 
     DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / m_gameClock->GetDeltaSeconds(), m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
 }
@@ -326,11 +295,6 @@ void Game::RenderAttractMode() const
 //----------------------------------------------------------------------------------------------------
 void Game::RenderEntities() const
 {
-    m_firstCube->Render();
-    m_secondCube->Render();
-    m_sphere->Render();
-    m_grid->Render();
-
     g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
     m_player->Render();
 }
@@ -339,20 +303,4 @@ void Game::RenderEntities() const
 void Game::SpawnPlayer()
 {
     m_player = new Player(this);
-}
-
-//----------------------------------------------------------------------------------------------------
-void Game::SpawnProp()
-{
-    Texture const* texture = g_theRenderer->CreateOrGetTextureFromFile("Data/Images/TestUV.png");
-
-    m_firstCube  = new Prop(this);
-    m_secondCube = new Prop(this);
-    m_sphere     = new Prop(this, texture);
-    m_grid       = new Prop(this);
-
-    m_firstCube->InitializeLocalVertsForCube();
-    m_secondCube->InitializeLocalVertsForCube();
-    m_sphere->InitializeLocalVertsForSphere();
-    m_grid->InitializeLocalVertsForGrid();
 }

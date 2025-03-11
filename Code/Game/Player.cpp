@@ -15,8 +15,9 @@
 
 //----------------------------------------------------------------------------------------------------
 Player::Player(Game* owner)
-    : Entity(owner)
+
 {
+    m_game = owner;
     m_worldCamera = new Camera();
 
     m_worldCamera->SetPerspectiveGraphicView(2.f, 60.f, 0.1f, 100.f);
@@ -51,8 +52,8 @@ void Player::Update(float deltaSeconds)
     {
         if (m_game->IsAttractMode() == false)
         {
-            m_position    = Vec3::ZERO;
-            m_orientation = EulerAngles::ZERO;
+            // m_position    = Vec3::ZERO;
+            // m_orientation = EulerAngles::ZERO;
         }
     }
 
@@ -129,4 +130,19 @@ void Player::UpdateFromController()
 Camera* Player::GetCamera() const
 {
     return m_worldCamera;
+}
+
+Mat44 Player::GetModelToWorldTransform() const
+{
+    Mat44 m2w;
+
+    m2w.SetTranslation3D(m_position);
+
+    m2w.AppendZRotation(m_orientation.m_yawDegrees);
+    m2w.AppendYRotation(m_orientation.m_pitchDegrees);
+    m2w.AppendXRotation(m_orientation.m_rollDegrees);
+
+    // m2w.Append(m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+
+    return m2w;
 }
