@@ -6,6 +6,7 @@
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
+#include "Engine/Core/Vertex_PCUTBN.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
@@ -29,7 +30,7 @@ void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 cons
     constexpr int NUM_SIDES     = 32;
     constexpr int NUM_TRIS      = 2 * NUM_SIDES;
     constexpr int NUM_VERTS     = 3 * NUM_TRIS;
-    Vertex_PCU    verts[NUM_VERTS];
+    Vertex_PCUTBN    verts[NUM_VERTS];
 
     constexpr float DEGREES_PER_SIDE = 360.f / static_cast<float>(NUM_SIDES);
 

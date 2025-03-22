@@ -35,5 +35,4 @@ public:
 
 private:
     Camera*     m_worldCamera     = nullptr;
-
 };
