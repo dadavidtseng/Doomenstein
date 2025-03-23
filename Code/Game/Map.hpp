@@ -27,12 +27,12 @@ public:
 
     void CreateTiles();
     void CreateGeometry();
-    void AddGeometryForWall(VertexList_PCUTBN& verts, std::vector<unsigned int>& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
-    void AddGeometryForFloor(VertexList_PCUTBN& verts, std::vector<unsigned int>& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
-    void AddGeometryForCeiling(VertexList_PCUTBN& verts, std::vector<unsigned int>& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
+    void AddGeometryForWall(VertexList_PCUTBN& verts, IndexList& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
+    void AddGeometryForFloor(VertexList_PCUTBN& verts, IndexList& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
+    void AddGeometryForCeiling(VertexList_PCUTBN& verts, IndexList& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
     void CreateBuffers();
 
-    bool  IsPositionInBounds(Vec3 position, float  tolerance = 0.f) const;
+    bool  IsPositionInBounds(Vec3 position, float tolerance = 0.f) const;
     bool  AreCoordsInBounds(int x, int y) const;
     Tile* GetTile(int x, int y) const;
 
@@ -54,14 +54,14 @@ public:
 protected:
     // Map
     MapDefinition const* m_definition = nullptr;
-    // std::vector<Tile>    m_tiles;
+    std::vector<Tile>    m_tiles;
     IntVec2              m_dimensions;
 
     // Rendering
-    // VertexList_PCUTBN         m_vertexes;
-    std::vector<unsigned int> m_indexes;
-    Texture const*            m_texture      = nullptr;
-    Shader*                   m_shader       = nullptr;
-    VertexBuffer*             m_vertexBuffer = nullptr;
-    IndexBuffer*              m_indexBuffer  = nullptr;
+    VertexList_PCUTBN m_vertexes;
+    IndexList         m_indexes;
+    Texture const*    m_texture      = nullptr;
+    Shader*           m_shader       = nullptr;
+    VertexBuffer*     m_vertexBuffer = nullptr;
+    IndexBuffer*      m_indexBuffer  = nullptr;
 };

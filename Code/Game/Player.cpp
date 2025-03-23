@@ -66,7 +66,7 @@ void Player::Update(float deltaSeconds)
     float constexpr moveSpeed = 2.f;
 
     Vec2 const leftStickInput = controller.GetLeftStick().GetPosition();
-    m_velocity += Vec3(leftStickInput.y, -leftStickInput.x, 0) * moveSpeed;
+    m_velocity += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
 
     if (g_theInput->IsKeyDown(KEYCODE_W)) m_velocity += forward * moveSpeed;
     if (g_theInput->IsKeyDown(KEYCODE_S)) m_velocity -= forward * moveSpeed;

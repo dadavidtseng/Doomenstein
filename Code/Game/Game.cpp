@@ -7,6 +7,7 @@
 
 #include "Map.hpp"
 #include "MapDefinition.hpp"
+#include "TileDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -88,6 +89,10 @@ void Game::Render() const
     if (m_gameState == eGameState::Game)
     {
         RenderEntities();
+        if (m_currentMap != nullptr)
+        {
+            m_currentMap->Render();
+        }
     }
 
     g_theRenderer->EndCamera(*m_player->GetCamera());
@@ -313,6 +318,7 @@ void Game::SpawnPlayer()
 void Game::InitializeMaps()
 {
     MapDefinition::InitializeMapDefs();
+    TileDefinition::InitializeTileDefs();
 
     m_maps.reserve(1);
 

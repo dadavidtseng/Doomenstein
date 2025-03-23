@@ -30,16 +30,18 @@ TileDefinition::~TileDefinition()
 STATIC void TileDefinition::InitializeTileDefs()
 {
     XmlDocument mapDefXml;
+
     if (mapDefXml.LoadFile("Data/Definitions/TileDefinitions.xml") != XmlResult::XML_SUCCESS)
     {
         return;
     }
 
-    if (XmlElement* root = mapDefXml.FirstChildElement("MapDefinitions"))
+    if (XmlElement* root = mapDefXml.FirstChildElement("TileDefinitions"))
     {
-        for (XmlElement* element = root->FirstChildElement("MapDefinition"); element != nullptr; element = element->NextSiblingElement("MapDefinition"))
+        for (XmlElement* element = root->FirstChildElement("TileDefinition"); element != nullptr; element = element->NextSiblingElement("TileDefinition"))
         {
             TileDefinition* mapDef = new TileDefinition(*element);
+
             s_tileDefinitions.push_back(mapDef);
         }
     }
