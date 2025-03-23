@@ -5,6 +5,8 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Game.hpp"
 
+#include "Map.hpp"
+#include "MapDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -30,7 +32,7 @@ Game::Game()
 
     m_gameClock = new Clock(Clock::GetSystemClock());
 
-    m_player->m_position     = Vec3(-2.f, 0.f, 1.f);
+    m_player->m_position = Vec3(-2.f, 0.f, 1.f);
 
 
     DebugAddWorldBasis(Mat44(), -1.f);
@@ -38,13 +40,15 @@ Game::Game()
     Mat44 transform;
 
     transform.SetIJKT3D(-Vec3::Y_BASIS, Vec3::X_BASIS, Vec3::Z_BASIS, Vec3(0.25f, 0.f, 0.25f));
-    DebugAddWorldText("X-Forward", transform, 0.25f, Vec2::ONE, -1.f , Rgba8::RED);
+    DebugAddWorldText("X-Forward", transform, 0.25f, Vec2::ONE, -1.f, Rgba8::RED);
 
     transform.SetIJKT3D(-Vec3::X_BASIS, -Vec3::Y_BASIS, Vec3::Z_BASIS, Vec3(0.f, 0.25f, 0.5f));
-    DebugAddWorldText("Y-Left", transform, 0.25f, Vec2::ZERO, -1.f , Rgba8::GREEN);
+    DebugAddWorldText("Y-Left", transform, 0.25f, Vec2::ZERO, -1.f, Rgba8::GREEN);
 
     transform.SetIJKT3D(-Vec3::X_BASIS, Vec3::Z_BASIS, Vec3::Y_BASIS, Vec3(0.f, -0.25f, 0.25f));
-    DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f , Rgba8::BLUE);
+    DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f, Rgba8::BLUE);
+
+    InitializeMaps();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -281,7 +285,7 @@ void Game::UpdateEntities(float const gameDeltaSeconds, float const systemDeltaS
 {
     m_player->Update(systemDeltaSeconds);
 
-    float const time       = static_cast<float>(m_gameClock->GetTotalSeconds());
+    float const time = static_cast<float>(m_gameClock->GetTotalSeconds());
 
     DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / m_gameClock->GetDeltaSeconds(), m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
 }
@@ -303,4 +307,19 @@ void Game::RenderEntities() const
 void Game::SpawnPlayer()
 {
     m_player = new Player(this);
+}
+
+//----------------------------------------------------------------------------------------------------
+void Game::InitializeMaps()
+{
+    MapDefinition::InitializeMapDefs();
+
+    m_maps.reserve(1);
+
+    for (int mapIndex = 0; mapIndex < 1; ++mapIndex)
+    {
+        m_maps.push_back(new Map(this, *MapDefinition::s_mapDefinitions[mapIndex]));
+    }
+
+    m_currentMap = m_maps[0];
 }

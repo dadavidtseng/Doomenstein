@@ -198,6 +198,7 @@
     <ClCompile Include="MapDefinition.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Tile.cpp" />
+    <ClCompile Include="TileDefinition.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.hpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="MapDefinition.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="TileDefinition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Docs\README.md" />

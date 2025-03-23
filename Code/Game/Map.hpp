@@ -22,7 +22,7 @@ class Game;
 class Map
 {
 public:
-    Map(Game* owner, MapDefinition const& mapDefinition);
+    Map(Game* owner, MapDefinition const& mapDef);
     ~Map();
 
     void CreateTiles();
@@ -32,7 +32,7 @@ public:
     void AddGeometryForCeiling(VertexList_PCUTBN& verts, std::vector<unsigned int>& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
     void CreateBuffers();
 
-    bool  IsPositionInBounds(Vec3 position, float const tolerance = 0.f) const;
+    bool  IsPositionInBounds(Vec3 position, float  tolerance = 0.f) const;
     bool  AreCoordsInBounds(int x, int y) const;
     Tile* GetTile(int x, int y) const;
 
@@ -53,12 +53,12 @@ public:
 
 protected:
     // Map
-    MapDefinition*    m_definition = nullptr;
-    std::vector<Tile> m_tiles;
-    IntVec2           m_dimensions;
+    MapDefinition const* m_definition = nullptr;
+    // std::vector<Tile>    m_tiles;
+    IntVec2              m_dimensions;
 
     // Rendering
-    VertexList_PCUTBN         m_vertexes;
+    // VertexList_PCUTBN         m_vertexes;
     std::vector<unsigned int> m_indexes;
     Texture const*            m_texture      = nullptr;
     Shader*                   m_shader       = nullptr;

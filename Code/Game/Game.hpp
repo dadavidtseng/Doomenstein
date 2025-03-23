@@ -4,14 +4,17 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
+#include <cstdint>
+#include <vector>
 
+class Map;
 //----------------------------------------------------------------------------------------------------
 class Camera;
 class Clock;
 class Player;
 
 //----------------------------------------------------------------------------------------------------
-enum class eGameState
+enum class eGameState : int8_t
 {
     Attract,
     Game
@@ -37,8 +40,12 @@ private:
 
     void SpawnPlayer();
 
-    Camera*    m_screenCamera = nullptr;
-    Player*    m_player       = nullptr;
-    Clock*     m_gameClock    = nullptr;
-    eGameState m_gameState    = eGameState::Attract;
+    void InitializeMaps();
+
+    Camera*           m_screenCamera = nullptr;
+    Player*           m_player       = nullptr;
+    Clock*            m_gameClock    = nullptr;
+    eGameState        m_gameState    = eGameState::Attract;
+    std::vector<Map*> m_maps;
+    Map*              m_currentMap = nullptr;
 };
