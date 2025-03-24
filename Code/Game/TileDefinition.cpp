@@ -46,3 +46,33 @@ STATIC void TileDefinition::InitializeTileDefs()
         }
     }
 }
+
+//----------------------------------------------------------------------------------------------------
+TileDefinition const* TileDefinition::GetTileDefByName(String const& name)
+{
+    for (TileDefinition const* tileDef : s_tileDefinitions)
+    {
+        if (tileDef->m_name == name)
+        {
+            return tileDef;
+        }
+    }
+
+    return nullptr;
+}
+
+//----------------------------------------------------------------------------------------------------
+StringList TileDefinition::GetTileNames()
+{
+    StringList tileNames;
+
+    for (TileDefinition const* tileDef : s_tileDefinitions)
+    {
+        if (tileDef)
+        {
+            tileNames.push_back(tileDef->m_name);
+        }
+    }
+
+    return tileNames;
+}

@@ -35,7 +35,6 @@ Game::Game()
 
     m_player->m_position = Vec3(-2.f, 0.f, 1.f);
 
-
     DebugAddWorldBasis(Mat44(), -1.f);
 
     Mat44 transform;
@@ -74,7 +73,7 @@ void Game::Update()
     // #TODO: Select keyboard or controller
 
     UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
-
+    m_currentMap->Update();
     UpdateFromKeyBoard();
     UpdateFromController();
 }

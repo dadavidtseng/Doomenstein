@@ -5,10 +5,10 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/MapDefinition.hpp"
 
-#include "GameCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/Renderer.hpp"
+#include "Game/GameCommon.hpp"
 
 //----------------------------------------------------------------------------------------------------
 std::vector<MapDefinition*> MapDefinition::s_mapDefinitions;

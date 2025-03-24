@@ -30,6 +30,7 @@ public:
     void Update();
     void Render() const;
     bool IsAttractMode() const;
+    Clock*            m_gameClock    = nullptr;
 
 private:
     void UpdateFromKeyBoard();
@@ -44,7 +45,6 @@ private:
 
     Camera*           m_screenCamera = nullptr;
     Player*           m_player       = nullptr;
-    Clock*            m_gameClock    = nullptr;
     eGameState        m_gameState    = eGameState::Attract;
     std::vector<Map*> m_maps;
     Map*              m_currentMap = nullptr;

@@ -7,6 +7,7 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
+#include "Engine/Renderer/ConstantBuffer.hpp"
 
 //-Forward-Declaration--------------------------------------------------------------------------------
 class Actor;
@@ -32,9 +33,9 @@ public:
     void AddGeometryForCeiling(VertexList_PCUTBN& verts, IndexList& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
     void CreateBuffers();
 
-    bool  IsPositionInBounds(Vec3 position, float tolerance = 0.f) const;
-    bool  AreCoordsInBounds(int x, int y) const;
-    Tile* GetTile(int x, int y) const;
+    bool        IsPositionInBounds(Vec3 position, float tolerance = 0.f) const;
+    bool        IsTileCoordsOutOfBounds(int x, int y) const;
+    Tile const* GetTile(int x, int y) const;
 
     void Update();
     void CollideActors();
@@ -64,4 +65,9 @@ protected:
     Shader*           m_shader       = nullptr;
     VertexBuffer*     m_vertexBuffer = nullptr;
     IndexBuffer*      m_indexBuffer  = nullptr;
+
+    ConstantBuffer* m_lightCBO         = nullptr;
+    Vec3            m_sunDirection     = Vec3(2.f, 1.f, -1.f).GetNormalized();
+    float           m_sunIntensity     = 0.85f;
+    float           m_ambientIntensity = 0.35f;
 };

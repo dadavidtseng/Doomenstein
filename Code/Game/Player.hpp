@@ -15,8 +15,13 @@ class Game;
 class Player
 {
 public:
+    // Construction / Destruction
     explicit Player(Game* owner);
     ~Player();
+    Player(Player& copyFrom)             = delete;
+    Player(Player&& moveFrom)            = delete;
+    Player& operator=(Player& copyFrom)  = delete;
+    Player& operator=(Player&& moveFrom) = delete;
 
     void Update(float deltaSeconds);
     void Render() const;
@@ -24,7 +29,7 @@ public:
     void UpdateFromController();
 
     Camera* GetCamera() const;
-    Mat44 GetModelToWorldTransform() const;
+    Mat44   GetModelToWorldTransform() const;
 
     Game*       m_game            = nullptr;
     Vec3        m_position        = Vec3::ZERO;
@@ -34,5 +39,5 @@ public:
     Rgba8       m_color           = Rgba8::WHITE;
 
 private:
-    Camera*     m_worldCamera     = nullptr;
+    Camera* m_worldCamera = nullptr;
 };

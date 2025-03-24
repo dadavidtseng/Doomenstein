@@ -15,6 +15,8 @@ struct TileDefinition
     ~TileDefinition();
 
     static void                         InitializeTileDefs();
+    static TileDefinition const*        GetTileDefByName(String const& name);
+    static StringList                   GetTileNames();
     static std::vector<TileDefinition*> s_tileDefinitions;
 
     String  m_name;
