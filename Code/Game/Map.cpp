@@ -14,7 +14,6 @@
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
-#include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/MapDefinition.hpp"
 #include "Game/Tile.hpp"
@@ -109,13 +108,6 @@ void Map::CreateGeometry()
         for (int j = 0; j < m_dimensions.y; ++j)
         {
             AABB3 const bounds = AABB3(Vec3(i, j, 0), Vec3(i + 1, j + 1, 1));
-
-            m_indexes.push_back(indexOffset);
-            m_indexes.push_back(indexOffset + 1);
-            m_indexes.push_back(indexOffset + 2);
-            m_indexes.push_back(indexOffset);
-            m_indexes.push_back(indexOffset + 2);
-            m_indexes.push_back(indexOffset + 3);
 
             IntVec2 currentTileCoords = IntVec2(i, j);
             AABB2   wallUVs, floorUVs, ceilingUVs;
