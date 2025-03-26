@@ -27,10 +27,10 @@ public:
     Game();
     ~Game();
 
-    void Update();
-    void Render() const;
-    bool IsAttractMode() const;
-    Clock*            m_gameClock    = nullptr;
+    void   Update();
+    void   Render() const;
+    bool   IsAttractMode() const;
+    Clock* m_gameClock = nullptr;
 
 private:
     void UpdateFromKeyBoard();
@@ -39,9 +39,9 @@ private:
     void RenderAttractMode() const;
     void RenderEntities() const;
 
+    void InitializeMaps();
     void SpawnPlayer();
 
-    void InitializeMaps();
 
     Camera*           m_screenCamera = nullptr;
     Player*           m_player       = nullptr;

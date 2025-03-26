@@ -21,10 +21,9 @@ Player::Player(Game* owner)
 
     m_worldCamera->SetPerspectiveGraphicView(2.f, 60.f, 0.1f, 100.f);
 
-    m_worldCamera->SetPosition(Vec3(-2, 0, 0));
+    m_worldCamera->SetPosition(Vec3(-2.f, 0.f, 0.f));
 
-    m_position    = Vec3(3.f, 3.f, 10.f);
-    m_orientation = EulerAngles(45.f, 30.f, 0.f);
+    m_position = Vec3(2.5f, 8.5f, 0.5f);
 
     Mat44 c2r;
 
@@ -41,8 +40,11 @@ Player::Player(Game* owner)
 //----------------------------------------------------------------------------------------------------
 Player::~Player()
 {
-    delete m_worldCamera;
-    m_worldCamera = nullptr;
+    if (m_worldCamera!=nullptr)
+    {
+        delete m_worldCamera;
+        m_worldCamera = nullptr;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -57,6 +59,11 @@ void Player::Update(float deltaSeconds)
             // m_position    = Vec3::ZERO;
             // m_orientation = EulerAngles::ZERO;
         }
+    }
+
+    if (!m_isMovable)
+    {
+        return;
     }
 
     Vec3 forward;
@@ -111,6 +118,8 @@ void Player::Update(float deltaSeconds)
     m_orientation.m_rollDegrees = GetClamped(m_orientation.m_rollDegrees, -45.f, 45.f);
 
     m_worldCamera->SetPositionAndOrientation(m_position, m_orientation);
+
+    UpdateFromKeyBoard();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -121,6 +130,11 @@ void Player::Render() const
 //----------------------------------------------------------------------------------------------------
 void Player::UpdateFromKeyBoard()
 {
+    if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
+    {
+        g_theEventSystem->FireEvent("ToggleActorStatic");
+        m_isMovable = !m_isMovable;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------

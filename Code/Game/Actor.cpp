@@ -6,34 +6,90 @@
 #include "Game/Actor.hpp"
 
 #include "GameCommon.hpp"
+#include "Engine/Core/Clock.hpp"
+#include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/AABB3.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Renderer.hpp"
+
+//----------------------------------------------------------------------------------------------------
+STATIC bool Actor::m_isStatic = true;
 
 //----------------------------------------------------------------------------------------------------
 Actor::Actor(Vec3 const&        position,
              EulerAngles const& orientation,
              float const        radius,
              float const        height,
+             bool const         isMovable,
              Rgba8 const&       color)
     : m_position(position),
       m_orientation(orientation),
       m_radius(radius),
       m_height(height),
+      m_isMovable(isMovable),
       m_color(color)
 {
+    g_theEventSystem->SubscribeEventCallbackFunction("ToggleActorStatic", OnToggleActorStatic);
     m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
+}
+
+//----------------------------------------------------------------------------------------------------
+STATIC bool Actor::OnToggleActorStatic(EventArgs& args)
+{
+    UNUSED(args)
+
+    m_isStatic = !m_isStatic;
+
+    return true;
 }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::Update()
 {
+    if (m_isStatic || !m_isMovable) return;
+
+    XboxController const& controller = g_theInput->GetController(0);
+
+    if (g_theInput->WasKeyJustPressed(KEYCODE_H) || controller.WasButtonJustPressed(XBOX_BUTTON_START))
+    {
+        // if (m_game->IsAttractMode() == false)
+        // {
+        //     // m_position    = Vec3::ZERO;
+        //     // m_orientation = EulerAngles::ZERO;
+        // }
+    }
+    float deltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
+
+    Vec3 forward;
+    Vec3 left;
+    Vec3 up;
+    m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
+
+    float constexpr moveSpeed = 2.f;
+
+    Vec2 const leftStickInput = controller.GetLeftStick().GetPosition();
+    m_position += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 10.f;
+    if (g_theInput->IsKeyDown(KEYCODE_W)) m_position += forward * moveSpeed * deltaSeconds;
+    if (g_theInput->IsKeyDown(KEYCODE_S)) m_position -= forward * moveSpeed * deltaSeconds;
+    if (g_theInput->IsKeyDown(KEYCODE_A)) m_position += left * moveSpeed * deltaSeconds;
+    if (g_theInput->IsKeyDown(KEYCODE_D)) m_position -= left * moveSpeed * deltaSeconds;
+    if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_position -= Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
+    if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_position += Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
+
+    m_cylinder.m_startPosition = m_position;
+    m_cylinder.m_endPosition   = m_position + Vec3(0.f, 0.f, m_height);
 }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::Render() const
 {
     VertexList_PCU verts;
+
 
     AddVertsForCylinder3D(verts, m_cylinder.m_startPosition, m_cylinder.m_endPosition, m_cylinder.m_radius, m_color);
     AddVertsForWireframeCylinder3D(verts, m_cylinder.m_startPosition, m_cylinder.m_endPosition, m_cylinder.m_radius, 0.001f);

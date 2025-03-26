@@ -36,6 +36,7 @@ public:
     Vec3        m_velocity        = Vec3::ZERO;
     EulerAngles m_orientation     = EulerAngles::ZERO;
     EulerAngles m_angularVelocity = EulerAngles::ZERO;
+    bool        m_isMovable       = true;
     Rgba8       m_color           = Rgba8::WHITE;
 
 private:

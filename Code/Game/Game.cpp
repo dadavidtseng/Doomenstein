@@ -87,24 +87,30 @@ void Game::Render() const
 {
     //-Start-of-Game-Camera---------------------------------------------------------------------------
 
-    g_theRenderer->BeginCamera(*m_player->GetCamera());
-
-    if (m_gameState == eGameState::Game)
+    if (m_player != nullptr)
     {
-        RenderEntities();
-        if (m_currentMap != nullptr)
-        {
-            m_currentMap->Render();
-        }
-    }
+        g_theRenderer->BeginCamera(*m_player->GetCamera());
 
-    g_theRenderer->EndCamera(*m_player->GetCamera());
+        if (m_gameState == eGameState::Game)
+        {
+            RenderEntities();
+            if (m_currentMap != nullptr)
+            {
+                m_currentMap->Render();
+            }
+        }
+
+        g_theRenderer->EndCamera(*m_player->GetCamera());
+    }
 
     //-End-of-Game-Camera-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
     if (m_gameState == eGameState::Game)
     {
-        DebugRenderWorld(*m_player->GetCamera());
+        if (m_player != nullptr)
+        {
+            DebugRenderWorld(*m_player->GetCamera());
+        }
     }
     //------------------------------------------------------------------------------------------------
     //-Start-of-Screen-Camera-------------------------------------------------------------------------
@@ -144,6 +150,8 @@ void Game::UpdateFromKeyBoard()
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
         {
             m_gameState = eGameState::Game;
+
+            SpawnPlayer();
         }
     }
 
@@ -152,6 +160,12 @@ void Game::UpdateFromKeyBoard()
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
             m_gameState = eGameState::Attract;
+
+            if (m_player != nullptr)
+            {
+                delete m_player;
+                m_player = nullptr;
+            }
         }
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_P))
@@ -237,7 +251,10 @@ void Game::UpdateFromKeyBoard()
             DebugAddMessage(Stringf("Camera Orientation: (%.2f, %.2f, %.2f)", orientationX, orientationY, orientationZ), 5.f);
         }
 
-        DebugAddMessage(Stringf("Player Position: (%.2f, %.2f, %.2f)", m_player->m_position.x, m_player->m_position.y, m_player->m_position.z), 0.f);
+        if (m_player != nullptr)
+        {
+            DebugAddMessage(Stringf("Player Position: (%.2f, %.2f, %.2f)", m_player->m_position.x, m_player->m_position.y, m_player->m_position.z), 0.f);
+        }
     }
 }
 
@@ -291,11 +308,12 @@ void Game::UpdateFromController()
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateEntities(float const gameDeltaSeconds, float const systemDeltaSeconds) const
 {
-    m_player->Update(systemDeltaSeconds);
+    if (m_player != nullptr)
+    {
+        m_player->Update(systemDeltaSeconds);
+    }
 
-    float const time = static_cast<float>(m_gameClock->GetTotalSeconds());
-
-    DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / m_gameClock->GetDeltaSeconds(), m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
+    DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / gameDeltaSeconds, m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
 }
 
 //----------------------------------------------------------------------------------------------------

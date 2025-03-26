@@ -4,6 +4,7 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
+#include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/Cylinder3.hpp"
 #include "Engine/Math/EulerAngles.hpp"
@@ -13,7 +14,10 @@
 class Actor
 {
 public:
-    Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, Rgba8 const& color);
+    Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
+
+    static bool OnToggleActorStatic(EventArgs& args);
+    static bool m_isStatic;
 
     void  Update();
     void  Render() const;
@@ -23,6 +27,8 @@ public:
     EulerAngles m_orientation = EulerAngles::ZERO;
     float       m_radius      = 0.f;
     float       m_height      = 0.f;
+    bool        m_isMovable   = false;
     Rgba8       m_color       = Rgba8::WHITE;
-    Cylinder3   m_cylinder;
+
+    Cylinder3 m_cylinder;
 };
