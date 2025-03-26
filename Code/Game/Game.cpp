@@ -33,8 +33,6 @@ Game::Game()
 
     m_gameClock = new Clock(Clock::GetSystemClock());
 
-    m_player->m_position = Vec3(-2.f, 0.f, 1.f);
-
     DebugAddWorldBasis(Mat44(), -1.f);
 
     Mat44 transform;
@@ -54,6 +52,12 @@ Game::Game()
 //----------------------------------------------------------------------------------------------------
 Game::~Game()
 {
+    if (m_currentMap != nullptr)
+    {
+        delete m_currentMap;
+        m_currentMap = nullptr;
+    }
+
     delete m_gameClock;
     m_gameClock = nullptr;
 

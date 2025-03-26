@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Map.hpp"
 
+#include "Actor.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -14,6 +15,7 @@
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
+#include "Engine/Renderer/VertexBuffer.hpp"
 #include "Game/GameCommon.hpp"
 #include "Game/MapDefinition.hpp"
 #include "Game/Tile.hpp"
@@ -30,6 +32,7 @@ Map::Map(Game*                owner,
 
     m_vertexes.reserve(sizeof(AABB3) * m_dimensions.x * m_dimensions.y);
     m_tiles.reserve(static_cast<unsigned int>(m_dimensions.x * m_dimensions.y));
+    m_actors.reserve(3);
 
     m_texture = m_definition->m_spriteSheetTexture;
     m_shader  = m_definition->m_shader;
@@ -59,11 +62,35 @@ Map::Map(Game*                owner,
     // }
 
     m_lightCBO = g_theRenderer->CreateConstantBuffer(sizeof(LightConstants));
+
+    Actor actor = Actor(Vec3::ZERO, EulerAngles::ZERO);
+    m_actors.push_back(&actor);
 }
 
 //----------------------------------------------------------------------------------------------------
 Map::~Map()
 {
+    if (m_lightCBO != nullptr)
+    {
+        delete m_lightCBO;
+        m_lightCBO = nullptr;
+    }
+
+    if (m_vertexBuffer != nullptr)
+    {
+        delete m_vertexBuffer;
+        m_vertexBuffer = nullptr;
+    }
+
+    if (m_indexBuffer != nullptr)
+    {
+        delete m_indexBuffer;
+        m_indexBuffer = nullptr;
+    }
+
+    m_vertexes.clear();
+    m_tiles.clear();
+    m_indexes.clear();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -305,20 +332,16 @@ void Map::CollideActorWithMap(Actor* actor)
 //----------------------------------------------------------------------------------------------------
 void Map::Render() const
 {
-    LightConstants lightConstants;
-
-    Vec3 const normalizedSunDirection = m_sunDirection.GetNormalized();
-
-    lightConstants.SunDirection[0]  = normalizedSunDirection.x;
-    lightConstants.SunDirection[1]  = normalizedSunDirection.y;
-    lightConstants.SunDirection[2]  = normalizedSunDirection.z;
-    lightConstants.SunIntensity     = m_sunIntensity;
-    lightConstants.AmbientIntensity = m_ambientIntensity;
-
-    g_theRenderer->CopyCPUToGPU(&lightConstants, sizeof(LightConstants), m_lightCBO);
-    g_theRenderer->BindConstantBuffer(Renderer::k_lightConstantSlot, m_lightCBO);
+    for (int i = 0; i < (int)m_actors.size(); i++)
+    {
+        if (m_actors[i])
+        {
+            m_actors[i]->Render();
+        }
+    }
 
     g_theRenderer->SetModelConstants();
+    g_theRenderer->SetLightConstants(m_sunDirection, m_sunIntensity, m_ambientIntensity);
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
     g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
@@ -330,9 +353,17 @@ void Map::Render() const
 }
 
 //----------------------------------------------------------------------------------------------------
-RaycastResult3D Map::RaycastAll(Vec3 const& start, Vec3 const& direction, float distance) const
+RaycastResult3D Map::RaycastAll(Vec3 const& start,
+                                Vec3 const& direction,
+                                float const distance) const
 {
-    return {};
+    RaycastResult3D result;
+
+    result = RaycastWorldXY(start, direction, distance);
+    result = RaycastWorldZ(start, direction, distance);
+    result = RaycastWorldActors(start, direction, distance);
+
+    return result;
 }
 
 //----------------------------------------------------------------------------------------------------

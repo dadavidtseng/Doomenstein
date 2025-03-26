@@ -70,4 +70,6 @@ protected:
     Vec3            m_sunDirection     = Vec3(2.f, 1.f, -1.f).GetNormalized();
     float           m_sunIntensity     = 0.85f;
     float           m_ambientIntensity = 0.35f;
+
+    std::vector<Actor*> m_actors;
 };

@@ -15,14 +15,16 @@
 
 //----------------------------------------------------------------------------------------------------
 Player::Player(Game* owner)
-
 {
-    m_game = owner;
+    m_game        = owner;
     m_worldCamera = new Camera();
 
     m_worldCamera->SetPerspectiveGraphicView(2.f, 60.f, 0.1f, 100.f);
 
     m_worldCamera->SetPosition(Vec3(-2, 0, 0));
+
+    m_position    = Vec3(3.f, 3.f, 10.f);
+    m_orientation = EulerAngles(45.f, 30.f, 0.f);
 
     Mat44 c2r;
 

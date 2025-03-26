@@ -8,6 +8,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/Renderer.hpp"
+#include "Engine/Renderer/Shader.hpp"
 #include "Game/GameCommon.hpp"
 
 //----------------------------------------------------------------------------------------------------
@@ -27,8 +28,15 @@ MapDefinition::MapDefinition(XmlElement const& mapDefElement)
     m_spriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile(spriteSheetTextureFilePath.c_str());
 }
 
+//----------------------------------------------------------------------------------------------------
 MapDefinition::~MapDefinition()
 {
+    for (MapDefinition* mapDef: s_mapDefinitions)
+    {
+        delete mapDef;
+    }
+
+    s_mapDefinitions.clear();
 }
 
 //----------------------------------------------------------------------------------------------------

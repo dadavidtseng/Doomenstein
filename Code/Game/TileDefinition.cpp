@@ -24,6 +24,7 @@ TileDefinition::TileDefinition(XmlElement const& tileDefElement)
 //----------------------------------------------------------------------------------------------------
 TileDefinition::~TileDefinition()
 {
+    s_tileDefinitions.clear();
 }
 
 //----------------------------------------------------------------------------------------------------
