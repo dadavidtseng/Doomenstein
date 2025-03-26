@@ -66,7 +66,6 @@ protected:
     VertexBuffer*     m_vertexBuffer = nullptr;
     IndexBuffer*      m_indexBuffer  = nullptr;
 
-    ConstantBuffer* m_lightCBO         = nullptr;
     Vec3            m_sunDirection     = Vec3(2.f, 1.f, -1.f).GetNormalized();
     float           m_sunIntensity     = 0.85f;
     float           m_ambientIntensity = 0.35f;

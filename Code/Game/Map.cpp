@@ -61,8 +61,6 @@ Map::Map(Game*                owner,
     //     }
     // }
 
-    m_lightCBO = g_theRenderer->CreateConstantBuffer(sizeof(LightConstants));
-
     m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, Rgba8::RED));
     m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, Rgba8::RED));
     m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, Rgba8::RED));
@@ -72,12 +70,6 @@ Map::Map(Game*                owner,
 //----------------------------------------------------------------------------------------------------
 Map::~Map()
 {
-    if (m_lightCBO != nullptr)
-    {
-        delete m_lightCBO;
-        m_lightCBO = nullptr;
-    }
-
     if (m_vertexBuffer != nullptr)
     {
         delete m_vertexBuffer;
