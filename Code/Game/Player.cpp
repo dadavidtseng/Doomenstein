@@ -6,12 +6,14 @@
 #include "Game/Player.hpp"
 
 #include "Game.hpp"
+#include "Map.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Camera.hpp"
+#include "Engine/Renderer/DebugRenderSystem.hpp"
 
 //----------------------------------------------------------------------------------------------------
 Player::Player(Game* owner)
@@ -40,7 +42,7 @@ Player::Player(Game* owner)
 //----------------------------------------------------------------------------------------------------
 Player::~Player()
 {
-    if (m_worldCamera!=nullptr)
+    if (m_worldCamera != nullptr)
     {
         delete m_worldCamera;
         m_worldCamera = nullptr;
@@ -59,6 +61,19 @@ void Player::Update(float deltaSeconds)
             // m_position    = Vec3::ZERO;
             // m_orientation = EulerAngles::ZERO;
         }
+    }
+
+    if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
+    {
+        Vec3            forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+        Ray3            ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
+        RaycastResult3D result        = m_game->GetCurrentMap()->RaycastWorldActors(m_position, forwardNormal, ray.m_maxLength);
+
+
+        DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.005f, 10.f);
+        DebugAddWorldPoint( result.m_impactPosition, 0.02f, 10.f, Rgba8::BLUE);
+        DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition+result.m_impactNormal.GetNormalized(), 0.000005f, 10.f, Rgba8::YELLOW,Rgba8::YELLOW);
+        DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition+ray.m_forwardNormal*ray.m_maxLength, 0.005f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
     }
 
     if (!m_isMovable)

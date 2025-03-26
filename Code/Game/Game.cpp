@@ -138,6 +138,12 @@ bool Game::IsAttractMode() const
 }
 
 //----------------------------------------------------------------------------------------------------
+Map* Game::GetCurrentMap() const
+{
+    return m_currentMap;
+}
+
+//----------------------------------------------------------------------------------------------------
 void Game::UpdateFromKeyBoard()
 {
     if (m_gameState == eGameState::Attract)

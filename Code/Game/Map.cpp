@@ -6,11 +6,13 @@
 #include "Game/Map.hpp"
 
 #include "Actor.hpp"
+#include "Game.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/Vertex_PCUTBN.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Math/FloatRange.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
@@ -395,7 +397,26 @@ RaycastResult3D Map::RaycastWorldZ(Vec3 const& start,
 //----------------------------------------------------------------------------------------------------
 RaycastResult3D Map::RaycastWorldActors(Vec3 const& start,
                                         Vec3 const& direction,
-                                        float       distance) const
+                                        float const distance) const
 {
-    return {};
+    RaycastResult3D closestResult;
+    closestResult.m_didImpact = false;
+    float closestDistance     = distance;
+
+    for (int i = 0; i < m_actors.size(); i++)
+    {
+        Cylinder3       cylinder3 = m_actors[i]->m_cylinder;
+        RaycastResult3D result    = RaycastVsCylinderZ3D(start, direction, distance,
+                                                         cylinder3.GetCenterPositionXY(),
+                                                         cylinder3.GetFloatRange(),
+                                                         cylinder3.m_radius);
+
+        if (result.m_didImpact && result.m_impactLength < closestDistance)
+        {
+            closestResult   = result;
+            closestDistance = result.m_impactLength;
+        }
+    }
+
+    return closestResult;
 }

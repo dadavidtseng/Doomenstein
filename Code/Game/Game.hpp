@@ -30,6 +30,7 @@ public:
     void   Update();
     void   Render() const;
     bool   IsAttractMode() const;
+    Map*   GetCurrentMap() const;
     Clock* m_gameClock = nullptr;
 
 private:
