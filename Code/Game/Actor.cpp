@@ -12,11 +12,17 @@
 
 //----------------------------------------------------------------------------------------------------
 Actor::Actor(Vec3 const&        position,
-             EulerAngles const& orientation)
+             EulerAngles const& orientation,
+             float const        radius,
+             float const        height,
+             Rgba8 const&       color)
     : m_position(position),
-      m_orientation(orientation)
+      m_orientation(orientation),
+      m_radius(radius),
+      m_height(height),
+      m_color(color)
 {
-    m_cylinder = Cylinder3(m_position, m_position + Vec3::Z_BASIS, 10.f);
+    m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -29,18 +35,18 @@ void Actor::Render() const
 {
     VertexList_PCU verts;
 
-    // AddVertsForCylinder3D(verts, m_cylinder.m_startPosition,m_cylinder.m_endPosition, 3.f);
-    AddVertsForCylinder3D(verts, m_position, m_position + Vec3::Z_BASIS, 10.f);
-    // AddVertsForAABB3D(verts, AABB3::ZERO_TO_ONE);
-    g_theRenderer->SetModelConstants(GetModelToWorldTransform(),Rgba8::RED);
+    AddVertsForCylinder3D(verts, m_cylinder.m_startPosition, m_cylinder.m_endPosition, m_cylinder.m_radius, m_color);
+    AddVertsForWireframeCylinder3D(verts, m_cylinder.m_startPosition, m_cylinder.m_endPosition, m_cylinder.m_radius, 0.001f);
+
+    g_theRenderer->SetModelConstants();
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
     g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
     g_theRenderer->BindTexture(nullptr);
     g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Default", eVertexType::VERTEX_PCU));
 
-    g_theRenderer->DrawVertexArray((int)verts.size(), verts.data());
+    g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());
 }
 
 Mat44 Actor::GetModelToWorldTransform() const

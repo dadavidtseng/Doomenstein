@@ -32,7 +32,7 @@ Map::Map(Game*                owner,
 
     m_vertexes.reserve(sizeof(AABB3) * m_dimensions.x * m_dimensions.y);
     m_tiles.reserve(static_cast<unsigned int>(m_dimensions.x * m_dimensions.y));
-    m_actors.reserve(3);
+    m_actors.reserve(4);
 
     m_texture = m_definition->m_spriteSheetTexture;
     m_shader  = m_definition->m_shader;
@@ -63,8 +63,10 @@ Map::Map(Game*                owner,
 
     m_lightCBO = g_theRenderer->CreateConstantBuffer(sizeof(LightConstants));
 
-    Actor actor = Actor(Vec3::ZERO, EulerAngles::ZERO);
-    m_actors.push_back(&actor);
+    m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, Rgba8::RED));
+    m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, Rgba8::RED));
+    m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, Rgba8::RED));
+    m_actors.push_back(new Actor(Vec3(5.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.0625f, 0.125f, Rgba8::BLUE));
 }
 
 //----------------------------------------------------------------------------------------------------

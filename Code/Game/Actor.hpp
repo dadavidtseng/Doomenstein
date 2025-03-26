@@ -13,14 +13,16 @@
 class Actor
 {
 public:
-    Actor(Vec3 const& position, EulerAngles const& orientation);
+    Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, Rgba8 const& color);
 
-    void Update();
-    void Render() const;
+    void  Update();
+    void  Render() const;
     Mat44 GetModelToWorldTransform() const;
 
     Vec3        m_position    = Vec3::ZERO;
     EulerAngles m_orientation = EulerAngles::ZERO;
+    float       m_radius      = 0.f;
+    float       m_height      = 0.f;
     Rgba8       m_color       = Rgba8::WHITE;
     Cylinder3   m_cylinder;
 };
