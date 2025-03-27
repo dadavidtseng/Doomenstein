@@ -527,6 +527,7 @@ RaycastResult3D Map::RaycastWorldXY(Vec3 const& start,
     Vec3  rayStep         = result.m_rayForwardNormal * 0.01f; // 每次移動的步長
     Vec3  currentPosition = start;
     float traveledDist    = 0.f;
+    FloatRange range = FloatRange(0.f, 1.f);
 
     while (traveledDist < distance)
     {
@@ -538,15 +539,23 @@ RaycastResult3D Map::RaycastWorldXY(Vec3 const& start,
         // 超出邊界時的處理
         if (IsTileCoordsOutOfBounds(tileCoords))
         {
-            result.m_didImpact      = true;
+            result.m_didImpact      = false;
             result.m_impactPosition = currentPosition;
-            result.m_impactLength   = traveledDist;
             result.m_impactNormal   = -result.m_rayForwardNormal;
             return result;
         }
 
-        // 碰撞到牆壁（非水面）時的處理
-        if (IsTileSolid(tileCoords))
+
+        AABB3 const aabb3Box        = GetTile(tileCoords.x, tileCoords.y)->m_bounds;
+        AABB2 const aabb2Box        = AABB2(Vec2(aabb3Box.m_mins.x, aabb3Box.m_mins.y), Vec2(aabb3Box.m_maxs.x, aabb3Box.m_maxs.y));
+        Vec3 prePosition = currentPosition - result.m_rayForwardNormal * rayStep.GetLength();;
+Vec2 prePositionXY = Vec2(prePosition.x, prePosition.y);
+        Vec2        currentPositionXY = Vec2(currentPosition.x, currentPosition.y);
+
+        bool isPointInside = aabb2Box.IsPointInside(prePositionXY);
+
+
+        if (IsTileSolid(tileCoords)&&range.IsOnRange(currentPosition.z)&&!isPointInside)
         {
             result.m_didImpact      = true;
             result.m_impactPosition = currentPosition;
@@ -575,6 +584,17 @@ RaycastResult3D Map::RaycastWorldZ(Vec3 const& start,
     result.m_rayStartPosition = start;
     result.m_rayForwardNormal = forwardNormal;
     result.m_rayMaxLength     = distance;
+
+    Vec3 endPosition = start+forwardNormal*distance;
+    IntVec2 tileCoords = IntVec2(RoundDownToInt(endPosition.x), RoundDownToInt(endPosition.y));
+
+    if (IsTileCoordsOutOfBounds(tileCoords))
+    {
+        result.m_didImpact      = false;
+        result.m_impactPosition = start;
+        result.m_impactNormal   = -result.m_rayForwardNormal;
+        return result;
+    }
 
     float vz = forwardNormal.z * distance;
     float Sz = start.z;
