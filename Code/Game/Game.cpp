@@ -91,9 +91,10 @@ void Game::Render() const
     {
         g_theRenderer->BeginCamera(*m_player->GetCamera());
 
-        if (m_gameState == eGameState::Game)
+        if (m_currentGameState == eGameState::INGAME)
         {
             RenderEntities();
+
             if (m_currentMap != nullptr)
             {
                 m_currentMap->Render();
@@ -105,27 +106,35 @@ void Game::Render() const
 
     //-End-of-Game-Camera-----------------------------------------------------------------------------
     //------------------------------------------------------------------------------------------------
-    if (m_gameState == eGameState::Game)
+
+    if (m_currentGameState == eGameState::INGAME)
     {
         if (m_player != nullptr)
         {
             DebugRenderWorld(*m_player->GetCamera());
         }
     }
+
     //------------------------------------------------------------------------------------------------
     //-Start-of-Screen-Camera-------------------------------------------------------------------------
 
     g_theRenderer->BeginCamera(*m_screenCamera);
 
-    if (m_gameState == eGameState::Attract)
+    if (m_currentGameState == eGameState::ATTRACT)
     {
         RenderAttractMode();
+    }
+
+    if (m_currentGameState == eGameState::INGAME)
+    {
+        RenderInGame();
     }
 
     g_theRenderer->EndCamera(*m_screenCamera);
 
     //-End-of-Screen-Camera---------------------------------------------------------------------------
-    if (m_gameState == eGameState::Game)
+
+    if (m_currentGameState == eGameState::INGAME)
     {
         DebugRenderScreen(*m_screenCamera);
     }
@@ -134,19 +143,24 @@ void Game::Render() const
 //----------------------------------------------------------------------------------------------------
 bool Game::IsAttractMode() const
 {
-    return m_gameState == eGameState::Attract;
+    return m_currentGameState == eGameState::ATTRACT;
 }
 
 //----------------------------------------------------------------------------------------------------
 Map* Game::GetCurrentMap() const
 {
+    if (m_currentMap == nullptr)
+    {
+        ERROR_AND_DIE("(Game::GetCurrentMap) m_currentMap is nullptr")
+    }
+
     return m_currentMap;
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateFromKeyBoard()
 {
-    if (m_gameState == eGameState::Attract)
+    if (m_currentGameState == eGameState::ATTRACT)
     {
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
@@ -155,17 +169,17 @@ void Game::UpdateFromKeyBoard()
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
         {
-            m_gameState = eGameState::Game;
+            m_currentGameState = eGameState::INGAME;
 
             SpawnPlayer();
         }
     }
 
-    if (m_gameState == eGameState::Game)
+    if (m_currentGameState == eGameState::INGAME)
     {
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
-            m_gameState = eGameState::Attract;
+            m_currentGameState = eGameState::ATTRACT;
 
             if (m_player != nullptr)
             {
@@ -269,7 +283,7 @@ void Game::UpdateFromController()
 {
     XboxController const& controller = g_theInput->GetController(0);
 
-    if (m_gameState == eGameState::Attract)
+    if (m_currentGameState == eGameState::ATTRACT)
     {
         if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
         {
@@ -278,15 +292,15 @@ void Game::UpdateFromController()
 
         if (controller.WasButtonJustPressed(XBOX_BUTTON_START))
         {
-            m_gameState = eGameState::Game;
+            m_currentGameState = eGameState::INGAME;
         }
     }
 
-    if (m_gameState == eGameState::Game)
+    if (m_currentGameState == eGameState::INGAME)
     {
         if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
         {
-            m_gameState = eGameState::Attract;
+            m_currentGameState = eGameState::ATTRACT;
         }
 
         if (controller.WasButtonJustPressed(XBOX_BUTTON_B))
@@ -329,9 +343,22 @@ void Game::RenderAttractMode() const
 }
 
 //----------------------------------------------------------------------------------------------------
+void Game::RenderInGame() const
+{
+    if (m_player->m_isMovable)
+    {
+        DebugAddScreenText(Stringf("(F1)Control Mode:Player Camera"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
+    }
+    else
+    {
+        DebugAddScreenText(Stringf("(F1)Control Mode:Actor"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
 void Game::RenderEntities() const
 {
-    g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
+    // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
     m_player->Render();
 }
 
@@ -339,6 +366,23 @@ void Game::RenderEntities() const
 void Game::SpawnPlayer()
 {
     m_player = new Player(this);
+}
+
+//----------------------------------------------------------------------------------------------------
+void Game::ChangeState(eGameState const nextState)
+{
+    if (m_currentGameState == nextState)
+    {
+        return;
+    }
+
+    m_currentGameState = nextState;
+}
+
+//----------------------------------------------------------------------------------------------------
+eGameState Game::GetGameState() const
+{
+    return m_currentGameState;
 }
 
 //----------------------------------------------------------------------------------------------------

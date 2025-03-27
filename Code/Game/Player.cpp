@@ -63,23 +63,7 @@ void Player::Update(float deltaSeconds)
         }
     }
 
-    if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
-    {
-        Vec3            forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
-        Ray3            ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
-        RaycastResult3D result        = m_game->GetCurrentMap()->RaycastWorldActors(m_position, forwardNormal, ray.m_maxLength);
-
-
-        DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.005f, 10.f);
-        DebugAddWorldPoint( result.m_impactPosition, 0.02f, 10.f, Rgba8::BLUE);
-        DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition+result.m_impactNormal.GetNormalized(), 0.000005f, 10.f, Rgba8::YELLOW,Rgba8::YELLOW);
-        DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition+ray.m_forwardNormal*ray.m_maxLength, 0.005f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
-    }
-
-    if (!m_isMovable)
-    {
-        return;
-    }
+    UpdateFromKeyBoard();
 
     Vec3 forward;
     Vec3 left;
@@ -88,20 +72,6 @@ void Player::Update(float deltaSeconds)
 
     m_velocity                = Vec3::ZERO;
     float constexpr moveSpeed = 2.f;
-
-    Vec2 const leftStickInput = controller.GetLeftStick().GetPosition();
-    m_velocity += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
-
-    if (g_theInput->IsKeyDown(KEYCODE_W)) m_velocity += forward * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_S)) m_velocity -= forward * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_A)) m_velocity += left * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_D)) m_velocity -= left * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_velocity -= Vec3(0.f, 0.f, 1.f) * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_velocity += Vec3(0.f, 0.f, 1.f) * moveSpeed;
-
-    if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 10.f;
-
-    m_position += m_velocity * deltaSeconds;
 
     Vec2 const rightStickInput = controller.GetRightStick().GetPosition();
     m_orientation.m_yawDegrees -= rightStickInput.x * 0.125f;
@@ -134,7 +104,24 @@ void Player::Update(float deltaSeconds)
 
     m_worldCamera->SetPositionAndOrientation(m_position, m_orientation);
 
-    UpdateFromKeyBoard();
+    if (!m_isMovable)
+    {
+        return;
+    }
+
+    Vec2 const leftStickInput = controller.GetLeftStick().GetPosition();
+    m_velocity += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
+
+    if (g_theInput->IsKeyDown(KEYCODE_W)) m_velocity += forward * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_S)) m_velocity -= forward * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_A)) m_velocity += left * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_D)) m_velocity -= left * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_velocity -= Vec3(0.f, 0.f, 1.f) * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_velocity += Vec3(0.f, 0.f, 1.f) * moveSpeed;
+
+    if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 10.f;
+
+    m_position += m_velocity * deltaSeconds;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -149,6 +136,25 @@ void Player::UpdateFromKeyBoard()
     {
         g_theEventSystem->FireEvent("ToggleActorStatic");
         m_isMovable = !m_isMovable;
+    }
+
+    if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
+    {
+        Vec3 const            forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+        Ray3 const            ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
+        RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
+
+        if (result.m_didImpact == true)
+        {
+            DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.01f, 10.f);
+            DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
+            DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal*0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
+            DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
+        }
+        else
+        {
+            DebugAddWorldArrow(ray.m_startPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::GREEN, Rgba8::GREEN);
+        }
     }
 }
 

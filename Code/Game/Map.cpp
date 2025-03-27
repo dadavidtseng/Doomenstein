@@ -111,8 +111,9 @@ void Map::CreateTiles()
             {
                 if (m_definition->m_image.GetTexelColor(coords) == tileDef->m_mapImagePixelColor)
                 {
-                    m_tiles[j + i * m_dimensions.y].m_bounds = bounds;
-                    m_tiles[j + i * m_dimensions.y].m_name   = tileDef->m_name;
+                    m_tiles[j + i * m_dimensions.y].m_bounds  = bounds;
+                    m_tiles[j + i * m_dimensions.y].m_name    = tileDef->m_name;
+                    m_tiles[j + i * m_dimensions.y].m_isSolid = tileDef->m_isSolid;
                 }
             }
         }
@@ -229,9 +230,18 @@ void Map::CreateBuffers()
 }
 
 //----------------------------------------------------------------------------------------------------
-bool Map::IsPositionInBounds(Vec3 position, float const tolerance) const
+bool Map::IsPositionInBounds(Vec3 const& position,
+                             float const tolerance) const
 {
-    return false;
+    return
+        position.x < (float)m_dimensions.x + tolerance &&
+        position.y < (float)m_dimensions.y + tolerance;
+}
+
+//----------------------------------------------------------------------------------------------------
+bool Map::IsTileCoordsOutOfBounds(IntVec2 const& tileCoords) const
+{
+    return IsTileCoordsOutOfBounds(tileCoords.x, tileCoords.y);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -243,6 +253,21 @@ bool Map::IsTileCoordsOutOfBounds(int const x,
         x >= m_dimensions.x ||
         y < 0 ||
         y >= m_dimensions.y;
+}
+
+//----------------------------------------------------------------------------------------------------
+bool Map::IsTileSolid(IntVec2 const& tileCoords) const
+{
+    return GetTile(tileCoords.x, tileCoords.y)->m_isSolid;
+}
+
+//----------------------------------------------------------------------------------------------------
+IntVec2 const Map::GetTileCoordsFromWorldPos(Vec3 const& worldPosition) const
+{
+    int const tileX = RoundDownToInt(worldPosition.x);
+    int const tileY = RoundDownToInt(worldPosition.y);
+
+    return IntVec2(tileX, tileY);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -262,12 +287,20 @@ void Map::Update()
 {
     for (int i = 0; i < (int)m_actors.size(); i++)
     {
-        if (m_actors[i])
+        if (m_actors[i] != nullptr)
         {
             m_actors[i]->Update();
         }
     }
 
+    UpdateFromKeyboard();
+    CollideActors();
+    CollideActorsWithMap();
+}
+
+//----------------------------------------------------------------------------------------------------
+void Map::UpdateFromKeyboard()
+{
     if (g_theInput->WasKeyJustPressed(KEYCODE_F2))
     {
         m_sunDirection.x -= 1.f;
@@ -324,21 +357,106 @@ void Map::Update()
 //----------------------------------------------------------------------------------------------------
 void Map::CollideActors()
 {
+    int actorCount = (int)m_actors.size();
+
+    for (int i = 0; i < actorCount; ++i)
+    {
+        Actor* actorA = m_actors[i];
+        if (actorA == nullptr) continue;
+
+        for (int j = i + 1; j < actorCount; ++j)
+        {
+            Actor* actorB = m_actors[j];
+            if (actorB == nullptr) continue;
+
+            // 呼叫 CollideActors 來解決碰撞
+            CollideActors(actorA, actorB);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
 void Map::CollideActors(Actor* actorA, Actor* actorB)
 {
+    if (!actorA->m_isMovable &&!actorB->m_isMovable) return;
+
+    // 檢查 z 軸是否重疊
+
+    FloatRange const actorAMinMaxZ = actorA->m_cylinder.GetFloatRange();
+    FloatRange const actorBMinMaxZ = actorB->m_cylinder.GetFloatRange();
+
+    if (!actorAMinMaxZ.IsOverlappingWith(actorBMinMaxZ))
+    {
+        return; // 沒有在相同 z 軸範圍內，不發生碰撞
+    }
+
+    // 取得 2D 位置
+    Vec2 posA = Vec2(actorA->m_position.x, actorA->m_position.y);
+    Vec2 posB = Vec2(actorB->m_position.x, actorB->m_position.y);
+
+    if (actorA->m_isMovable&&!actorB->m_isMovable)
+    {
+        PushDiscOutOfDisc2D(posA, actorA->m_radius, posB, actorB->m_radius);
+    }
+    else if (actorB->m_isMovable&&!actorA->m_isMovable)
+    {
+        PushDiscOutOfDisc2D(posB, actorB->m_radius, posA, actorA->m_radius);
+    }
+    // 處理圓形碰撞
+
+
+    // 更新 Actor 位置
+    actorA->m_position.x = posA.x;
+    actorA->m_position.y = posA.y;
+    actorB->m_position.x = posB.x;
+    actorB->m_position.y = posB.y;
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::CollideActorsWithMap()
+void Map::CollideActorsWithMap() const
 {
+    for (int actorIndex = 0; actorIndex < static_cast<int>(m_actors.size()); ++actorIndex)
+    {
+        if (m_actors[actorIndex] != nullptr)
+        {
+            CollideActorWithMap(m_actors[actorIndex]);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::CollideActorWithMap(Actor* actor)
+void Map::CollideActorWithMap(Actor* actor) const
 {
+    IntVec2 const actorTileCoords = GetTileCoordsFromWorldPos(actor->m_position);
+
+    // Push out of cardinal neighbors (NSEW) first
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(1, 0));
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(0, 1));
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(-1, 0));
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(0, -1));
+
+    // Push out of diagonal neighbors second
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(1, 1));
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(-1, 1));
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(-1, -1));
+    PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(1, -1));
+}
+
+//----------------------------------------------------------------------------------------------------
+void Map::PushActorOutOfTileIfSolid(Actor* actor, IntVec2 const& tileCoords) const
+{
+    if (!IsTileSolid(tileCoords)) return;
+
+    if (IsTileCoordsOutOfBounds(tileCoords)) return;
+
+    AABB3 const aabb3Box        = GetTile(tileCoords.x, tileCoords.y)->m_bounds;
+    AABB2 const aabb2Box        = AABB2(Vec2(aabb3Box.m_mins.x, aabb3Box.m_mins.y), Vec2(aabb3Box.m_maxs.x, aabb3Box.m_maxs.y));
+    Vec2        actorPositionXY = Vec2(actor->m_position.x, actor->m_position.y);
+
+    PushDiscOutOfAABB2D(actorPositionXY, actor->m_radius, aabb2Box);
+
+    actor->m_position.x = actorPositionXY.x;
+    actor->m_position.y = actorPositionXY.y;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -369,28 +487,130 @@ RaycastResult3D Map::RaycastAll(Vec3 const& start,
                                 Vec3 const& direction,
                                 float const distance) const
 {
-    RaycastResult3D result;
+    RaycastResult3D closestResult;
+    float           closestDistance = distance;
 
-    result = RaycastWorldXY(start, direction, distance);
-    result = RaycastWorldZ(start, direction, distance);
-    result = RaycastWorldActors(start, direction, distance);
+    RaycastResult3D xyResult = RaycastWorldXY(start, direction, distance);
+    if (xyResult.m_didImpact && xyResult.m_impactLength < closestDistance)
+    {
+        closestResult   = xyResult;
+        closestDistance = xyResult.m_impactLength;
+    }
 
-    return result;
+    RaycastResult3D zResult = RaycastWorldZ(start, direction, distance);
+    if (zResult.m_didImpact && zResult.m_impactLength < closestDistance)
+    {
+        closestResult   = zResult;
+        closestDistance = zResult.m_impactLength;
+    }
+
+    RaycastResult3D actorResult = RaycastWorldActors(start, direction, distance);
+    if (actorResult.m_didImpact && actorResult.m_impactLength < closestDistance)
+    {
+        closestResult   = actorResult;
+        closestDistance = actorResult.m_impactLength;
+    }
+
+    return closestResult;
 }
 
 //----------------------------------------------------------------------------------------------------
 RaycastResult3D Map::RaycastWorldXY(Vec3 const& start,
                                     Vec3 const& direction,
-                                    float       distance) const
+                                    float const distance) const
 {
-    return {};
+    RaycastResult3D result;
+    result.m_rayStartPosition = start;
+    result.m_rayForwardNormal = direction.GetNormalized();
+    result.m_rayMaxLength     = distance;
+
+    Vec3  rayStep         = result.m_rayForwardNormal * 0.01f; // 每次移動的步長
+    Vec3  currentPosition = start;
+    float traveledDist    = 0.f;
+
+    while (traveledDist < distance)
+    {
+        currentPosition += rayStep;
+        traveledDist += rayStep.GetLength();
+
+        IntVec2 tileCoords = IntVec2(RoundDownToInt(currentPosition.x), RoundDownToInt(currentPosition.y));
+
+        // 超出邊界時的處理
+        if (IsTileCoordsOutOfBounds(tileCoords))
+        {
+            result.m_didImpact      = true;
+            result.m_impactPosition = currentPosition;
+            result.m_impactLength   = traveledDist;
+            result.m_impactNormal   = -result.m_rayForwardNormal;
+            return result;
+        }
+
+        // 碰撞到牆壁（非水面）時的處理
+        if (IsTileSolid(tileCoords))
+        {
+            result.m_didImpact      = true;
+            result.m_impactPosition = currentPosition;
+            result.m_impactLength   = traveledDist;
+            // 計算 impactNormal
+            Vec3 prePosition = currentPosition - result.m_rayForwardNormal * rayStep.GetLength();;
+
+            IntVec2 impactNormal = GetTileCoordsFromWorldPos(prePosition) - GetTileCoordsFromWorldPos(currentPosition);
+
+            result.m_impactNormal = Vec3(impactNormal.x, impactNormal.y, 0);
+
+            return result;
+        }
+    }
+
+    result.m_didImpact = false;
+    return result;
 }
 
 //----------------------------------------------------------------------------------------------------
 RaycastResult3D Map::RaycastWorldZ(Vec3 const& start,
-                                   Vec3 const& direction,
-                                   float       distance) const
+                                   Vec3 const& forwardNormal,
+                                   float const distance) const
 {
+    RaycastResult3D result;
+    result.m_rayStartPosition = start;
+    result.m_rayForwardNormal = forwardNormal;
+    result.m_rayMaxLength     = distance;
+
+    float vz = forwardNormal.z * distance;
+    float Sz = start.z;
+    float t  = 0.f;
+
+    // 射線向上，檢測天花板 (z = 1)
+    if (vz > 0.f)
+    {
+        t = (1.f - Sz) / vz;
+        if (t >= 0.f && t <= 1.f)
+        {
+            result.m_impactPosition = start + forwardNormal * t * distance;
+            result.m_impactNormal   = -Vec3::Z_BASIS;
+            result.m_impactLength   = (forwardNormal * t * distance).GetLength();
+            result.m_didImpact      = true;
+            return result;
+        }
+    }
+    // 射線向下，檢測地板 (z = 0)
+    else if (vz < 0.f)
+    {
+        t = (-Sz) / vz;
+        if (t >= 0.f && t <= 1.f)
+        {
+            result.m_impactPosition = start + forwardNormal * t * distance;
+            result.m_impactNormal   = Vec3::Z_BASIS;
+            result.m_impactLength   = (forwardNormal * t * distance).GetLength();
+            result.m_didImpact      = true;
+            return result;
+        }
+    }
+
+    // 若 vz == 0 或 t 不在範圍內，則無碰撞
+    result.m_didImpact = false;
+    return result;
+
     return {};
 }
 
@@ -400,18 +620,18 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& start,
                                         float const distance) const
 {
     RaycastResult3D closestResult;
-    closestResult.m_didImpact = false;
-    float closestDistance     = distance;
+    float           closestDistance = distance;
 
-    for (int i = 0; i < m_actors.size(); i++)
+    for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
-        Cylinder3       cylinder3 = m_actors[i]->m_cylinder;
-        RaycastResult3D result    = RaycastVsCylinderZ3D(start, direction, distance,
-                                                         cylinder3.GetCenterPositionXY(),
-                                                         cylinder3.GetFloatRange(),
-                                                         cylinder3.m_radius);
+        Cylinder3             cylinder3 = m_actors[i]->m_cylinder;
+        RaycastResult3D const result    = RaycastVsCylinderZ3D(start, direction, distance,
+                                                               cylinder3.GetCenterPositionXY(),
+                                                               cylinder3.GetFloatRange(),
+                                                               cylinder3.m_radius);
 
-        if (result.m_didImpact && result.m_impactLength < closestDistance)
+        if (result.m_didImpact &&
+            result.m_impactLength < closestDistance)
         {
             closestResult   = result;
             closestDistance = result.m_impactLength;

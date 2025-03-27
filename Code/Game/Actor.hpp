@@ -20,6 +20,7 @@ public:
     static bool m_isStatic;
 
     void  Update();
+    void UpdatePosition();
     void  Render() const;
     Mat44 GetModelToWorldTransform() const;
 

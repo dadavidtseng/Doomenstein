@@ -33,21 +33,27 @@ public:
     void AddGeometryForCeiling(VertexList_PCUTBN& verts, IndexList& indexes, AABB3 const& bounds, AABB2 const& UVs) const;
     void CreateBuffers();
 
-    bool        IsPositionInBounds(Vec3 position, float tolerance = 0.f) const;
-    bool        IsTileCoordsOutOfBounds(int x, int y) const;
+    bool          IsPositionInBounds(Vec3 const& position, float tolerance = 0.f) const;
+    bool          IsTileCoordsOutOfBounds(IntVec2 const& tileCoords) const;
+    bool          IsTileCoordsOutOfBounds(int x, int y) const;
+    bool          IsTileSolid(IntVec2 const& tileCoords) const;
+    IntVec2 const GetTileCoordsFromWorldPos(Vec3 const& worldPosition) const;
     Tile const* GetTile(int x, int y) const;
 
     void Update();
+    void UpdateFromKeyboard();
     void CollideActors();
     void CollideActors(Actor* actorA, Actor* actorB);
-    void CollideActorsWithMap();
-    void CollideActorWithMap(Actor* actor);
+    void CollideActorsWithMap() const;
+    void CollideActorWithMap(Actor* actor) const;
+
+    void PushActorOutOfTileIfSolid(Actor* actor,IntVec2 const& tileCoords) const;
 
     void Render() const;
 
     RaycastResult3D RaycastAll(Vec3 const& start, Vec3 const& direction, float distance) const;
     RaycastResult3D RaycastWorldXY(Vec3 const& start, Vec3 const& direction, float distance) const;
-    RaycastResult3D RaycastWorldZ(Vec3 const& start, Vec3 const& direction, float distance) const;
+    RaycastResult3D RaycastWorldZ(Vec3 const& start, Vec3 const& forwardNormal, float distance) const;
     RaycastResult3D RaycastWorldActors(Vec3 const& start, Vec3 const& direction, float distance) const;
 
     Game* m_game = nullptr;
@@ -66,9 +72,9 @@ protected:
     VertexBuffer*     m_vertexBuffer = nullptr;
     IndexBuffer*      m_indexBuffer  = nullptr;
 
-    Vec3            m_sunDirection     = Vec3(2.f, 1.f, -1.f).GetNormalized();
-    float           m_sunIntensity     = 0.85f;
-    float           m_ambientIntensity = 0.35f;
+    Vec3  m_sunDirection     = Vec3(2.f, 1.f, -1.f).GetNormalized();
+    float m_sunIntensity     = 0.85f;
+    float m_ambientIntensity = 0.35f;
 
     std::vector<Actor*> m_actors;
 };
