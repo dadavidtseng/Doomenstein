@@ -90,6 +90,10 @@ void Actor::UpdatePosition()
     if (g_theInput->IsKeyDown(KEYCODE_D)) m_position -= left * moveSpeed * deltaSeconds;
     if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_position -= Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
     if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_position += Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
+
+    m_orientation.m_yawDegrees -= g_theInput->GetCursorClientDelta().x * 0.125f;
+    m_orientation.m_pitchDegrees += g_theInput->GetCursorClientDelta().y * 0.125f;
+    m_orientation.m_pitchDegrees = GetClamped(m_orientation.m_pitchDegrees, -85.f, 85.f);
 }
 
 //----------------------------------------------------------------------------------------------------

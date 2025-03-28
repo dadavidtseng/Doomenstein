@@ -7,17 +7,16 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
-#include "Engine/Renderer/ConstantBuffer.hpp"
 
 //-Forward-Declaration--------------------------------------------------------------------------------
 class Actor;
+class Game;
 class IndexBuffer;
-class VertexBuffer;
 class Shader;
 class Texture;
-struct Tile;
+class VertexBuffer;
 struct MapDefinition;
-class Game;
+struct Tile;
 
 //----------------------------------------------------------------------------------------------------
 class Map
@@ -38,23 +37,28 @@ public:
     bool          IsTileCoordsOutOfBounds(int x, int y) const;
     bool          IsTileSolid(IntVec2 const& tileCoords) const;
     IntVec2 const GetTileCoordsFromWorldPos(Vec3 const& worldPosition) const;
-    Tile const* GetTile(int x, int y) const;
+    Tile const*   GetTile(int x, int y) const;
+    Tile const*   GetTile(IntVec2 const& tileCoords) const;
 
     void Update();
     void UpdateFromKeyboard();
+    void UpdateAllActors() const;
+
     void CollideActors();
     void CollideActors(Actor* actorA, Actor* actorB);
     void CollideActorsWithMap() const;
     void CollideActorWithMap(Actor* actor) const;
 
-    void PushActorOutOfTileIfSolid(Actor* actor,IntVec2 const& tileCoords) const;
+    void PushActorOutOfTileIfSolid(Actor* actor, IntVec2 const& tileCoords) const;
+    void RenderAllActors() const;
+    void RenderMap() const;
 
     void Render() const;
 
-    RaycastResult3D RaycastAll(Vec3 const& start, Vec3 const& direction, float distance) const;
-    RaycastResult3D RaycastWorldXY(Vec3 const& start, Vec3 const& direction, float distance) const;
-    RaycastResult3D RaycastWorldZ(Vec3 const& start, Vec3 const& forwardNormal, float distance) const;
-    RaycastResult3D RaycastWorldActors(Vec3 const& start, Vec3 const& direction, float distance) const;
+    RaycastResult3D RaycastAll(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
+    RaycastResult3D RaycastWorldXY(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
+    RaycastResult3D RaycastWorldZ(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
+    RaycastResult3D RaycastWorldActors(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
 
     Game* m_game = nullptr;
 

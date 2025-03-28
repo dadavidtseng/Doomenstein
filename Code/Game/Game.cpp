@@ -77,9 +77,13 @@ void Game::Update()
     // #TODO: Select keyboard or controller
 
     UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
-    m_currentMap->Update();
     UpdateFromKeyBoard();
     UpdateFromController();
+
+    if (m_currentMap != nullptr)
+    {
+        m_currentMap->Update();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -328,7 +332,8 @@ void Game::UpdateFromController()
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateEntities(float const gameDeltaSeconds, float const systemDeltaSeconds) const
 {
-    if (m_player != nullptr)
+    if (m_player != nullptr &&
+        m_currentGameState == eGameState::INGAME)
     {
         m_player->Update(systemDeltaSeconds);
     }
