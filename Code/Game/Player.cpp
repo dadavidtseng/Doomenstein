@@ -153,7 +153,7 @@ void Player::UpdateFromKeyBoard()
         }
         else
         {
-            DebugAddWorldArrow(ray.m_startPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::GREEN, Rgba8::GREEN);
+            DebugAddWorldLine(ray.m_startPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f);
         }
     }
 }

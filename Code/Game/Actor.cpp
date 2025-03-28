@@ -5,7 +5,9 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Actor.hpp"
 
+#include "Game.hpp"
 #include "GameCommon.hpp"
+#include "Player.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -91,9 +93,7 @@ void Actor::UpdatePosition()
     if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_position -= Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
     if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_position += Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
 
-    m_orientation.m_yawDegrees -= g_theInput->GetCursorClientDelta().x * 0.125f;
-    m_orientation.m_pitchDegrees += g_theInput->GetCursorClientDelta().y * 0.125f;
-    m_orientation.m_pitchDegrees = GetClamped(m_orientation.m_pitchDegrees, -85.f, 85.f);
+    m_orientation.m_yawDegrees = g_theGame->GetPlayer()->m_orientation.m_yawDegrees;
 }
 
 //----------------------------------------------------------------------------------------------------

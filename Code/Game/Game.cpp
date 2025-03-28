@@ -161,6 +161,11 @@ Map* Game::GetCurrentMap() const
     return m_currentMap;
 }
 
+Player* Game::GetPlayer() const
+{
+    return m_player;
+}
+
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateFromKeyBoard()
 {

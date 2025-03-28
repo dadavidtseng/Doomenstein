@@ -442,20 +442,20 @@ void Map::PushActorOutOfTileIfSolid(Actor*         actor,
 
     if (IsTileCoordsOutOfBounds(tileCoords)) return;
 
-    Vec3        actorForwardNormal     = actor->m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
-    float const deltaSeconds           = (float)Clock::GetSystemClock().GetDeltaSeconds();
-    Vec3        previousPosition       = actor->m_position - actorForwardNormal * deltaSeconds * 15.f;
-    Vec3        nextPosition           = actor->m_position + actorForwardNormal * deltaSeconds * 15.f;
-    Vec3        midCurrentNextPosition = (actor->m_position + nextPosition) / 2.f;
-    IntVec2     midCoords              = GetTileCoordsFromWorldPos(midCurrentNextPosition);
-
-    if (GetTile(midCoords)->m_isSolid)
-    {
-        actor->m_position.x = previousPosition.x;
-        actor->m_position.y = previousPosition.y;
-
-        return;
-    }
+    // Vec3        actorForwardNormal     = actor->m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+    // float const deltaSeconds           = (float)Clock::GetSystemClock().GetDeltaSeconds();
+    // Vec3        previousPosition       = actor->m_position - actorForwardNormal * deltaSeconds * 15.f;
+    // Vec3        nextPosition           = actor->m_position + actorForwardNormal * deltaSeconds * 15.f;
+    // Vec3        midCurrentNextPosition = (actor->m_position + nextPosition) / 2.f;
+    // IntVec2     midCoords              = GetTileCoordsFromWorldPos(midCurrentNextPosition);
+    //
+    // if (GetTile(midCoords)->m_isSolid)
+    // {
+    //     actor->m_position.x = previousPosition.x;
+    //     actor->m_position.y = previousPosition.y;
+    //
+    //     return;
+    // }
 
     AABB3 const aabb3Box = GetTile(tileCoords.x, tileCoords.y)->m_bounds;
     AABB2 const aabb2Box = AABB2(Vec2(aabb3Box.m_mins.x, aabb3Box.m_mins.y), Vec2(aabb3Box.m_maxs.x, aabb3Box.m_maxs.y));
