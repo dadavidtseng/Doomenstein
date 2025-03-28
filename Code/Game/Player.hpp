@@ -6,13 +6,14 @@
 #pragma once
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/EulerAngles.hpp"
+#include "Game/Controller.hpp"
 
 //----------------------------------------------------------------------------------------------------
 class Camera;
 class Game;
 
 //----------------------------------------------------------------------------------------------------
-class Player
+class Player : public Controller
 {
 public:
     // Construction / Destruction
