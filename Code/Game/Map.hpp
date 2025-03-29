@@ -8,6 +8,8 @@
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
 
+struct ActorHandle;
+struct SpawnInfo;
 //-Forward-Declaration--------------------------------------------------------------------------------
 class Actor;
 class Game;
@@ -60,6 +62,9 @@ public:
     RaycastResult3D RaycastWorldZ(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldActors(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
 
+    Actor* SpawnActor(SpawnInfo const& spawnInfo);
+    Actor* GetActorByHandle(ActorHandle const handle);
+
     Game* m_game = nullptr;
 
 protected:
@@ -80,5 +85,8 @@ protected:
     float m_sunIntensity     = 0.85f;
     float m_ambientIntensity = 0.35f;
 
-    std::vector<Actor*> m_actors;
+    // Actor
+    std::vector<Actor*>           m_actors;
+    static constexpr unsigned int MAX_ACTOR_UID  = 0x0000fffeu;
+    unsigned int                  m_nextActorUID = 0;
 };

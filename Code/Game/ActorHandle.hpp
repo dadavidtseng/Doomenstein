@@ -6,9 +6,8 @@
 #pragma once
 
 //----------------------------------------------------------------------------------------------------
-class ActorHandle
+struct ActorHandle
 {
-public:
     ActorHandle();
     ActorHandle(unsigned int uid, unsigned int index);
 
@@ -20,5 +19,5 @@ public:
     bool         operator!=(ActorHandle const& other) const;
 
 private:
-    unsigned int m_data;
+    unsigned int m_data;    // used to store 32-bit integers.
 };

@@ -12,6 +12,12 @@ class Texture;
 class Shader;
 
 //----------------------------------------------------------------------------------------------------
+struct SpawnInfo
+{
+    String m_name;
+};
+
+//----------------------------------------------------------------------------------------------------
 struct MapDefinition
 {
     explicit MapDefinition(XmlElement const& mapDefElement);

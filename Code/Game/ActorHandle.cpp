@@ -4,46 +4,42 @@
 
 //----------------------------------------------------------------------------------------------------
 #include "Game/ActorHandle.hpp"
-#include <Engine/Core/EngineCommon.hpp>
+
+ActorHandle const ActorHandle::INVALID = ActorHandle(0x0000ffff, 0x0000ffff);
 
 //----------------------------------------------------------------------------------------------------
 ActorHandle::ActorHandle()
-    : m_data()
+    : m_data(INVALID.m_data)
 {
 }
 
 //----------------------------------------------------------------------------------------------------
 ActorHandle::ActorHandle(unsigned int const uid,
                          unsigned int const index)
-    : m_data(uid)
 {
-    UNUSED(index)
+    m_data = (uid << 16) | (index & 0x0000ffff);
 }
 
 //----------------------------------------------------------------------------------------------------
 bool ActorHandle::IsValid() const
 {
-    return false;
+    return *this != INVALID;
 }
 
 //----------------------------------------------------------------------------------------------------
 unsigned int ActorHandle::GetIndex() const
 {
-    return 0;
+    return m_data & 0x0000ffff;
 }
 
 //----------------------------------------------------------------------------------------------------
 bool ActorHandle::operator==(ActorHandle const& other) const
 {
-	UNUSED(other)
-
-    return false;
+    return m_data == other.m_data;
 }
 
 //----------------------------------------------------------------------------------------------------
 bool ActorHandle::operator!=(ActorHandle const& other) const
 {
-    UNUSED(other)
-
-    return false;
+    return m_data != other.m_data;
 }
