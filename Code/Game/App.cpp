@@ -201,6 +201,7 @@ void App::Update()
     Clock::TickSystemClock();
 
     UpdateCursorMode();
+
     g_theGame->Update();
 }
 

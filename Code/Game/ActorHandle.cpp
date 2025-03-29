@@ -4,3 +4,46 @@
 
 //----------------------------------------------------------------------------------------------------
 #include "Game/ActorHandle.hpp"
+#include <Engine/Core/EngineCommon.hpp>
+
+//----------------------------------------------------------------------------------------------------
+ActorHandle::ActorHandle()
+    : m_data()
+{
+}
+
+//----------------------------------------------------------------------------------------------------
+ActorHandle::ActorHandle(unsigned int const uid,
+                         unsigned int const index)
+    : m_data(uid)
+{
+    UNUSED(index)
+}
+
+//----------------------------------------------------------------------------------------------------
+bool ActorHandle::IsValid() const
+{
+    return false;
+}
+
+//----------------------------------------------------------------------------------------------------
+unsigned int ActorHandle::GetIndex() const
+{
+    return 0;
+}
+
+//----------------------------------------------------------------------------------------------------
+bool ActorHandle::operator==(ActorHandle const& other) const
+{
+	UNUSED(other)
+
+    return false;
+}
+
+//----------------------------------------------------------------------------------------------------
+bool ActorHandle::operator!=(ActorHandle const& other) const
+{
+    UNUSED(other)
+
+    return false;
+}

@@ -8,6 +8,7 @@
 #include "Game.hpp"
 #include "Map.hpp"
 #include "Engine/Core/Clock.hpp"
+#include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
@@ -53,15 +54,6 @@ Player::~Player()
 void Player::Update(float deltaSeconds)
 {
     XboxController const& controller = g_theInput->GetController(0);
-
-    if (g_theInput->WasKeyJustPressed(KEYCODE_H) || controller.WasButtonJustPressed(XBOX_BUTTON_START))
-    {
-        if (m_game->IsAttractMode() == false)
-        {
-            // m_position    = Vec3::ZERO;
-            // m_orientation = EulerAngles::ZERO;
-        }
-    }
 
     UpdateFromKeyBoard();
 
@@ -148,7 +140,7 @@ void Player::UpdateFromKeyBoard()
         {
             DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.01f, 10.f);
             DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
-            DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal*0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
+            DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal * 0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
             DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
         }
         else

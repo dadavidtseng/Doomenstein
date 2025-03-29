@@ -53,17 +53,6 @@ void Actor::Update()
 {
     if (m_isStatic || !m_isMovable) return;
 
-    XboxController const& controller = g_theInput->GetController(0);
-
-    if (g_theInput->WasKeyJustPressed(KEYCODE_H) || controller.WasButtonJustPressed(XBOX_BUTTON_START))
-    {
-        // if (m_game->IsAttractMode() == false)
-        // {
-        //     // m_position    = Vec3::ZERO;
-        //     // m_orientation = EulerAngles::ZERO;
-        // }
-    }
-
     UpdatePosition();
 
     m_cylinder.m_startPosition = m_position;
@@ -78,14 +67,14 @@ void Actor::UpdatePosition()
     Vec2 const            leftStickInput = controller.GetLeftStick().GetPosition();
     float constexpr       moveSpeed      = 2.f;
 
-    Vec3                  forward;
-    Vec3                  left;
-    Vec3                  up;
+    Vec3 forward;
+    Vec3 left;
+    Vec3 up;
     m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
 
     m_position += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
 
-    if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 10.f;
+    if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 15.f;
     if (g_theInput->IsKeyDown(KEYCODE_W)) m_position += forward * moveSpeed * deltaSeconds;
     if (g_theInput->IsKeyDown(KEYCODE_S)) m_position -= forward * moveSpeed * deltaSeconds;
     if (g_theInput->IsKeyDown(KEYCODE_A)) m_position += left * moveSpeed * deltaSeconds;
@@ -93,7 +82,10 @@ void Actor::UpdatePosition()
     if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_position -= Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
     if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_position += Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
 
-    m_orientation.m_yawDegrees = g_theGame->GetPlayer()->m_orientation.m_yawDegrees;
+    if (g_theGame->GetPlayer() != nullptr)
+    {
+        m_orientation.m_yawDegrees = g_theGame->GetPlayer()->m_orientation.m_yawDegrees;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -58,17 +58,27 @@ Game::~Game()
         m_currentMap = nullptr;
     }
 
-    delete m_gameClock;
-    m_gameClock = nullptr;
+    if (m_gameClock != nullptr)
+    {
+        delete m_gameClock;
+        m_gameClock = nullptr;
+    }
 
-    delete m_player;
-    m_player = nullptr;
+    if (m_player != nullptr)
+    {
+        delete m_player;
+        m_player = nullptr;
+    }
 
-    delete m_screenCamera;
-    m_screenCamera = nullptr;
+    if (m_screenCamera != nullptr)
+    {
+        delete m_screenCamera;
+        m_screenCamera = nullptr;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
+// All timers in the game, such as those required by weapons, should use the game clock.
 void Game::Update()
 {
     float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
