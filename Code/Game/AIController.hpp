@@ -7,7 +7,7 @@
 #include "Game/Controller.hpp"
 
 //----------------------------------------------------------------------------------------------------
-class AI : public Controller
+class AIController : public Controller
 {
 
 };

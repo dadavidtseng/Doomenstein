@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------------------------------
-// Player.hpp
+// PlayerController.hpp
 //----------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
@@ -13,16 +13,16 @@ class Camera;
 class Game;
 
 //----------------------------------------------------------------------------------------------------
-class Player : public Controller
+class PlayerController : public Controller
 {
 public:
     // Construction / Destruction
-    explicit Player(Game* owner);
-    ~Player();
-    Player(Player& copyFrom)             = delete;
-    Player(Player&& moveFrom)            = delete;
-    Player& operator=(Player& copyFrom)  = delete;
-    Player& operator=(Player&& moveFrom) = delete;
+    explicit PlayerController(Game* owner);
+    ~PlayerController();
+    PlayerController(PlayerController& copyFrom)             = delete;
+    PlayerController(PlayerController&& moveFrom)            = delete;
+    PlayerController& operator=(PlayerController& copyFrom)  = delete;
+    PlayerController& operator=(PlayerController&& moveFrom) = delete;
 
     void Update(float deltaSeconds);
     void Render() const;

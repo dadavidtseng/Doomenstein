@@ -63,7 +63,7 @@ public:
     RaycastResult3D RaycastWorldActors(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
 
     Actor* SpawnActor(SpawnInfo const& spawnInfo);
-    Actor* GetActorByHandle(ActorHandle const handle);
+    Actor* GetActorByHandle(ActorHandle handle);
 
     Game* m_game = nullptr;
 

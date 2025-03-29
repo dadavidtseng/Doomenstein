@@ -17,7 +17,7 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Game/App.hpp"
 #include "Game/GameCommon.hpp"
-#include "Game/Player.hpp"
+#include "Game/PlayerController.hpp"
 
 //----------------------------------------------------------------------------------------------------
 Game::Game()
@@ -172,7 +172,7 @@ Map* Game::GetCurrentMap() const
     return m_currentMap;
 }
 
-Player* Game::GetPlayer() const
+PlayerController* Game::GetPlayer() const
 {
     return m_player;
 }
@@ -354,7 +354,7 @@ void Game::RenderEntities() const
 //----------------------------------------------------------------------------------------------------
 void Game::SpawnPlayer()
 {
-    m_player = new Player(this);
+    m_player = new PlayerController(this);
 }
 
 //----------------------------------------------------------------------------------------------------

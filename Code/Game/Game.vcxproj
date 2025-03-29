@@ -192,7 +192,7 @@
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="ActorDefinition.cpp" />
     <ClCompile Include="ActorHandle.cpp" />
-    <ClCompile Include="AI.cpp" />
+    <ClCompile Include="AIController.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -200,7 +200,7 @@
     <ClCompile Include="Main_Windows.cpp" />
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="MapDefinition.cpp" />
-    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerController.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="Weapon.cpp" />
@@ -210,7 +210,7 @@
     <ClInclude Include="Actor.hpp" />
     <ClInclude Include="ActorDefinition.hpp" />
     <ClInclude Include="ActorHandle.hpp" />
-    <ClInclude Include="AI.hpp" />
+    <ClInclude Include="AIController.hpp" />
     <ClInclude Include="App.hpp" />
     <ClInclude Include="Controller.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
@@ -218,7 +218,7 @@
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="Map.hpp" />
     <ClInclude Include="MapDefinition.hpp" />
-    <ClInclude Include="Player.hpp" />
+    <ClInclude Include="PlayerController.hpp" />
     <ClInclude Include="Tile.hpp" />
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="Weapon.hpp" />

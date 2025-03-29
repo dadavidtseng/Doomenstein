@@ -25,9 +25,6 @@
     <ClCompile Include="Main_Windows.cpp">
       <Filter>Framework</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
     <ClCompile Include="Map.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
@@ -49,9 +46,6 @@
     <ClCompile Include="ActorHandle.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="AI.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
     <ClCompile Include="Controller.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
@@ -59,6 +53,12 @@
       <Filter>Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="WeaponDefinition.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="AIController.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerController.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,9 +74,6 @@
     </ClInclude>
     <ClInclude Include="EngineBuildPreferences.hpp">
       <Filter>Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.hpp">
-      <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="Map.hpp">
       <Filter>Gameplay</Filter>
@@ -99,9 +96,6 @@
     <ClInclude Include="ActorHandle.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
-    <ClInclude Include="AI.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
     <ClInclude Include="Controller.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
@@ -109,6 +103,12 @@
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="WeaponDefinition.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="AIController.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerController.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>

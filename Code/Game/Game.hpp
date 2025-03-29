@@ -11,7 +11,7 @@
 class Map;
 class Camera;
 class Clock;
-class Player;
+class PlayerController;
 
 //----------------------------------------------------------------------------------------------------
 enum class eGameState : int8_t
@@ -33,7 +33,7 @@ public:
     void   Render() const;
     bool   IsAttractMode() const;
     Map*   GetCurrentMap() const;
-    Player* GetPlayer() const;
+    PlayerController* GetPlayer() const;
     Clock* m_gameClock = nullptr;
 
 private:
@@ -50,7 +50,7 @@ private:
     eGameState GetGameState() const;
 
     Camera*           m_screenCamera     = nullptr;
-    Player*           m_player           = nullptr;
+    PlayerController*           m_player           = nullptr;
     eGameState        m_currentGameState = eGameState::ATTRACT;
     std::vector<Map*> m_maps;
     Map*              m_currentMap = nullptr;

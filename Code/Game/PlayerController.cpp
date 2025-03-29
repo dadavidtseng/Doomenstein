@@ -3,7 +3,7 @@
 //----------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
-#include "Game/Player.hpp"
+#include "Game/PlayerController.hpp"
 
 #include "Game.hpp"
 #include "Map.hpp"
@@ -17,7 +17,7 @@
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 
 //----------------------------------------------------------------------------------------------------
-Player::Player(Game* owner)
+PlayerController::PlayerController(Game* owner)
 {
     m_game        = owner;
     m_worldCamera = new Camera();
@@ -41,7 +41,7 @@ Player::Player(Game* owner)
 }
 
 //----------------------------------------------------------------------------------------------------
-Player::~Player()
+PlayerController::~PlayerController()
 {
     if (m_worldCamera != nullptr)
     {
@@ -51,7 +51,7 @@ Player::~Player()
 }
 
 //----------------------------------------------------------------------------------------------------
-void Player::Update(float deltaSeconds)
+void PlayerController::Update(float deltaSeconds)
 {
     XboxController const& controller = g_theInput->GetController(0);
 
@@ -117,12 +117,12 @@ void Player::Update(float deltaSeconds)
 }
 
 //----------------------------------------------------------------------------------------------------
-void Player::Render() const
+void PlayerController::Render() const
 {
 }
 
 //----------------------------------------------------------------------------------------------------
-void Player::UpdateFromKeyBoard()
+void PlayerController::UpdateFromKeyBoard()
 {
     if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
     {
@@ -150,17 +150,17 @@ void Player::UpdateFromKeyBoard()
 }
 
 //----------------------------------------------------------------------------------------------------
-void Player::UpdateFromController()
+void PlayerController::UpdateFromController()
 {
 }
 
 //----------------------------------------------------------------------------------------------------
-Camera* Player::GetCamera() const
+Camera* PlayerController::GetCamera() const
 {
     return m_worldCamera;
 }
 
-Mat44 Player::GetModelToWorldTransform() const
+Mat44 PlayerController::GetModelToWorldTransform() const
 {
     Mat44 m2w;
 

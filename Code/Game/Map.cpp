@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Map.hpp"
 
+#include "ActorHandle.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -692,4 +693,14 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
     }
 
     return closestResult;
+}
+
+Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
+{
+    return nullptr;
+}
+
+Actor* Map::GetActorByHandle(ActorHandle handle)
+{
+    return nullptr;
 }
