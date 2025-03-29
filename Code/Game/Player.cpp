@@ -126,7 +126,6 @@ void Player::UpdateFromKeyBoard()
 {
     if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
     {
-        g_theEventSystem->FireEvent("ToggleActorStatic");
         m_isMovable = !m_isMovable;
     }
 

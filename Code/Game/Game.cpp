@@ -46,7 +46,7 @@ Game::Game()
     transform.SetIJKT3D(-Vec3::X_BASIS, Vec3::Z_BASIS, Vec3::Y_BASIS, Vec3(0.f, -0.25f, 0.25f));
     DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f, Rgba8::BLUE);
 
-    InitializeMaps();
+    // InitializeMaps();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -90,7 +90,8 @@ void Game::Update()
     UpdateFromKeyBoard();
     UpdateFromController();
 
-    if (m_currentMap != nullptr)
+    if (m_currentMap != nullptr&&
+        !m_player->m_isMovable)
     {
         m_currentMap->Update();
     }
@@ -189,6 +190,7 @@ void Game::UpdateFromKeyBoard()
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
         {
             m_currentGameState = eGameState::INGAME;
+            InitializeMaps();
 
             SpawnPlayer();
         }
@@ -205,6 +207,14 @@ void Game::UpdateFromKeyBoard()
                 delete m_player;
                 m_player = nullptr;
             }
+
+            if (m_currentMap != nullptr)
+            {
+                delete m_currentMap;
+                m_currentMap = nullptr;
+            }
+
+            m_maps.clear();
         }
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_P))
@@ -225,69 +235,6 @@ void Game::UpdateFromKeyBoard()
         if (g_theInput->WasKeyJustReleased(KEYCODE_T))
         {
             m_gameClock->SetTimeScale(1.f);
-        }
-
-        if (g_theInput->WasKeyJustPressed(NUMCODE_1))
-        {
-            Vec3 forward;
-            Vec3 right;
-            Vec3 up;
-            m_player->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, right, up);
-
-            DebugAddWorldLine(m_player->m_position, m_player->m_position + forward * 20.f, 0.01f, 10.f, Rgba8(255, 255, 0), Rgba8(255, 255, 0), DebugRenderMode::X_RAY);
-        }
-
-        if (g_theInput->IsKeyDown(NUMCODE_2))
-        {
-            DebugAddWorldPoint(Vec3(m_player->m_position.x, m_player->m_position.y, 0.f), 0.25f, 60.f, Rgba8(150, 75, 0), Rgba8(150, 75, 0));
-        }
-
-        if (g_theInput->WasKeyJustPressed(NUMCODE_3))
-        {
-            Vec3 forward;
-            Vec3 right;
-            Vec3 up;
-            m_player->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, right, up);
-
-            DebugAddWorldWireSphere(m_player->m_position + forward * 2.f, 1.f, 5.f, Rgba8::GREEN, Rgba8::RED);
-        }
-
-        if (g_theInput->WasKeyJustPressed(NUMCODE_4))
-        {
-            DebugAddWorldBasis(m_player->GetModelToWorldTransform(), 20.f);
-        }
-
-        if (g_theInput->WasKeyJustReleased(NUMCODE_5))
-        {
-            float const  positionX    = m_player->m_position.x;
-            float const  positionY    = m_player->m_position.y;
-            float const  positionZ    = m_player->m_position.z;
-            float const  orientationX = m_player->m_orientation.m_yawDegrees;
-            float const  orientationY = m_player->m_orientation.m_pitchDegrees;
-            float const  orientationZ = m_player->m_orientation.m_rollDegrees;
-            String const text         = Stringf("Position: (%.2f, %.2f, %.2f)\nOrientation: (%.2f, %.2f, %.2f)", positionX, positionY, positionZ, orientationX, orientationY, orientationZ);
-
-            Vec3 forward;
-            Vec3 right;
-            Vec3 up;
-            m_player->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, right, up);
-
-            DebugAddBillboardText(text, m_player->m_position + forward, 0.1f, Vec2::HALF, 10.f, Rgba8::WHITE, Rgba8::RED);
-        }
-
-        if (g_theInput->WasKeyJustPressed(NUMCODE_6))
-        {
-            DebugAddWorldWireCylinder(m_player->m_position, m_player->m_position + Vec3::Z_BASIS * 2, 1.f, 10.f, Rgba8::WHITE, Rgba8::RED);
-        }
-
-
-        if (g_theInput->WasKeyJustReleased(NUMCODE_7))
-        {
-            float const orientationX = m_player->GetCamera()->GetOrientation().m_yawDegrees;
-            float const orientationY = m_player->GetCamera()->GetOrientation().m_pitchDegrees;
-            float const orientationZ = m_player->GetCamera()->GetOrientation().m_rollDegrees;
-
-            DebugAddMessage(Stringf("Camera Orientation: (%.2f, %.2f, %.2f)", orientationX, orientationY, orientationZ), 5.f);
         }
 
         if (m_player != nullptr)

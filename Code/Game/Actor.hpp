@@ -16,9 +16,6 @@ class Actor
 public:
     Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
 
-    static bool OnToggleActorStatic(EventArgs& args);
-    static bool m_isStatic;
-
     void  Update();
     void  UpdatePosition();
     void  Render() const;

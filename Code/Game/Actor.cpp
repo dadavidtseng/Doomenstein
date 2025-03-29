@@ -14,11 +14,7 @@
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/InputSystem.hpp"
-#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Renderer.hpp"
-
-//----------------------------------------------------------------------------------------------------
-STATIC bool Actor::m_isStatic = true;
 
 //----------------------------------------------------------------------------------------------------
 Actor::Actor(Vec3 const&        position,
@@ -34,24 +30,13 @@ Actor::Actor(Vec3 const&        position,
       m_isMovable(isMovable),
       m_color(color)
 {
-    g_theEventSystem->SubscribeEventCallbackFunction("ToggleActorStatic", OnToggleActorStatic);
     m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
-}
-
-//----------------------------------------------------------------------------------------------------
-STATIC bool Actor::OnToggleActorStatic(EventArgs& args)
-{
-    UNUSED(args)
-
-    m_isStatic = !m_isStatic;
-
-    return true;
 }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::Update()
 {
-    if (m_isStatic || !m_isMovable) return;
+    if (!m_isMovable) return;
 
     UpdatePosition();
 
@@ -98,7 +83,7 @@ void Actor::Render() const
 
     g_theRenderer->SetModelConstants();
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
     g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
     g_theRenderer->BindTexture(nullptr);
