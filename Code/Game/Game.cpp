@@ -90,7 +90,7 @@ void Game::Update()
     UpdateFromKeyBoard();
     UpdateFromController();
 
-    if (m_currentMap != nullptr&&
+    if (m_currentMap != nullptr &&
         !m_player->m_isMovable)
     {
         m_currentMap->Update();
@@ -259,11 +259,33 @@ void Game::UpdateFromController()
         if (controller.WasButtonJustPressed(XBOX_BUTTON_START))
         {
             m_currentGameState = eGameState::INGAME;
+            InitializeMaps();
+
+            SpawnPlayer();
         }
     }
 
     if (m_currentGameState == eGameState::INGAME)
     {
+        if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
+        {
+            m_currentGameState = eGameState::ATTRACT;
+
+            if (m_player != nullptr)
+            {
+                delete m_player;
+                m_player = nullptr;
+            }
+
+            if (m_currentMap != nullptr)
+            {
+                delete m_currentMap;
+                m_currentMap = nullptr;
+            }
+
+            m_maps.clear();
+        }
+
         if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
         {
             m_currentGameState = eGameState::ATTRACT;

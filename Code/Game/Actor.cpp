@@ -50,27 +50,31 @@ void Actor::UpdatePosition()
     float                 deltaSeconds   = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
     XboxController const& controller     = g_theInput->GetController(0);
     Vec2 const            leftStickInput = controller.GetLeftStick().GetPosition();
-    float constexpr       moveSpeed      = 2.f;
 
     Vec3 forward;
     Vec3 left;
     Vec3 up;
     m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
 
-    m_position += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
+    m_velocity                = Vec3::ZERO;
+    float constexpr moveSpeed = 1.f;
+    m_velocity += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
 
+    if (g_theInput->IsKeyDown(KEYCODE_W)) m_velocity += forward * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_S)) m_velocity -= forward * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_A)) m_velocity += left * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_D)) m_velocity -= left * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_velocity -= Vec3(0.f, 0.f, 1.f) * moveSpeed;
+    if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_velocity += Vec3(0.f, 0.f, 1.f) * moveSpeed;
     if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 15.f;
-    if (g_theInput->IsKeyDown(KEYCODE_W)) m_position += forward * moveSpeed * deltaSeconds;
-    if (g_theInput->IsKeyDown(KEYCODE_S)) m_position -= forward * moveSpeed * deltaSeconds;
-    if (g_theInput->IsKeyDown(KEYCODE_A)) m_position += left * moveSpeed * deltaSeconds;
-    if (g_theInput->IsKeyDown(KEYCODE_D)) m_position -= left * moveSpeed * deltaSeconds;
-    if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_position -= Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
-    if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_position += Vec3(0.f, 0.f, 1.f) * moveSpeed * deltaSeconds;
+
 
     if (g_theGame->GetPlayer() != nullptr)
     {
         m_orientation.m_yawDegrees = g_theGame->GetPlayer()->m_orientation.m_yawDegrees;
     }
+
+    m_position += m_velocity * deltaSeconds;
 }
 
 //----------------------------------------------------------------------------------------------------

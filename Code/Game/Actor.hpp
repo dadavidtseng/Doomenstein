@@ -21,12 +21,14 @@ public:
     void  Render() const;
     Mat44 GetModelToWorldTransform() const;
 
-    Vec3        m_position    = Vec3::ZERO;
-    EulerAngles m_orientation = EulerAngles::ZERO;
-    float       m_radius      = 0.f;
-    float       m_height      = 0.f;
-    bool        m_isMovable   = false;
-    Rgba8       m_color       = Rgba8::WHITE;
+    Vec3        m_position        = Vec3::ZERO;
+    Vec3        m_velocity        = Vec3::ZERO;
+    EulerAngles m_orientation     = EulerAngles::ZERO;
+    EulerAngles m_angularVelocity = EulerAngles::ZERO;
+    float       m_radius          = 0.f;
+    float       m_height          = 0.f;
+    bool        m_isMovable       = false;
+    Rgba8       m_color           = Rgba8::WHITE;
 
     Cylinder3 m_cylinder;
 };

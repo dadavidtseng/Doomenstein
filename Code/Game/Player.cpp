@@ -63,7 +63,7 @@ void Player::Update(float deltaSeconds)
     m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
 
     m_velocity                = Vec3::ZERO;
-    float constexpr moveSpeed = 2.f;
+    float constexpr moveSpeed = 1.f;
 
     Vec2 const rightStickInput = controller.GetRightStick().GetPosition();
     m_orientation.m_yawDegrees -= rightStickInput.x * 0.125f;
