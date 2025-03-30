@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Game.hpp"
 
+#include "ActorDefinition.hpp"
 #include "Map.hpp"
 #include "MapDefinition.hpp"
 #include "TileDefinition.hpp"
@@ -379,6 +380,8 @@ void Game::InitializeMaps()
 {
     MapDefinition::InitializeMapDefs();
     TileDefinition::InitializeTileDefs();
+    ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
+    ActorDefinition::s_actorDefinitions;
 
     m_maps.reserve(1);
 

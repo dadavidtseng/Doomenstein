@@ -9,5 +9,8 @@
 //----------------------------------------------------------------------------------------------------
 class AIController : public Controller
 {
+    void DamagedBy();
+    void Update();
 
+    ActorHandle m_targetActorHandle;
 };

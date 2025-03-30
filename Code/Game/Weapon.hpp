@@ -11,5 +11,8 @@ struct WeaponDefinition;
 //----------------------------------------------------------------------------------------------------
 class Weapon
 {
-    WeaponDefinition* m_definition = nullptr;
+    void Fire();
+    void getRandomDirectionInCone();
+
+    WeaponDefinition* m_weaponDefinition = nullptr;
 };

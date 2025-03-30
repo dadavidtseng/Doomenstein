@@ -31,7 +31,7 @@ MapDefinition::MapDefinition(XmlElement const& mapDefElement)
 //----------------------------------------------------------------------------------------------------
 MapDefinition::~MapDefinition()
 {
-    for (MapDefinition* mapDef: s_mapDefinitions)
+    for (MapDefinition const* mapDef : s_mapDefinitions)
     {
         delete mapDef;
     }

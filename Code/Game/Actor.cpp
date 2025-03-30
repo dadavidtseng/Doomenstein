@@ -30,7 +30,13 @@ Actor::Actor(Vec3 const&        position,
       m_isMovable(isMovable),
       m_color(color)
 {
+
+
     m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
+}
+
+Actor::Actor(ActorDefinition const& actorDefinition)
+{
 }
 
 //----------------------------------------------------------------------------------------------------

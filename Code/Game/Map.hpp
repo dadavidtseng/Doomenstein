@@ -64,12 +64,16 @@ public:
 
     Actor* SpawnActor(SpawnInfo const& spawnInfo);
     Actor* GetActorByHandle(ActorHandle handle);
+    void DeletrDestroyedActor();
+    void SpawnPlayer();
+    void GetClosestVisibleEnemy();
+    void DebugPossessNext();
 
     Game* m_game = nullptr;
 
 protected:
     // Map
-    MapDefinition const* m_definition = nullptr;
+    MapDefinition const* m_mapDefinition = nullptr;
     std::vector<Tile>    m_tiles;
     IntVec2              m_dimensions;
 

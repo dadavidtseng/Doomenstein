@@ -27,16 +27,16 @@
 Map::Map(Game*                owner,
          MapDefinition const& mapDef)
     : m_game(owner),
-      m_definition(&mapDef)
+      m_mapDefinition(&mapDef)
 {
-    m_dimensions = m_definition->m_image.GetDimensions();
+    m_dimensions = m_mapDefinition->m_image.GetDimensions();
 
     m_vertexes.reserve(sizeof(AABB3) * m_dimensions.x * m_dimensions.y);
     m_tiles.reserve(static_cast<unsigned int>(m_dimensions.x * m_dimensions.y));
     m_actors.reserve(4);
 
-    m_texture = m_definition->m_spriteSheetTexture;
-    m_shader  = m_definition->m_shader;
+    m_texture = m_mapDefinition->m_spriteSheetTexture;
+    m_shader  = m_mapDefinition->m_shader;
 
     CreateBuffers();
     CreateTiles();
@@ -88,7 +88,7 @@ void Map::CreateTiles()
 
             for (TileDefinition const* tileDef : TileDefinition::s_tileDefinitions)
             {
-                if (m_definition->m_image.GetTexelColor(coords) == tileDef->m_mapImagePixelColor)
+                if (m_mapDefinition->m_image.GetTexelColor(coords) == tileDef->m_mapImagePixelColor)
                 {
                     m_tiles[j + i * m_dimensions.y].m_bounds  = bounds;
                     m_tiles[j + i * m_dimensions.y].m_name    = tileDef->m_name;
@@ -103,8 +103,8 @@ void Map::CreateTiles()
 void Map::CreateGeometry()
 {
     unsigned int      indexOffset          = 0;
-    IntVec2 const     spriteSheetCellCount = m_definition->m_spriteSheetCellCount;
-    SpriteSheet const spriteSheet          = SpriteSheet(*m_definition->m_spriteSheetTexture, spriteSheetCellCount);
+    IntVec2 const     spriteSheetCellCount = m_mapDefinition->m_spriteSheetCellCount;
+    SpriteSheet const spriteSheet          = SpriteSheet(*m_mapDefinition->m_spriteSheetTexture, spriteSheetCellCount);
 
     for (int i = 0; i < m_dimensions.x; ++i)
     {
@@ -117,7 +117,7 @@ void Map::CreateGeometry()
 
             for (TileDefinition const* tileDef : TileDefinition::s_tileDefinitions)
             {
-                if (m_definition->m_image.GetTexelColor(currentTileCoords) == tileDef->m_mapImagePixelColor)
+                if (m_mapDefinition->m_image.GetTexelColor(currentTileCoords) == tileDef->m_mapImagePixelColor)
                 {
                     wallUVs    = spriteSheet.GetSpriteUVs(tileDef->m_wallSpriteCoords.x + tileDef->m_wallSpriteCoords.y * 8);
                     floorUVs   = spriteSheet.GetSpriteUVs(tileDef->m_floorSpriteCoords.x + tileDef->m_floorSpriteCoords.y * 8);
@@ -697,10 +697,31 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
 
 Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
 {
+if (m_nextActorUID >= MAX_ACTOR_UID)
+{
     return nullptr;
 }
 
-Actor* Map::GetActorByHandle(ActorHandle handle)
+    // // 創建 Actor 並加入 m_actors
+    // unsigned int index = static_cast<unsigned int>(m_actors.size());
+    // Actor* newActor = new Actor(spawnInfo); // 根據 SpawnInfo 建立 Actor
+    // m_actors.push_back(newActor);
+    //
+    // // 設定 Handle (UID << 16) | Index
+    // newActor->m_handle = ActorHandle(m_nextActorUID++, index);
+    //
+    // return newActor;
+}
+
+Actor* Map::GetActorByHandle(ActorHandle const handle)
 {
-    return nullptr;
+    // 解析 index
+    unsigned int index = handle.GetIndex();
+
+    // 確保 index 在範圍內且該位置的 Actor 存在
+    if (index >= m_actors.size() || m_actors[index] == nullptr) {
+        return nullptr; // Handle 無效
+    }
+
+    return m_actors[index]; // 返回 Actor 指標
 }
