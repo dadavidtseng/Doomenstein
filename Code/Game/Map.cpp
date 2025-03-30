@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Map.hpp"
 
+#include "ActorDefinition.hpp"
 #include "ActorHandle.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -33,7 +34,7 @@ Map::Map(Game*                owner,
 
     m_vertexes.reserve(sizeof(AABB3) * m_dimensions.x * m_dimensions.y);
     m_tiles.reserve(static_cast<unsigned int>(m_dimensions.x * m_dimensions.y));
-    m_actors.reserve(4);
+    m_actors.reserve(5);
 
     m_texture = m_mapDefinition->m_spriteSheetTexture;
     m_shader  = m_mapDefinition->m_shader;
@@ -42,10 +43,15 @@ Map::Map(Game*                owner,
     CreateTiles();
     CreateGeometry();
 
-    m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    m_actors.push_back(new Actor(Vec3(5.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.0625f, 0.125f, true, Rgba8::BLUE));
+    // m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    // m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    // m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    // m_actors.push_back(new Actor(Vec3(5.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.0625f, 0.125f, true, Rgba8::BLUE));
+
+    for (int actorIndex = 0; actorIndex < 5; ++actorIndex)
+    {
+        m_actors.push_back(new Actor(*ActorDefinition::s_actorDefinitions[actorIndex]));
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -697,10 +703,10 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
 
 Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
 {
-if (m_nextActorUID >= MAX_ACTOR_UID)
-{
-    return nullptr;
-}
+    if (m_nextActorUID >= MAX_ACTOR_UID)
+    {
+        return nullptr;
+    }
 
     // // 創建 Actor 並加入 m_actors
     // unsigned int index = static_cast<unsigned int>(m_actors.size());
@@ -719,7 +725,8 @@ Actor* Map::GetActorByHandle(ActorHandle const handle)
     unsigned int index = handle.GetIndex();
 
     // 確保 index 在範圍內且該位置的 Actor 存在
-    if (index >= m_actors.size() || m_actors[index] == nullptr) {
+    if (index >= m_actors.size() || m_actors[index] == nullptr)
+    {
         return nullptr; // Handle 無效
     }
 

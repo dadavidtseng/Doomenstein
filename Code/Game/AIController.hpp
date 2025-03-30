@@ -7,6 +7,7 @@
 #include "Game/Controller.hpp"
 
 //----------------------------------------------------------------------------------------------------
+// AI controllers should be constructed by the actor when the actor is spawned and immediately possess that actor.
 class AIController : public Controller
 {
     void DamagedBy();

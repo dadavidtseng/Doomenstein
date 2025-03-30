@@ -64,6 +64,9 @@ public:
     ActorDefinition const* m_actorDefinition = nullptr;
     bool                   m_isDead          = false;
     int                    m_health          = -1;
+    bool                   m_canBePossessed  = false;
+    float                  m_corpseLifetime  = 0.f;
+    bool                   m_isVisible       = false;
     Map*                   m_map             = nullptr;
     std::vector<Weapon*>   m_weapons;
     PlayerController*      m_playerController = nullptr;

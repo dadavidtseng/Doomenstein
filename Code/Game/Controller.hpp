@@ -11,6 +11,7 @@
 class Map;
 
 //----------------------------------------------------------------------------------------------------
+// Controllers may possess, and control, an actor.
 class Controller
 {
 public:
@@ -18,6 +19,6 @@ public:
     void GetActor();
 
 protected:
-    ActorHandle m_handle;
+    ActorHandle m_handle;   // The reference to controller's actor is by actor handle.
     Map*        m_map = nullptr;
 };

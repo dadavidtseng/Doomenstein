@@ -22,4 +22,5 @@ struct ActorDefinition
 
     String m_name;
     int    m_health = 0;
+
 };
