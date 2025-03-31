@@ -732,7 +732,7 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
 // If that slot in our list of actors contains an actor, check if that actor’s handle matches the input actor handle.
 // If they do not match, return null.
 // Otherwise, return the actor pointer at that index.
-Actor const* Map::GetActorByHandle(ActorHandle const handle)
+Actor* Map::GetActorByHandle(ActorHandle const handle) const
 {
     if (!handle.IsValid())
     {
@@ -746,7 +746,7 @@ Actor const* Map::GetActorByHandle(ActorHandle const handle)
         return nullptr;
     }
 
-    Actor const* storedActor = m_actors[handleIndex];
+    Actor* storedActor = m_actors[handleIndex];
 
     if (storedActor == nullptr)
     {

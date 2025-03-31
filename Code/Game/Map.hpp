@@ -66,9 +66,9 @@ public:
     RaycastResult3D RaycastWorldActors(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
 
     Actor*       SpawnActor(SpawnInfo const& spawnInfo);
-    Actor const* GetActorByHandle(ActorHandle handle);
+    Actor*       GetActorByHandle(ActorHandle handle) const;
     Actor const* GetActorByName(String const& name);
-    void  GetActorsByName(std::vector<Actor*>& actorList, String const& name);
+    void         GetActorsByName(std::vector<Actor*>& actorList, String const& name);
     void         DeletrDestroyedActor();
     void         SpawnPlayer();
     void         GetClosestVisibleEnemy();

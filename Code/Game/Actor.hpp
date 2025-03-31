@@ -12,6 +12,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Game/ActorHandle.hpp"
 
+class Controller;
 //-Forward-Declaration--------------------------------------------------------------------------------
 class AIController;
 class Map;
@@ -46,12 +47,13 @@ public:
     void  AddForce();
     void  AddImpulse();
     void  OnCollide();
-    void  OnPossessed();
+    void  OnPossessed(Controller* controller);
     void  OnUnpossessed();
     void  MoveInDirection();
     void  TurnInDirection();
     void  Attack();
     void  EquipWeapon();
+    // SwitchInventory(unsigned int index);
 
     Vec3        m_position          = Vec3::ZERO;
     Vec3        m_velocity          = Vec3::ZERO;
@@ -71,7 +73,7 @@ public:
     bool                   m_isVisible      = false;
     Map*                   m_map            = nullptr;
     std::vector<Weapon*>   m_weapons;
-    PlayerController*      m_playerController = nullptr;    // A reference to the controller currently possessing us, if any.
+    Controller*      m_controller = nullptr;    // A reference to the controller currently possessing us, if any.
     ActorHandle            m_handle;
 
     //----------------------------------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 #include "Game/Actor.hpp"
 
 #include "ActorDefinition.hpp"
+#include "AIController.hpp"
 #include "Game.hpp"
 #include "GameCommon.hpp"
 #include "MapDefinition.hpp"
@@ -137,4 +138,21 @@ Mat44 Actor::GetModelToWorldTransform() const
     m2w.Append(m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
 
     return m2w;
+}
+
+//----------------------------------------------------------------------------------------------------
+void Actor::OnPossessed(Controller* controller)
+{
+    m_controller = controller;
+}
+
+//----------------------------------------------------------------------------------------------------
+void Actor::OnUnpossessed()
+{
+    m_controller = nullptr;
+
+    if (m_aiController != nullptr)
+    {
+        m_aiController->Possess(m_handle);
+    }
 }
