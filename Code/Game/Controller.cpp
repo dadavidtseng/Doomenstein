@@ -7,6 +7,7 @@
 
 #include "Actor.hpp"
 #include "Map.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 
 //----------------------------------------------------------------------------------------------------
 Controller::Controller(Map* owner)
@@ -20,10 +21,22 @@ Controller::Controller(Map* owner)
 void Controller::Possess(ActorHandle& actorHandle)
 {
     Actor* currentPossessActor = m_map->GetActorByHandle(m_actorHandle);
-    if (currentPossessActor && currentPossessActor->m_handle.IsValid()) currentPossessActor->OnUnpossessed();
+
+    if (currentPossessActor && currentPossessActor->m_handle.IsValid())
+    {
+        currentPossessActor->OnUnpossessed();
+    }
+
     Actor* newPossessActor = m_map->GetActorByHandle(actorHandle);
-    if (newPossessActor && newPossessActor->m_handle.IsValid()) newPossessActor->OnPossessed(this);
+
+    if (newPossessActor && newPossessActor->m_handle.IsValid())
+    {
+        newPossessActor->OnPossessed(this);
+    }
+
     m_actorHandle = actorHandle;
+
+    DebuggerPrintf("%d\n",m_actorHandle.GetIndex());
 }
 
 //----------------------------------------------------------------------------------------------------

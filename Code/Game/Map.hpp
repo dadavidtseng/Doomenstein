@@ -69,10 +69,10 @@ public:
     Actor*       GetActorByHandle(ActorHandle handle) const;
     Actor const* GetActorByName(String const& name);
     void         GetActorsByName(std::vector<Actor*>& actorList, String const& name);
-    void         DeletrDestroyedActor();
+    void         DeleteDestroyedActor();
     void         SpawnPlayer();
     void         GetClosestVisibleEnemy();
-    void         DebugPossessNext();
+    void         DebugPossessNext() const;
 
     Game* m_game = nullptr;
 

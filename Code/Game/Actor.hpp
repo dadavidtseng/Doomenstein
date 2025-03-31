@@ -73,7 +73,7 @@ public:
     bool                   m_isVisible      = false;
     Map*                   m_map            = nullptr;
     std::vector<Weapon*>   m_weapons;
-    Controller*      m_controller = nullptr;    // A reference to the controller currently possessing us, if any.
+    Controller*            m_controller = nullptr;    // A reference to the controller currently possessing us, if any.
     ActorHandle            m_handle;
 
     //----------------------------------------------------------------------------------------------------

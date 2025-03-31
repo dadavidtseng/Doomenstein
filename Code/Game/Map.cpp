@@ -7,6 +7,8 @@
 
 #include "ActorDefinition.hpp"
 #include "ActorHandle.hpp"
+#include "Game.hpp"
+#include "PlayerController.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -705,6 +707,9 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
     return closestResult;
 }
 
+//----------------------------------------------------------------------------------------------------
+// Spawn a specified actor according to the provided spawn info.
+// Should find or add a slot in our actor list, increment our next uid, generate a handle, and construct and return the actor.
 Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
 {
     if (m_nextActorUID >= MAX_ACTOR_UID)
@@ -789,6 +794,61 @@ void Map::GetActorsByName(std::vector<Actor*>& actorList, String const& name)
             {
                 actorList.push_back(actor);
             }
+        }
+    }
+}
+
+//----------------------------------------------------------------------------------------------------
+// Delete any actors marked as destroyed.
+void Map::DeleteDestroyedActor()
+{
+    // for (Actor* actor : m_actors)
+    // {
+    //     if (actor && actor->m_handle.IsValid() && actor->m_isGarbage)
+    //     {
+    //         unsigned int index = actor->m_handle.GetIndex();
+    //         delete actor;
+    //         m_actors[index] = nullptr;
+    //     }
+    // }
+}
+
+//----------------------------------------------------------------------------------------------------
+// Have the player controller possess the next actor in the list that can be possessed.
+void Map::DebugPossessNext() const
+{
+    PlayerController* playerController = m_game->GetPlayerController();
+
+    if (playerController == nullptr)
+    {
+        return;
+    }
+
+    Actor const* playerControlledActor = playerController->GetActor();
+    unsigned int startIndex            = 0;
+
+    if (playerControlledActor != nullptr)
+    {
+        startIndex = playerControlledActor->m_handle.GetIndex() + 1;
+    }
+
+    unsigned int const actorCount = static_cast<unsigned int>(m_actors.size());
+    if (actorCount == 0)
+    {
+        return;
+    }
+
+    for (unsigned int i = 0; i < actorCount; i++)
+    {
+        unsigned int const desiredIndex   = (startIndex + i) % actorCount;
+        Actor*             potentialActor = m_actors[desiredIndex];
+
+        if (potentialActor &&
+            potentialActor->m_handle.IsValid() &&
+            potentialActor->m_definition->m_canBePossessed)
+        {
+            playerController->Possess(potentialActor->m_handle);
+            return;
         }
     }
 }

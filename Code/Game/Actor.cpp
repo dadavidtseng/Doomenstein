@@ -102,9 +102,9 @@ void Actor::UpdatePosition()
     if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 15.f;
 
 
-    if (g_theGame->GetPlayer() != nullptr)
+    if (g_theGame->GetPlayerController() != nullptr)
     {
-        m_orientation.m_yawDegrees = g_theGame->GetPlayer()->m_orientation.m_yawDegrees;
+        m_orientation.m_yawDegrees = g_theGame->GetPlayerController()->m_orientation.m_yawDegrees;
     }
 
     m_position += m_velocity * deltaSeconds;
@@ -143,7 +143,9 @@ Mat44 Actor::GetModelToWorldTransform() const
 //----------------------------------------------------------------------------------------------------
 void Actor::OnPossessed(Controller* controller)
 {
-    m_controller = controller;
+    m_controller                       = controller;
+    PlayerController* playerController = dynamic_cast<PlayerController*>(m_controller);
+    playerController->m_position       = m_position + Vec3(1.f, 0.f, playerController->m_eyeHeight);
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -175,7 +175,7 @@ Map* Game::GetCurrentMap() const
     return m_currentMap;
 }
 
-PlayerController* Game::GetPlayer() const
+PlayerController* Game::GetPlayerController() const
 {
     return m_playerController;
 }
@@ -194,8 +194,7 @@ void Game::UpdateFromKeyBoard()
         {
             m_currentGameState = eGameState::INGAME;
             InitializeMaps();
-
-            SpawnPlayer();
+            SpawnPlayerController();
         }
     }
 
@@ -264,7 +263,7 @@ void Game::UpdateFromController()
             m_currentGameState = eGameState::INGAME;
             InitializeMaps();
 
-            SpawnPlayer();
+            SpawnPlayerController();
         }
     }
 
@@ -355,7 +354,7 @@ void Game::RenderEntities() const
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::SpawnPlayer()
+void Game::SpawnPlayerController()
 {
     if (m_currentMap == nullptr) return;
 
@@ -363,14 +362,15 @@ void Game::SpawnPlayer()
     spawnInfo.m_name = "Marine";
     std::vector<Actor*> tempActorList;
     m_currentMap->GetActorsByName(tempActorList, "SpawnPoint");
-    Actor const* tempActor = tempActorList[g_theRNG->RollRandomIntInRange(0, static_cast<int>(tempActorList.size())-1)];
-    spawnInfo.m_position = tempActor->m_position;
+    Actor const* tempActor  = tempActorList[g_theRNG->RollRandomIntInRange(0, static_cast<int>(tempActorList.size()) - 1)];
+    spawnInfo.m_position    = tempActor->m_position;
     spawnInfo.m_orientation = tempActor->m_orientation;
 
-    Actor* playerActor = m_currentMap->SpawnActor(spawnInfo);
+    Actor const* playerActor = m_currentMap->SpawnActor(spawnInfo);
 
-    m_playerController = new PlayerController(m_currentMap);
-    m_playerController->Possess();
+    m_playerController             = new PlayerController(m_currentMap);
+    m_playerController->m_position = playerActor->m_position + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
+    m_playerController->Possess(m_playerController->m_actorHandle);
 }
 
 //----------------------------------------------------------------------------------------------------

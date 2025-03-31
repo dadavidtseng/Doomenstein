@@ -33,7 +33,7 @@ public:
     void              Render() const;
     bool              IsAttractMode() const;
     Map*              GetCurrentMap() const;
-    PlayerController* GetPlayer() const;
+    PlayerController* GetPlayerController() const;
     Clock*            m_gameClock = nullptr;
 
 private:
@@ -45,7 +45,7 @@ private:
     void RenderEntities() const;
 
     void       InitializeMaps();
-    void       SpawnPlayer();
+    void       SpawnPlayerController();
     void       ChangeState(eGameState nextState);
     eGameState GetGameState() const;
 

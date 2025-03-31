@@ -9,7 +9,8 @@ ActorHandle const ActorHandle::INVALID = ActorHandle(0x0000ffff, 0x0000ffff);
 
 //----------------------------------------------------------------------------------------------------
 ActorHandle::ActorHandle()
-    : m_data(INVALID.m_data)
+    : m_data()
+// : m_data(INVALID.m_data)
 {
 }
 

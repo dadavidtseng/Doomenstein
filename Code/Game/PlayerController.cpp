@@ -30,7 +30,7 @@ PlayerController::PlayerController(Map* owner)
     m_worldCamera->SetPosition(Vec3(-2.f, 0.f, 0.f));
 
     // m_position = Vec3(2.5f, 8.5f, 0.5f);
-    m_position = Vec3(2.5f, 8.5f, m_eyeHeight);
+    m_position.z = m_eyeHeight;
 
     Mat44 c2r;
 
@@ -128,6 +128,10 @@ void PlayerController::Render() const
 //----------------------------------------------------------------------------------------------------
 void PlayerController::UpdateFromKeyBoard()
 {
+    if (g_theInput->WasKeyJustPressed(KEYCODE_N))
+    {
+        m_map->DebugPossessNext();
+    }
     if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
     {
         m_isMovable = !m_isMovable;
