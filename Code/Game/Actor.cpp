@@ -8,6 +8,7 @@
 #include "ActorDefinition.hpp"
 #include "Game.hpp"
 #include "GameCommon.hpp"
+#include "MapDefinition.hpp"
 #include "PlayerController.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -17,29 +18,46 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
-//----------------------------------------------------------------------------------------------------
-Actor::Actor(Vec3 const&        position,
-             EulerAngles const& orientation,
-             float const        radius,
-             float const        height,
-             bool const         isMovable,
-             Rgba8 const&       color)
-    : m_position(position),
-      m_orientation(orientation),
-      m_radius(radius),
-      m_height(height),
-      m_isMovable(isMovable),
-      m_color(color)
-{
-
-
-    m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
-}
-
-// Actor::Actor(ActorDefinition const& actorDefinition)
+// //----------------------------------------------------------------------------------------------------
+// Actor::Actor(Vec3 const&        position,
+//              EulerAngles const& orientation,
+//              float const        radius,
+//              float const        height,
+//              bool const         isMovable,
+//              Rgba8 const&       color)
+//     : m_position(position),
+//       m_orientation(orientation),
+//       m_radius(radius),
+//       m_height(height),
+//       m_isMovable(isMovable),
+//       m_color(color)
 // {
-//     m_health = actorDefinition.m_health;
+//
+//
+//     m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 // }
+
+Actor::Actor(SpawnInfo const& spawnInfo)
+{
+    ActorDefinition const* definition = ActorDefinition::GetDefByName(spawnInfo.m_name);
+
+    if (definition == nullptr)
+    {
+        ERROR_AND_DIE("Failed to find actor definition")
+    }
+
+    m_health      = definition->m_health;
+    m_radius      = definition->m_radius;
+    m_position    = spawnInfo.m_position;
+    m_orientation = spawnInfo.m_orientation;
+
+    if (spawnInfo.m_name == "Demon")
+    {
+        m_color = Rgba8::RED;
+    }
+
+    m_collisionCylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
+}
 
 //----------------------------------------------------------------------------------------------------
 void Actor::Update()
@@ -48,8 +66,8 @@ void Actor::Update()
 
     UpdatePosition();
 
-    m_cylinder.m_startPosition = m_position;
-    m_cylinder.m_endPosition   = m_position + Vec3(0.f, 0.f, m_height);
+    m_collisionCylinder.m_startPosition = m_position;
+    m_collisionCylinder.m_endPosition   = m_position + Vec3(0.f, 0.f, m_height);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -90,8 +108,8 @@ void Actor::Render() const
 {
     VertexList_PCU verts;
 
-    AddVertsForCylinder3D(verts, m_cylinder.m_startPosition, m_cylinder.m_endPosition, m_cylinder.m_radius, m_color);
-    AddVertsForWireframeCylinder3D(verts, m_cylinder.m_startPosition, m_cylinder.m_endPosition, m_cylinder.m_radius, 0.001f);
+    AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, m_color);
+    AddVertsForWireframeCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, 0.001f);
 
     g_theRenderer->SetModelConstants();
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);

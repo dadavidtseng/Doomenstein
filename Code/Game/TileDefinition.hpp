@@ -17,7 +17,7 @@ struct TileDefinition
     bool LoadFromXmlElement(XmlElement const& element);
 
     static void                         InitializeTileDefs(char const* path);
-    static TileDefinition const*        GetTileDefByName(String const& name);
+    static TileDefinition const*        GetDefByName(String const& name);
     static StringList                   GetTileNames();
     static std::vector<TileDefinition*> s_tileDefinitions;
 

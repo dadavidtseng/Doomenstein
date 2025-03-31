@@ -43,11 +43,15 @@ Map::Map(Game*                owner,
     CreateTiles();
     CreateGeometry();
 
-    m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    m_actors.push_back(new Actor(Vec3(5.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.0625f, 0.125f, true, Rgba8::BLUE));
+    // m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    // m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    // m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    // m_actors.push_back(new Actor(Vec3(5.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.0625f, 0.125f, true, Rgba8::BLUE));
 
+    for (SpawnInfo const& spawnInfo : m_mapDefinition->m_spawnInfos)
+    {
+        SpawnActor(spawnInfo);
+    }
     // for (int actorIndex = 0; actorIndex < 5; ++actorIndex)
     // {
     //     m_actors.push_back(new Actor(*ActorDefinition::s_actorDefinitions[actorIndex]));
@@ -376,8 +380,8 @@ void Map::CollideActors(Actor* actorA,
     if (!actorA->m_isMovable && !actorB->m_isMovable) return;
 
     // 2. Get actors' MinMaxZ range.
-    FloatRange const actorAMinMaxZ = actorA->m_cylinder.GetFloatRange();
-    FloatRange const actorBMinMaxZ = actorB->m_cylinder.GetFloatRange();
+    FloatRange const actorAMinMaxZ = actorA->m_collisionCylinder.GetFloatRange();
+    FloatRange const actorBMinMaxZ = actorB->m_collisionCylinder.GetFloatRange();
 
     // 3. If actors are not overlapping on their MinMaxZ range, there will be no collision, so return.
     if (!actorAMinMaxZ.IsOverlappingWith(actorBMinMaxZ))
@@ -683,7 +687,7 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
 
     for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
-        Cylinder3             cylinder3 = m_actors[i]->m_cylinder;
+        Cylinder3             cylinder3 = m_actors[i]->m_collisionCylinder;
         RaycastResult3D const result    = RaycastVsCylinderZ3D(startPosition,
                                                                forwardNormal, maxLength,
                                                                cylinder3.GetCenterPositionXY(),
@@ -708,6 +712,9 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
         return nullptr;
     }
 
+    Actor* newActor = new Actor(spawnInfo);
+    m_actors.push_back(newActor);
+
     // // 創建 Actor 並加入 m_actors
     // unsigned int index = static_cast<unsigned int>(m_actors.size());
     // Actor* newActor = new Actor(spawnInfo); // 根據 SpawnInfo 建立 Actor
@@ -716,7 +723,7 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
     // // 設定 Handle (UID << 16) | Index
     // newActor->m_handle = ActorHandle(m_nextActorUID++, index);
     //
-    // return newActor;
+    return newActor;
 }
 
 Actor* Map::GetActorByHandle(ActorHandle const handle)

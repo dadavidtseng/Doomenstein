@@ -87,7 +87,7 @@ STATIC void TileDefinition::InitializeTileDefs(char const* path)
 }
 
 //----------------------------------------------------------------------------------------------------
-TileDefinition const* TileDefinition::GetTileDefByName(String const& name)
+TileDefinition const* TileDefinition::GetDefByName(String const& name)
 {
     for (TileDefinition const* tileDef : s_tileDefinitions)
     {

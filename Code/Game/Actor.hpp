@@ -17,23 +17,24 @@ class Map;
 class PlayerController;
 class Weapon;
 struct ActorDefinition;
+struct SpawnInfo;
 
-//----------------------------------------------------------------------------------------------------
-enum class eActorFaction : int8_t
-{
-    INVALID = -1,
-    MARINE,
-    DEMON,
-    BULLET,
-    COUNT
-};
+// //----------------------------------------------------------------------------------------------------
+// enum class eActorFaction : int8_t
+// {
+//     INVALID = -1,
+//     MARINE,
+//     DEMON,
+//     NEUTRAL,
+//     COUNT
+// };
 
 //----------------------------------------------------------------------------------------------------
 class Actor
 {
 public:
-    Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
-    // Actor(ActorDefinition const& actorDefinition);
+    // Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
+    explicit Actor(SpawnInfo const& spawnInfo);
 
     void  Update();
     void  UpdatePosition();
@@ -51,24 +52,29 @@ public:
     void  Attack();
     void  EquipWeapon();
 
-    Vec3        m_position        = Vec3::ZERO;
-    Vec3        m_velocity        = Vec3::ZERO;
-    EulerAngles m_orientation     = EulerAngles::ZERO;
-    EulerAngles m_angularVelocity = EulerAngles::ZERO;
-    float       m_radius          = 0.f;
-    float       m_height          = 0.f;
-    bool        m_isMovable       = false;
-    Rgba8       m_color           = Rgba8::WHITE;
-    Cylinder3   m_cylinder;
+    Vec3        m_position          = Vec3::ZERO;
+    Vec3        m_velocity          = Vec3::ZERO;
+    EulerAngles m_orientation       = EulerAngles::ZERO;
+    EulerAngles m_angularVelocity   = EulerAngles::ZERO;
+    float       m_radius            = 1.f;
+    float       m_height            = 1.f;
+    bool        m_isMovable         = false;
+    Rgba8       m_color             = Rgba8::WHITE;
+    Cylinder3   m_collisionCylinder = Cylinder3();
 
-    ActorDefinition const* m_actorDefinition = nullptr;
-    bool                   m_isDead          = false;
-    int                    m_health          = -1;
+    ActorDefinition const* m_actorDefinition = nullptr; // A reference to our actor definition.
+    bool                   m_isDead          = false;   // Any data needed to track if and how long we have been dead.
+    int                    m_health          = 0;       // Current health.
     bool                   m_canBePossessed  = false;
     float                  m_corpseLifetime  = 0.f;
     bool                   m_isVisible       = false;
     Map*                   m_map             = nullptr;
     std::vector<Weapon*>   m_weapons;
-    PlayerController*      m_playerController = nullptr;
-    AIController*          m_aiController     = nullptr;
+    PlayerController*      m_playerController = nullptr;    // A reference to the controller currently possessing us, if any.
+
+    //----------------------------------------------------------------------------------------------------
+    // A reference to our default AI controller, if any.
+    // Used to keep track of our AI controller if the player possesses this actor,
+    // in which case he pushes the AI out of the way until he releases possession.
+    AIController* m_aiController = nullptr;    // AI controllers should be constructed by the actor when the actor is spawned and immediately possess that actor.
 };

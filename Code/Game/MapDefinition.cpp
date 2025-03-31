@@ -38,6 +38,24 @@ bool MapDefinition::LoadFromXmlElement(XmlElement const& element)
     m_shader             = g_theRenderer->CreateOrGetShaderFromFile(shaderFilePath.c_str(), eVertexType::VERTEX_PCUTBN);
     m_spriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile(spriteSheetTextureFilePath.c_str());
 
+    XmlElement const* spawnInfosElement = element.FirstChildElement("SpawnInfos");
+
+    if (spawnInfosElement != nullptr)
+    {
+        XmlElement const* spawnInfoElement = spawnInfosElement->FirstChildElement("SpawnInfo");
+
+        while (spawnInfoElement != nullptr)
+        {
+            SpawnInfo spawnInfo;
+
+            spawnInfo.m_name        = ParseXmlAttribute(*spawnInfoElement, "actor", "Unnamed");
+            spawnInfo.m_position    = ParseXmlAttribute(*spawnInfoElement, "position", Vec3::ZERO);
+            spawnInfo.m_orientation = ParseXmlAttribute(*spawnInfoElement, "orientation", EulerAngles::ZERO);
+            m_spawnInfos.push_back(spawnInfo);
+            spawnInfoElement = spawnInfoElement->NextSiblingElement("SpawnInfo");
+        }
+    }
+
     return true;
 }
 
