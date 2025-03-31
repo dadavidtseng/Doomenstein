@@ -18,28 +18,28 @@
 #include "Engine/Renderer/Renderer.hpp"
 
 //----------------------------------------------------------------------------------------------------
-// Actor::Actor(Vec3 const&        position,
-//              EulerAngles const& orientation,
-//              float const        radius,
-//              float const        height,
-//              bool const         isMovable,
-//              Rgba8 const&       color)
-//     : m_position(position),
-//       m_orientation(orientation),
-//       m_radius(radius),
-//       m_height(height),
-//       m_isMovable(isMovable),
-//       m_color(color)
-// {
-//
-//
-//     m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
-// }
-
-Actor::Actor(ActorDefinition const& actorDefinition)
+Actor::Actor(Vec3 const&        position,
+             EulerAngles const& orientation,
+             float const        radius,
+             float const        height,
+             bool const         isMovable,
+             Rgba8 const&       color)
+    : m_position(position),
+      m_orientation(orientation),
+      m_radius(radius),
+      m_height(height),
+      m_isMovable(isMovable),
+      m_color(color)
 {
-    m_health = actorDefinition.m_health;
+
+
+    m_cylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 }
+
+// Actor::Actor(ActorDefinition const& actorDefinition)
+// {
+//     m_health = actorDefinition.m_health;
+// }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::Update()

@@ -20,10 +20,12 @@ struct SpawnInfo
 //----------------------------------------------------------------------------------------------------
 struct MapDefinition
 {
-    explicit MapDefinition(XmlElement const& mapDefElement);
+    MapDefinition() = default;
     ~MapDefinition();
 
-    static void                        InitializeMapDefs();
+    bool LoadFromXmlElement(XmlElement const& element);
+
+    static void                        InitializeMapDefs(char const* path);
     static std::vector<MapDefinition*> s_mapDefinitions;
 
     String         m_name;

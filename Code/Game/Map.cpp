@@ -43,15 +43,15 @@ Map::Map(Game*                owner,
     CreateTiles();
     CreateGeometry();
 
-    // m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    // m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    // m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
-    // m_actors.push_back(new Actor(Vec3(5.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.0625f, 0.125f, true, Rgba8::BLUE));
+    m_actors.push_back(new Actor(Vec3(7.5f, 8.5f, 0.25f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    m_actors.push_back(new Actor(Vec3(8.5f, 8.5f, 0.125f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    m_actors.push_back(new Actor(Vec3(9.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.35f, 0.75f, false, Rgba8::RED));
+    m_actors.push_back(new Actor(Vec3(5.5f, 8.5f, 0.f), EulerAngles::ZERO, 0.0625f, 0.125f, true, Rgba8::BLUE));
 
-    for (int actorIndex = 0; actorIndex < 5; ++actorIndex)
-    {
-        m_actors.push_back(new Actor(*ActorDefinition::s_actorDefinitions[actorIndex]));
-    }
+    // for (int actorIndex = 0; actorIndex < 5; ++actorIndex)
+    // {
+    //     m_actors.push_back(new Actor(*ActorDefinition::s_actorDefinitions[actorIndex]));
+    // }
 }
 
 //----------------------------------------------------------------------------------------------------

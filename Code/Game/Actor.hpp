@@ -32,8 +32,8 @@ enum class eActorFaction : int8_t
 class Actor
 {
 public:
-    // Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
-    Actor(ActorDefinition const& actorDefinition);
+    Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
+    // Actor(ActorDefinition const& actorDefinition);
 
     void  Update();
     void  UpdatePosition();

@@ -11,10 +11,12 @@
 //----------------------------------------------------------------------------------------------------
 struct TileDefinition
 {
-    explicit TileDefinition(XmlElement const& tileDefElement);
+    TileDefinition() = default;
     ~TileDefinition();
 
-    static void                         InitializeTileDefs();
+    bool LoadFromXmlElement(XmlElement const& element);
+
+    static void                         InitializeTileDefs(char const* path);
     static TileDefinition const*        GetTileDefByName(String const& name);
     static StringList                   GetTileNames();
     static std::vector<TileDefinition*> s_tileDefinitions;

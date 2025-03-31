@@ -378,8 +378,8 @@ eGameState Game::GetGameState() const
 //----------------------------------------------------------------------------------------------------
 void Game::InitializeMaps()
 {
-    MapDefinition::InitializeMapDefs();
-    TileDefinition::InitializeTileDefs();
+    MapDefinition::InitializeMapDefs("Data/Definitions/MapDefinitions.xml");
+    TileDefinition::InitializeTileDefs("Data/Definitions/TileDefinitions.xml");
     ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
 
     m_maps.reserve(1);
