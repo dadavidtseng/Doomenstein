@@ -4,10 +4,10 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
-
 #include "Game/ActorHandle.hpp"
 
-//----------------------------------------------------------------------------------------------------
+//-Forward-Declaration--------------------------------------------------------------------------------
+class Actor;
 class Map;
 
 //----------------------------------------------------------------------------------------------------
@@ -15,10 +15,14 @@ class Map;
 class Controller
 {
 public:
-    void Possess();
-    void GetActor();
+    explicit Controller(Map* owner);
+    virtual  ~Controller() = default;
+
+    virtual void         Possess();
+    virtual Actor const* GetActor();
 
 protected:
-    ActorHandle m_handle;   // The reference to controller's actor is by actor handle.
-    Map*        m_map = nullptr;
+    // The reference to controller's actor is by actor handle.
+    ActorHandle m_handle;           // Handle of our currently possessed actor or INVALID if no actor is possessed.
+    Map*        m_map = nullptr;    // Reference to the current map for purposes of dereferencing actor handles.
 };

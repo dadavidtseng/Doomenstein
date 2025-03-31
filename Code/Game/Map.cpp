@@ -712,30 +712,83 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
         return nullptr;
     }
 
-    Actor* newActor = new Actor(spawnInfo);
-    m_actors.push_back(newActor);
+    unsigned int const newIndex = static_cast<unsigned int>(m_actors.size());
+    Actor*             newActor = new Actor(spawnInfo);
 
-    // // 創建 Actor 並加入 m_actors
-    // unsigned int index = static_cast<unsigned int>(m_actors.size());
-    // Actor* newActor = new Actor(spawnInfo); // 根據 SpawnInfo 建立 Actor
-    // m_actors.push_back(newActor);
-    //
-    // // 設定 Handle (UID << 16) | Index
-    // newActor->m_handle = ActorHandle(m_nextActorUID++, index);
-    //
+    ActorHandle const handle = ActorHandle(m_nextActorUID, newIndex);
+    newActor->m_handle       = handle;
+    newActor->m_map          = this;
+
+    m_actors.push_back(newActor);
+    m_nextActorUID++;
+
     return newActor;
 }
 
-Actor* Map::GetActorByHandle(ActorHandle const handle)
+//----------------------------------------------------------------------------------------------------
+// Dereference an actor handle and return an actor pointer.
+// Get the index from the actor handle.
+// If that slot in our list of actors is null, return null.
+// If that slot in our list of actors contains an actor, check if that actor’s handle matches the input actor handle.
+// If they do not match, return null.
+// Otherwise, return the actor pointer at that index.
+Actor const* Map::GetActorByHandle(ActorHandle const handle)
 {
-    // 解析 index
-    unsigned int index = handle.GetIndex();
-
-    // 確保 index 在範圍內且該位置的 Actor 存在
-    if (index >= m_actors.size() || m_actors[index] == nullptr)
+    if (!handle.IsValid())
     {
-        return nullptr; // Handle 無效
+        return nullptr;
     }
 
-    return m_actors[index]; // 返回 Actor 指標
+    unsigned int const handleIndex = handle.GetIndex();
+
+    if (handleIndex >= m_actors.size())
+    {
+        return nullptr;
+    }
+
+    Actor const* storedActor = m_actors[handleIndex];
+
+    if (storedActor == nullptr)
+    {
+        return nullptr;
+    }
+
+    if (storedActor->m_handle != handle)
+    {
+        return nullptr;
+    }
+
+    return storedActor;
+}
+
+Actor const* Map::GetActorByName(String const& name)
+{
+    for (Actor const* actor : m_actors)
+    {
+        if (actor != nullptr &&
+            actor->m_handle.IsValid())
+        {
+            if (actor->m_definition->m_name == name)
+            {
+                return actor;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+void Map::GetActorsByName(std::vector<Actor*>& actorList, String const& name)
+{
+    for (Actor* actor : m_actors)
+    {
+        if (actor != nullptr &&
+            actor->m_handle.IsValid())
+        {
+            if (actor->m_definition->m_name == name)
+            {
+                actorList.push_back(actor);
+            }
+        }
+    }
 }

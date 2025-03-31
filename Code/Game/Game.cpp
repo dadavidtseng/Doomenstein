@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Game.hpp"
 
+#include "Actor.hpp"
 #include "ActorDefinition.hpp"
 #include "Map.hpp"
 #include "MapDefinition.hpp"
@@ -13,6 +14,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
@@ -23,7 +25,7 @@
 //----------------------------------------------------------------------------------------------------
 Game::Game()
 {
-    SpawnPlayer();
+    // SpawnPlayer();
 
     m_screenCamera = new Camera();
 
@@ -65,10 +67,10 @@ Game::~Game()
         m_gameClock = nullptr;
     }
 
-    if (m_player != nullptr)
+    if (m_playerController != nullptr)
     {
-        delete m_player;
-        m_player = nullptr;
+        delete m_playerController;
+        m_playerController = nullptr;
     }
 
     if (m_screenCamera != nullptr)
@@ -92,7 +94,7 @@ void Game::Update()
     UpdateFromController();
 
     if (m_currentMap != nullptr &&
-        !m_player->m_isMovable)
+        !m_playerController->m_isMovable)
     {
         m_currentMap->Update();
     }
@@ -103,9 +105,9 @@ void Game::Render() const
 {
     //-Start-of-Game-Camera---------------------------------------------------------------------------
 
-    if (m_player != nullptr)
+    if (m_playerController != nullptr)
     {
-        g_theRenderer->BeginCamera(*m_player->GetCamera());
+        g_theRenderer->BeginCamera(*m_playerController->GetCamera());
 
         if (m_currentGameState == eGameState::INGAME)
         {
@@ -117,7 +119,7 @@ void Game::Render() const
             }
         }
 
-        g_theRenderer->EndCamera(*m_player->GetCamera());
+        g_theRenderer->EndCamera(*m_playerController->GetCamera());
     }
 
     //-End-of-Game-Camera-----------------------------------------------------------------------------
@@ -125,9 +127,9 @@ void Game::Render() const
 
     if (m_currentGameState == eGameState::INGAME)
     {
-        if (m_player != nullptr)
+        if (m_playerController != nullptr)
         {
-            DebugRenderWorld(*m_player->GetCamera());
+            DebugRenderWorld(*m_playerController->GetCamera());
         }
     }
 
@@ -175,7 +177,7 @@ Map* Game::GetCurrentMap() const
 
 PlayerController* Game::GetPlayer() const
 {
-    return m_player;
+    return m_playerController;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -203,10 +205,10 @@ void Game::UpdateFromKeyBoard()
         {
             m_currentGameState = eGameState::ATTRACT;
 
-            if (m_player != nullptr)
+            if (m_playerController != nullptr)
             {
-                delete m_player;
-                m_player = nullptr;
+                delete m_playerController;
+                m_playerController = nullptr;
             }
 
             if (m_currentMap != nullptr)
@@ -238,9 +240,9 @@ void Game::UpdateFromKeyBoard()
             m_gameClock->SetTimeScale(1.f);
         }
 
-        if (m_player != nullptr)
+        if (m_playerController != nullptr)
         {
-            DebugAddMessage(Stringf("Player Position: (%.2f, %.2f, %.2f)", m_player->m_position.x, m_player->m_position.y, m_player->m_position.z), 0.f);
+            DebugAddMessage(Stringf("Player Position: (%.2f, %.2f, %.2f)", m_playerController->m_position.x, m_playerController->m_position.y, m_playerController->m_position.z), 0.f);
         }
     }
 }
@@ -272,10 +274,10 @@ void Game::UpdateFromController()
         {
             m_currentGameState = eGameState::ATTRACT;
 
-            if (m_player != nullptr)
+            if (m_playerController != nullptr)
             {
-                delete m_player;
-                m_player = nullptr;
+                delete m_playerController;
+                m_playerController = nullptr;
             }
 
             if (m_currentMap != nullptr)
@@ -317,10 +319,10 @@ void Game::UpdateFromController()
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateEntities(float const gameDeltaSeconds, float const systemDeltaSeconds) const
 {
-    if (m_player != nullptr &&
+    if (m_playerController != nullptr &&
         m_currentGameState == eGameState::INGAME)
     {
-        m_player->Update(systemDeltaSeconds);
+        m_playerController->Update(systemDeltaSeconds);
     }
 
     DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / gameDeltaSeconds, m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
@@ -335,7 +337,7 @@ void Game::RenderAttractMode() const
 //----------------------------------------------------------------------------------------------------
 void Game::RenderInGame() const
 {
-    if (m_player->m_isMovable)
+    if (m_playerController->m_isMovable)
     {
         DebugAddScreenText(Stringf("(F1)Control Mode:Player Camera"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
     }
@@ -349,13 +351,26 @@ void Game::RenderInGame() const
 void Game::RenderEntities() const
 {
     // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
-    m_player->Render();
+    m_playerController->Render();
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::SpawnPlayer()
 {
-    m_player = new PlayerController(this);
+    if (m_currentMap == nullptr) return;
+
+    SpawnInfo spawnInfo;
+    spawnInfo.m_name = "Marine";
+    std::vector<Actor*> tempActorList;
+    m_currentMap->GetActorsByName(tempActorList, "SpawnPoint");
+    Actor const* tempActor = tempActorList[g_theRNG->RollRandomIntInRange(0, static_cast<int>(tempActorList.size())-1)];
+    spawnInfo.m_position = tempActor->m_position;
+    spawnInfo.m_orientation = tempActor->m_orientation;
+
+    Actor* playerActor = m_currentMap->SpawnActor(spawnInfo);
+
+    m_playerController = new PlayerController(m_currentMap);
+    m_playerController->Possess();
 }
 
 //----------------------------------------------------------------------------------------------------

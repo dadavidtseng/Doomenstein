@@ -5,8 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/PlayerController.hpp"
 
-#include "Game.hpp"
-#include "Map.hpp"
+#include "ActorDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/DevConsole.hpp"
 #include "Engine/Core/EngineCommon.hpp"
@@ -15,18 +14,23 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
+#include "Game/Map.hpp"
 
 //----------------------------------------------------------------------------------------------------
-PlayerController::PlayerController(Game* owner)
+PlayerController::PlayerController(Map* owner)
+    : Controller(owner)
 {
-    m_game        = owner;
+    ActorDefinition const* definition = ActorDefinition::GetDefByName("Marine");
+
+    m_eyeHeight = definition->m_eyeHeight;
+    m_cameraFOV = definition->m_cameraFOV;
+
     m_worldCamera = new Camera();
-
-    m_worldCamera->SetPerspectiveGraphicView(2.f, 60.f, 0.1f, 100.f);
-
+    m_worldCamera->SetPerspectiveGraphicView(2.f, m_cameraFOV, 0.1f, 100.f);
     m_worldCamera->SetPosition(Vec3(-2.f, 0.f, 0.f));
 
-    m_position = Vec3(2.5f, 8.5f, 0.5f);
+    // m_position = Vec3(2.5f, 8.5f, 0.5f);
+    m_position = Vec3(2.5f, 8.5f, m_eyeHeight);
 
     Mat44 c2r;
 
@@ -131,9 +135,10 @@ void PlayerController::UpdateFromKeyBoard()
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
     {
-        Vec3 const            forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
-        Ray3 const            ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
-        RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
+        Vec3 const forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+        Ray3 const ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
+        // RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
+        RaycastResult3D const result = m_map->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
 
         if (result.m_didImpact == true)
         {

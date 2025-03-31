@@ -39,17 +39,23 @@
 
 Actor::Actor(SpawnInfo const& spawnInfo)
 {
-    ActorDefinition const* definition = ActorDefinition::GetDefByName(spawnInfo.m_name);
+    m_definition = ActorDefinition::GetDefByName(spawnInfo.m_name);
 
-    if (definition == nullptr)
+    if (m_definition == nullptr)
     {
         ERROR_AND_DIE("Failed to find actor definition")
     }
 
-    m_health      = definition->m_health;
-    m_radius      = definition->m_radius;
+    m_health      = m_definition->m_health;
+    m_height      = m_definition->m_height;
+    m_radius      = m_definition->m_radius;
     m_position    = spawnInfo.m_position;
     m_orientation = spawnInfo.m_orientation;
+
+    if (spawnInfo.m_name == "Marine")
+    {
+        m_color = Rgba8::GREEN;
+    }
 
     if (spawnInfo.m_name == "Demon")
     {

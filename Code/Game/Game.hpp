@@ -29,12 +29,12 @@ public:
     Game();
     ~Game();
 
-    void   Update();
-    void   Render() const;
-    bool   IsAttractMode() const;
-    Map*   GetCurrentMap() const;
+    void              Update();
+    void              Render() const;
+    bool              IsAttractMode() const;
+    Map*              GetCurrentMap() const;
     PlayerController* GetPlayer() const;
-    Clock* m_gameClock = nullptr;
+    Clock*            m_gameClock = nullptr;
 
 private:
     void UpdateFromKeyBoard();
@@ -50,7 +50,7 @@ private:
     eGameState GetGameState() const;
 
     Camera*           m_screenCamera     = nullptr;
-    PlayerController*           m_player           = nullptr;
+    PlayerController* m_playerController = nullptr;
     eGameState        m_currentGameState = eGameState::ATTRACT;
     std::vector<Map*> m_maps;
     Map*              m_currentMap = nullptr;

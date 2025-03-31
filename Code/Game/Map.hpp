@@ -4,6 +4,9 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
+#include <string>
+
+#include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
@@ -62,12 +65,14 @@ public:
     RaycastResult3D RaycastWorldZ(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldActors(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
 
-    Actor* SpawnActor(SpawnInfo const& spawnInfo);
-    Actor* GetActorByHandle(ActorHandle handle);
-    void DeletrDestroyedActor();
-    void SpawnPlayer();
-    void GetClosestVisibleEnemy();
-    void DebugPossessNext();
+    Actor*       SpawnActor(SpawnInfo const& spawnInfo);
+    Actor const* GetActorByHandle(ActorHandle handle);
+    Actor const* GetActorByName(String const& name);
+    void  GetActorsByName(std::vector<Actor*>& actorList, String const& name);
+    void         DeletrDestroyedActor();
+    void         SpawnPlayer();
+    void         GetClosestVisibleEnemy();
+    void         DebugPossessNext();
 
     Game* m_game = nullptr;
 

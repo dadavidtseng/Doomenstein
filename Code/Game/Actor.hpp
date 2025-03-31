@@ -10,6 +10,7 @@
 #include "Engine/Math/Cylinder3.hpp"
 #include "Engine/Math/EulerAngles.hpp"
 #include "Engine/Math/Vec3.hpp"
+#include "Game/ActorHandle.hpp"
 
 //-Forward-Declaration--------------------------------------------------------------------------------
 class AIController;
@@ -56,21 +57,22 @@ public:
     Vec3        m_velocity          = Vec3::ZERO;
     EulerAngles m_orientation       = EulerAngles::ZERO;
     EulerAngles m_angularVelocity   = EulerAngles::ZERO;
-    float       m_radius            = 1.f;
-    float       m_height            = 1.f;
+    float       m_radius            = 0.f;
+    float       m_height            = 0.f;
     bool        m_isMovable         = false;
     Rgba8       m_color             = Rgba8::WHITE;
     Cylinder3   m_collisionCylinder = Cylinder3();
 
-    ActorDefinition const* m_actorDefinition = nullptr; // A reference to our actor definition.
-    bool                   m_isDead          = false;   // Any data needed to track if and how long we have been dead.
-    int                    m_health          = 0;       // Current health.
-    bool                   m_canBePossessed  = false;
-    float                  m_corpseLifetime  = 0.f;
-    bool                   m_isVisible       = false;
-    Map*                   m_map             = nullptr;
+    ActorDefinition const* m_definition     = nullptr; // A reference to our actor definition.
+    bool                   m_isDead         = false;   // Any data needed to track if and how long we have been dead.
+    int                    m_health         = 0;       // Current health.
+    bool                   m_canBePossessed = false;
+    float                  m_corpseLifetime = 0.f;
+    bool                   m_isVisible      = false;
+    Map*                   m_map            = nullptr;
     std::vector<Weapon*>   m_weapons;
     PlayerController*      m_playerController = nullptr;    // A reference to the controller currently possessing us, if any.
+    ActorHandle            m_handle;
 
     //----------------------------------------------------------------------------------------------------
     // A reference to our default AI controller, if any.
