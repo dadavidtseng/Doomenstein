@@ -12,9 +12,9 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Game/ActorHandle.hpp"
 
-class Controller;
 //-Forward-Declaration--------------------------------------------------------------------------------
 class AIController;
+class Controller;
 class Map;
 class PlayerController;
 class Weapon;
@@ -55,9 +55,9 @@ public:
     void  EquipWeapon();
     // SwitchInventory(unsigned int index);
 
-    Vec3        m_position          = Vec3::ZERO;
-    Vec3        m_velocity          = Vec3::ZERO;
-    EulerAngles m_orientation       = EulerAngles::ZERO;
+    Vec3        m_position          = Vec3::ZERO;               // 3D position, as a Vec3, in world units.
+    Vec3        m_velocity          = Vec3::ZERO;               // 3D velocity, as a Vec3, in world units per second.
+    EulerAngles m_orientation       = EulerAngles::ZERO;        // 3D orientation, as EulerAngles, in degrees.
     EulerAngles m_angularVelocity   = EulerAngles::ZERO;
     float       m_radius            = 0.f;
     float       m_height            = 0.f;
@@ -65,15 +65,15 @@ public:
     Rgba8       m_color             = Rgba8::WHITE;
     Cylinder3   m_collisionCylinder = Cylinder3();
 
-    ActorDefinition const* m_definition     = nullptr; // A reference to our actor definition.
-    bool                   m_isDead         = false;   // Any data needed to track if and how long we have been dead.
-    int                    m_health         = 0;       // Current health.
+    ActorDefinition const* m_definition     = nullptr;      // A reference to our actor definition.
+    bool                   m_isDead         = false;        // Any data needed to track if and how long we have been dead.
+    int                    m_health         = 0;            // Current health.
     bool                   m_canBePossessed = false;
     float                  m_corpseLifetime = 0.f;
     bool                   m_isVisible      = false;
-    Map*                   m_map            = nullptr;
+    Map*                   m_map            = nullptr;      // Reference to the map that spawned us.
     std::vector<Weapon*>   m_weapons;
-    Controller*            m_controller = nullptr;    // A reference to the controller currently possessing us, if any.
+    Controller*            m_controller = nullptr;          // A reference to the controller currently possessing us, if any.
     ActorHandle            m_handle;
 
     //----------------------------------------------------------------------------------------------------

@@ -111,6 +111,7 @@ void Actor::UpdatePosition()
 }
 
 //----------------------------------------------------------------------------------------------------
+// If visible, we will need vertexes and any other information necessary for rendering.
 void Actor::Render() const
 {
     VertexList_PCU verts;

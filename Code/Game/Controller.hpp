@@ -18,7 +18,7 @@ public:
     explicit Controller(Map* owner);
     virtual  ~Controller() = default;
 
-    virtual void         Possess(ActorHandle& actorHandle);
+    virtual void         Possess(ActorHandle const& actorHandle);
     virtual Actor const* GetActor();
     ActorHandle m_actorHandle;           // Handle of our currently possessed actor or INVALID if no actor is possessed.
 protected:

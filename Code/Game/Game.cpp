@@ -358,19 +358,21 @@ void Game::SpawnPlayerController()
 {
     if (m_currentMap == nullptr) return;
 
-    SpawnInfo spawnInfo;
-    spawnInfo.m_name = "Marine";
+    // SpawnInfo spawnInfo;
+    // spawnInfo.m_name = "Marine";
     std::vector<Actor*> tempActorList;
     m_currentMap->GetActorsByName(tempActorList, "SpawnPoint");
     Actor const* tempActor  = tempActorList[g_theRNG->RollRandomIntInRange(0, static_cast<int>(tempActorList.size()) - 1)];
-    spawnInfo.m_position    = tempActor->m_position;
-    spawnInfo.m_orientation = tempActor->m_orientation;
+    // spawnInfo.m_position    = tempActor->m_position;
+    // spawnInfo.m_orientation = tempActor->m_orientation;
 
-    Actor const* playerActor = m_currentMap->SpawnActor(spawnInfo);
+    // Actor const* playerActor = m_currentMap->SpawnActor(spawnInfo);
 
-    m_playerController             = new PlayerController(m_currentMap);
-    m_playerController->m_position = playerActor->m_position + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
-    m_playerController->Possess(m_playerController->m_actorHandle);
+    m_playerController = new PlayerController(m_currentMap);
+    m_playerController->Possess(tempActor->m_handle);
+    m_currentMap->GetActorByHandle(tempActor->m_handle);
+    m_playerController->m_position    = tempActor->m_position + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
+    m_playerController->m_orientation = tempActor->m_orientation;
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ Controller::Controller(Map* owner)
 //----------------------------------------------------------------------------------------------------
 // Unpossess any currently possessed actor and possess a new one.
 // Notify each actor so it can check for restoring AI controllers or handle other change of possession logic.
-void Controller::Possess(ActorHandle& actorHandle)
+void Controller::Possess(ActorHandle const& actorHandle)
 {
     Actor* currentPossessActor = m_map->GetActorByHandle(m_actorHandle);
 
@@ -36,7 +36,7 @@ void Controller::Possess(ActorHandle& actorHandle)
 
     m_actorHandle = actorHandle;
 
-    DebuggerPrintf("%d\n",m_actorHandle.GetIndex());
+    // DebuggerPrintf("%d\n", m_actorHandle.GetIndex());
 }
 
 //----------------------------------------------------------------------------------------------------
