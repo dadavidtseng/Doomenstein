@@ -151,6 +151,16 @@ Mat44 Actor::GetModelToWorldTransform() const
     return m2w;
 }
 
+Vec3 Actor::GetPosition() const
+{
+    return m_position;
+}
+
+EulerAngles Actor::GetOrientation() const
+{
+    return m_orientation;
+}
+
 void Actor::UpdatePhysics(float const deltaSeconds)
 {
     m_velocity += m_acceleration * deltaSeconds;
@@ -190,6 +200,8 @@ void Actor::OnPossessed(Controller* controller)
 }
 
 //----------------------------------------------------------------------------------------------------
+// a. Actors remember who their controller is.
+// b. If the player possesses an actor with an AI controller, the AI controller is saved and then restored if the player unpossesses the actor.
 void Actor::OnUnpossessed()
 {
     m_controller = nullptr;

@@ -34,27 +34,34 @@ struct SpawnInfo;
 //----------------------------------------------------------------------------------------------------
 class Actor
 {
+    friend class Map;
+    // friend class Game;
 public:
     // Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
     explicit Actor(SpawnInfo const& spawnInfo);
 
-    void  Update();
-    void  UpdatePosition();
-    void  Render() const;
-    Mat44 GetModelToWorldTransform() const;
-    void  UpdatePhysics(float deltaSeconds);
-    void  Damage();
-    void  AddForce(Vec3 const& force);
-    void  AddImpulse(Vec3 const& impulse);
-    void  MoveInDirection(Vec3 const& direction, float speed);
-    void  TurnInDirection(Vec3 const& direction);
-    void  OnCollide();
-    void  OnPossessed(Controller* controller);
-    void  OnUnpossessed();
-    void  Attack();
-    void  EquipWeapon();
+    void        Update();
+    void        UpdatePosition();
+    void        Render() const;
+    Mat44       GetModelToWorldTransform() const;
+    Vec3        GetPosition() const;
+    EulerAngles GetOrientation() const;
+    void        UpdatePhysics(float deltaSeconds);
+    void        Damage();
+    void        AddForce(Vec3 const& force);
+    void        AddImpulse(Vec3 const& impulse);
+    void        MoveInDirection(Vec3 const& direction, float speed);
+    void        TurnInDirection(Vec3 const& direction);
+    void        OnCollide();
+    void        OnPossessed(Controller* controller);
+    void        OnUnpossessed();
+    void        Attack();
+    void        EquipWeapon();
     // SwitchInventory(unsigned int index);
 
+    ActorHandle m_handle;
+
+private:
     Vec3        m_position          = Vec3::ZERO;               // 3D position, as a Vec3, in world units.
     Vec3        m_velocity          = Vec3::ZERO;               // 3D velocity, as a Vec3, in world units per second.
     EulerAngles m_orientation       = EulerAngles::ZERO;        // 3D orientation, as EulerAngles, in degrees.
@@ -76,7 +83,6 @@ public:
     std::vector<Weapon*>   m_weapons;
     Weapon*                m_currentWeapon = nullptr;
     Controller*            m_controller    = nullptr;          // A reference to the controller currently possessing us, if any.
-    ActorHandle            m_handle;
 
     //----------------------------------------------------------------------------------------------------
     // A reference to our default AI controller, if any.

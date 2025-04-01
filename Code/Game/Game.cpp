@@ -363,16 +363,16 @@ void Game::SpawnPlayerController()
     std::vector<Actor*> tempActorList;
     m_currentMap->GetActorsByName(tempActorList, "SpawnPoint");
     Actor const* tempActor  = tempActorList[g_theRNG->RollRandomIntInRange(0, static_cast<int>(tempActorList.size()) - 1)];
-    spawnInfo.m_position    = tempActor->m_position;
-    spawnInfo.m_orientation = tempActor->m_orientation;
+    spawnInfo.m_position    = tempActor->GetPosition();
+    spawnInfo.m_orientation = tempActor->GetOrientation();
 
     Actor const* playerActor = m_currentMap->SpawnActor(spawnInfo);
 
     m_playerController = new PlayerController(m_currentMap);
     m_playerController->Possess(playerActor->m_handle);
     m_currentMap->GetActorByHandle(playerActor->m_handle);
-    m_playerController->m_position    = playerActor->m_position + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
-    m_playerController->m_orientation = playerActor->m_orientation;
+    m_playerController->m_position    = playerActor->GetPosition() + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
+    m_playerController->m_orientation = playerActor->GetOrientation();
 }
 
 //----------------------------------------------------------------------------------------------------
