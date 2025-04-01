@@ -118,8 +118,14 @@ void Actor::UpdatePosition()
 // If visible, we will need vertexes and any other information necessary for rendering.
 void Actor::Render() const
 {
-    VertexList_PCU verts;
+    if (m_definition->m_name == "SpawnPoint") return;
 
+    VertexList_PCU verts;
+    float const    eyeHeight         = m_definition->m_eyeHeight;
+    Vec3 const     forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+    Vec3 const     coneStartPosition = m_collisionCylinder.m_startPosition + Vec3(0.f, 0.f, eyeHeight) + forwardNormal * m_radius;
+    AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, m_color);
+    AddVertsForWireframeCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, 0.001f);
     AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, m_color);
     AddVertsForWireframeCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, 0.001f);
 
@@ -143,6 +149,36 @@ Mat44 Actor::GetModelToWorldTransform() const
     m2w.Append(m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
 
     return m2w;
+}
+
+void Actor::UpdatePhysics(float const deltaSeconds)
+{
+    m_velocity += m_acceleration * deltaSeconds;
+    m_position += m_velocity * deltaSeconds;
+}
+
+void Actor::AddForce(Vec3 const& force)
+{
+    m_acceleration += force;
+}
+
+void Actor::AddImpulse(Vec3 const& impulse)
+{
+    m_velocity += impulse;
+}
+
+void Actor::MoveInDirection(Vec3 const& direction,
+                            float const speed)
+{
+    Vec3  directionNormal = direction.GetNormalized();
+    float dragValue       = m_definition->m_drag;
+    Vec3  force           = directionNormal * speed * dragValue;
+    AddForce(force);
+}
+
+void Actor::TurnInDirection(Vec3 const& direction)
+{
+    // m_orientation = EulerAngles(direction);
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -42,15 +42,15 @@ public:
     void  UpdatePosition();
     void  Render() const;
     Mat44 GetModelToWorldTransform() const;
-    void  UpdatePhysics();
+    void  UpdatePhysics(float deltaSeconds);
     void  Damage();
-    void  AddForce();
-    void  AddImpulse();
+    void  AddForce(Vec3 const& force);
+    void  AddImpulse(Vec3 const& impulse);
+    void  MoveInDirection(Vec3 const& direction, float speed);
+    void  TurnInDirection(Vec3 const& direction);
     void  OnCollide();
     void  OnPossessed(Controller* controller);
     void  OnUnpossessed();
-    void  MoveInDirection();
-    void  TurnInDirection();
     void  Attack();
     void  EquipWeapon();
     // SwitchInventory(unsigned int index);
@@ -58,6 +58,7 @@ public:
     Vec3        m_position          = Vec3::ZERO;               // 3D position, as a Vec3, in world units.
     Vec3        m_velocity          = Vec3::ZERO;               // 3D velocity, as a Vec3, in world units per second.
     EulerAngles m_orientation       = EulerAngles::ZERO;        // 3D orientation, as EulerAngles, in degrees.
+    Vec3        m_acceleration      = Vec3::ZERO;
     EulerAngles m_angularVelocity   = EulerAngles::ZERO;
     float       m_radius            = 0.f;
     float       m_height            = 0.f;
@@ -73,7 +74,8 @@ public:
     bool                   m_isVisible      = false;
     Map*                   m_map            = nullptr;      // Reference to the map that spawned us.
     std::vector<Weapon*>   m_weapons;
-    Controller*            m_controller = nullptr;          // A reference to the controller currently possessing us, if any.
+    Weapon*                m_currentWeapon = nullptr;
+    Controller*            m_controller    = nullptr;          // A reference to the controller currently possessing us, if any.
     ActorHandle            m_handle;
 
     //----------------------------------------------------------------------------------------------------

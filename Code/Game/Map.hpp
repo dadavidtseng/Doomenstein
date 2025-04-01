@@ -4,7 +4,6 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
-#include <string>
 
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/VertexUtils.hpp"
