@@ -34,7 +34,8 @@ public:
     bool              IsAttractMode() const;
     Map*              GetCurrentMap() const;
     PlayerController* GetPlayerController() const;
-    Clock*            m_gameClock = nullptr;
+    void              SpawnPlayerController();
+    Clock* m_gameClock = nullptr;
 
 private:
     void UpdateFromKeyBoard();
@@ -45,7 +46,6 @@ private:
     void RenderEntities() const;
 
     void       InitializeMaps();
-    void       SpawnPlayerController();
     void       ChangeState(eGameState nextState);
     eGameState GetGameState() const;
 

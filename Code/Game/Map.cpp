@@ -54,6 +54,9 @@ Map::Map(Game*                owner,
     {
         SpawnActor(spawnInfo);
     }
+
+    m_game->SpawnPlayerController();
+
     // for (int actorIndex = 0; actorIndex < 5; ++actorIndex)
     // {
     //     m_actors.push_back(new Actor(*ActorDefinition::s_actorDefinitions[actorIndex]));

@@ -71,7 +71,11 @@ void Actor::Update()
 {
     if (!m_isMovable) return;
 
-    UpdatePosition();
+    if (!dynamic_cast<PlayerController*>(m_controller)->m_isCameraMode)
+    {
+        UpdatePosition();
+    }
+
 
     m_collisionCylinder.m_startPosition = m_position;
     m_collisionCylinder.m_endPosition   = m_position + Vec3(0.f, 0.f, m_height);

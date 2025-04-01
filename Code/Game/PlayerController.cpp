@@ -100,7 +100,7 @@ void PlayerController::Update(float deltaSeconds)
 
     m_worldCamera->SetPositionAndOrientation(m_position, m_orientation);
 
-    if (!m_isMovable)
+    if (!m_isCameraMode)
     {
         return;
     }
@@ -134,7 +134,7 @@ void PlayerController::UpdateFromKeyBoard()
     }
     if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
     {
-        m_isMovable = !m_isMovable;
+        m_isCameraMode = !m_isCameraMode;
     }
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
