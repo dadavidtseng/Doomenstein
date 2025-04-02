@@ -23,7 +23,7 @@ enum class eCameraMode : int8_t
 
 //----------------------------------------------------------------------------------------------------
 // Player controllers should be constructed by the game and told to possess their actor whenever it is spawned or respawned. Player controller can possess other possessable actors in the game.
-class PlayerController  : public Controller
+class PlayerController : public Controller
 {
 public:
     // Construction / Destruction
@@ -37,6 +37,7 @@ public:
     void Update(float deltaSeconds);
     void Render() const;
     void UpdateFromKeyBoard();
+    void UpdateCamera();
     void UpdateFromController();
 
     Camera* GetCamera() const;
@@ -44,15 +45,16 @@ public:
 
 
     // Game*       m_game              = nullptr;
-    Vec3        m_position        = Vec3::ZERO;
-    Vec3        m_velocity        = Vec3::ZERO;
-    EulerAngles m_orientation     = EulerAngles::ZERO;
+    Vec3        m_position    = Vec3::ZERO;
+    Vec3        m_velocity    = Vec3::ZERO;
+    EulerAngles m_orientation = EulerAngles::ZERO;
     // EulerAngles m_angularVelocity = EulerAngles::ZERO;
-    bool        m_isCameraMode       = false;
-    Rgba8       m_color           = Rgba8::WHITE;
-    eCameraMode m_cameraMode      = eCameraMode::PLAYER;
-    float       m_eyeHeight       = 0.f;
-    float       m_cameraFOV       = 0.f;
+    bool        m_isCameraMode = false;
+    Rgba8       m_color        = Rgba8::WHITE;
+    eCameraMode m_cameraMode   = eCameraMode::PLAYER;
+    float       m_cameraFOV    = 0.f;
+    float       m_speed        = 0.f;
+    float       m_turnRate     = 0.f;
 
 private:
     Camera* m_worldCamera = nullptr;

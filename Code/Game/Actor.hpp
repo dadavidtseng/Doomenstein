@@ -45,13 +45,15 @@ public:
     void        Render() const;
     Mat44       GetModelToWorldTransform() const;
     Vec3        GetPosition() const;
+    Vec3        GetEyePosition() const;
+    float       GetCameraFOV() const;
     EulerAngles GetOrientation() const;
     void        UpdatePhysics(float deltaSeconds);
     void        Damage();
     void        AddForce(Vec3 const& force);
     void        AddImpulse(Vec3 const& impulse);
     void        MoveInDirection(Vec3 const& direction, float speed);
-    void        TurnInDirection(Vec3 const& direction);
+    void        TurnInDirection(EulerAngles & direction);
     void        OnCollide();
     void        OnPossessed(Controller* controller);
     void        OnUnpossessed();
@@ -61,20 +63,23 @@ public:
 
     ActorHandle m_handle;
     // bool      m_isMovable         = false;
-    bool                   m_isVisible      = true;
+    bool m_isVisible = true;
+    ActorDefinition const* m_definition     = nullptr;      // A reference to our actor definition.
+    Vec3        m_position     = Vec3::ZERO;               // 3D position, as a Vec3, in world units.
+    EulerAngles m_orientation  = EulerAngles::ZERO;        // 3D orientation, as EulerAngles, in degrees.
+
 
 private:
-    Vec3        m_position     = Vec3::ZERO;               // 3D position, as a Vec3, in world units.
     Vec3        m_velocity     = Vec3::ZERO;               // 3D velocity, as a Vec3, in world units per second.
-    EulerAngles m_orientation  = EulerAngles::ZERO;        // 3D orientation, as EulerAngles, in degrees.
-    Vec3        m_acceleration = Vec3::ZERO;
+    Vec3        m_acceleration = Vec3::ZERO;                // 3D acceleration, as a Vec3, in world units per second squared.
     // EulerAngles m_angularVelocity   = EulerAngles::ZERO;
     float     m_radius            = 0.f;
     float     m_height            = 0.f;
+    float     m_eyeHeight         = 0.f;
+    float m_cameraFOV            = 0.f;
     Rgba8     m_color             = Rgba8::WHITE;
     Cylinder3 m_collisionCylinder = Cylinder3();
 
-    ActorDefinition const* m_definition     = nullptr;      // A reference to our actor definition.
     bool                   m_isDead         = false;        // Any data needed to track if and how long we have been dead.
     int                    m_health         = 0;            // Current health.
     bool                   m_canBePossessed = false;

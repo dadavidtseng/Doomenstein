@@ -377,8 +377,8 @@ void Game::SpawnPlayerController()
     m_playerController = new PlayerController(m_currentMap);
     m_playerController->Possess(playerActor->m_handle);
     m_currentMap->GetActorByHandle(playerActor->m_handle);
-    m_playerController->m_position    = playerActor->GetPosition() + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
-    m_playerController->m_orientation = playerActor->GetOrientation();
+    // m_playerController->m_position    = playerActor->GetPosition() + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
+    // m_playerController->m_orientation = playerActor->GetOrientation();
 }
 
 //----------------------------------------------------------------------------------------------------

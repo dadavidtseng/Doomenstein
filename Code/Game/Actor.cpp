@@ -49,6 +49,8 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 
     m_health      = m_definition->m_health;
     m_height      = m_definition->m_height;
+    m_eyeHeight   = m_definition->m_eyeHeight;
+    m_cameraFOV   = m_definition->m_cameraFOV;
     m_radius      = m_definition->m_radius;
     m_position    = spawnInfo.m_position;
     m_orientation = spawnInfo.m_orientation;
@@ -160,6 +162,16 @@ Vec3 Actor::GetPosition() const
     return m_position;
 }
 
+Vec3 Actor::GetEyePosition() const
+{
+    return m_position + Vec3(0.f, 0.f, m_eyeHeight);
+}
+
+float Actor::GetCameraFOV() const
+{
+    return m_cameraFOV;
+}
+
 EulerAngles Actor::GetOrientation() const
 {
     return m_orientation;
@@ -167,8 +179,8 @@ EulerAngles Actor::GetOrientation() const
 
 void Actor::UpdatePhysics(float const deltaSeconds)
 {
-    DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
-    DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
+    // DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
+    // DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
 
     float dragValue = m_definition->m_drag;
     Vec3  dragForce = -m_velocity * dragValue;
@@ -177,8 +189,8 @@ void Actor::UpdatePhysics(float const deltaSeconds)
     m_velocity += m_acceleration * deltaSeconds;
     m_position += m_velocity * deltaSeconds;
     m_acceleration = Vec3::ZERO;
-    DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
-    DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
+    // DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
+    // DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
 }
 
 void Actor::AddForce(Vec3 const& force)
@@ -200,17 +212,20 @@ void Actor::MoveInDirection(Vec3 const& direction,
     AddForce(force);
 }
 
-void Actor::TurnInDirection(Vec3 const& direction)
+void Actor::TurnInDirection(EulerAngles& direction)
 {
-    // m_orientation = EulerAngles(direction);
+
+
+    m_orientation = direction;
+
+    // DebuggerPrintf("Actor Orientation(%f, %f, %f)\n", m_orientation.m_yawDegrees, m_orientation.m_pitchDegrees, m_orientation.m_rollDegrees);
+
 }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::OnPossessed(Controller* controller)
 {
-    m_controller                       = controller;
-    PlayerController* playerController = dynamic_cast<PlayerController*>(m_controller);
-    playerController->m_position       = m_position + Vec3(1.f, 0.f, playerController->m_eyeHeight);
+    m_controller = controller;
 }
 
 //----------------------------------------------------------------------------------------------------
