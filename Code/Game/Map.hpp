@@ -10,6 +10,7 @@
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
 
+class PlayerController;
 struct ActorHandle;
 struct SpawnInfo;
 //-Forward-Declaration--------------------------------------------------------------------------------
@@ -44,9 +45,9 @@ public:
     Tile const*   GetTile(int x, int y) const;
     Tile const*   GetTile(IntVec2 const& tileCoords) const;
 
-    void Update();
+    void Update(float deltaSeconds);
     void UpdateFromKeyboard();
-    void UpdateAllActors() const;
+    void UpdateAllActors(float deltaSeconds) const;
 
     void CollideActors();
     void CollideActors(Actor* actorA, Actor* actorB);
@@ -69,7 +70,7 @@ public:
     Actor const* GetActorByName(String const& name);
     void         GetActorsByName(std::vector<Actor*>& actorList, String const& name);
     void         DeleteDestroyedActor();
-    void         SpawnPlayer();
+    Actor*         SpawnPlayer(PlayerController* playerController);
     void         GetClosestVisibleEnemy();
     void         DebugPossessNext() const;
 
@@ -97,4 +98,5 @@ protected:
     std::vector<Actor*>           m_actors;
     static constexpr unsigned int MAX_ACTOR_UID  = 0x0000fffeu;
     unsigned int                  m_nextActorUID = 0;
+    PlayerController*             m_playerController = nullptr;
 };

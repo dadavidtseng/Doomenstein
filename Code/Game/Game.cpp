@@ -26,6 +26,7 @@
 Game::Game()
 {
     // SpawnPlayer();
+    m_playerController = new PlayerController(m_currentMap);
 
     m_screenCamera = new Camera();
 
@@ -84,19 +85,24 @@ Game::~Game()
 // All timers in the game, such as those required by weapons, should use the game clock.
 void Game::Update()
 {
-    float const gameDeltaSeconds   = static_cast<float>(m_gameClock->GetDeltaSeconds());
-    float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
+    float const gameDeltaSeconds = static_cast<float>(m_gameClock->GetDeltaSeconds());
+    // float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
 
     // #TODO: Select keyboard or controller
 
-    UpdateEntities(gameDeltaSeconds, systemDeltaSeconds);
     UpdateFromKeyBoard();
     UpdateFromController();
+    UpdatePlayerController(gameDeltaSeconds);
+
+    // if (m_currentMap != nullptr)
+    // {
+    //     m_currentMap->Update(gameDeltaSeconds);
+    // }
 
     if (m_currentMap != nullptr &&
-        !m_playerController->m_isCameraMode)
+        m_playerController != nullptr)
     {
-        m_currentMap->Update();
+        m_currentMap->Update(gameDeltaSeconds);
     }
 }
 
@@ -194,7 +200,7 @@ void Game::UpdateFromKeyBoard()
         {
             m_currentGameState = eGameState::INGAME;
             InitializeMaps();
-            SpawnPlayerController();
+            // SpawnPlayerController();
         }
     }
 
@@ -263,7 +269,7 @@ void Game::UpdateFromController()
             m_currentGameState = eGameState::INGAME;
             InitializeMaps();
 
-            SpawnPlayerController();
+            // SpawnPlayerController();
         }
     }
 
@@ -316,15 +322,15 @@ void Game::UpdateFromController()
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::UpdateEntities(float const gameDeltaSeconds, float const systemDeltaSeconds) const
+void Game::UpdatePlayerController(float const deltaSeconds) const
 {
     if (m_playerController != nullptr &&
         m_currentGameState == eGameState::INGAME)
     {
-        m_playerController->Update(systemDeltaSeconds);
+        m_playerController->Update(deltaSeconds);
     }
 
-    DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / gameDeltaSeconds, m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
+    DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / deltaSeconds, m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
 }
 
 //----------------------------------------------------------------------------------------------------

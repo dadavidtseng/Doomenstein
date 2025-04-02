@@ -41,7 +41,7 @@ void Controller::Possess(ActorHandle const& actorHandle)
 
 //----------------------------------------------------------------------------------------------------
 // Returns the currently possessed actor or null if no actor is possessed.
-Actor const* Controller::GetActor()
+Actor* Controller::GetActor()
 {
     return m_map->GetActorByHandle(m_actorHandle);
 }

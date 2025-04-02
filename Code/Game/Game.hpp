@@ -40,7 +40,7 @@ public:
 private:
     void UpdateFromKeyBoard();
     void UpdateFromController();
-    void UpdateEntities(float gameDeltaSeconds, float systemDeltaSeconds) const;
+    void UpdatePlayerController(float deltaSeconds) const;
     void RenderAttractMode() const;
     void RenderInGame() const;
     void RenderEntities() const;

@@ -67,13 +67,16 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 }
 
 //----------------------------------------------------------------------------------------------------
-void Actor::Update()
+void Actor::Update(float const deltaSeconds)
 {
-    if (!m_isMovable) return;
+    // if (!m_isMovable) return;
 
-    if (!dynamic_cast<PlayerController*>(m_controller)->m_isCameraMode)
+    PlayerController const* playerController = dynamic_cast<PlayerController*>(m_controller);
+    if (playerController != nullptr &&
+        !playerController->m_isCameraMode)
     {
-        UpdatePosition();
+        // UpdatePosition();
+        UpdatePhysics(deltaSeconds);
     }
 
 
@@ -119,6 +122,7 @@ void Actor::UpdatePosition()
 void Actor::Render() const
 {
     if (m_definition->m_name == "SpawnPoint") return;
+    if (!m_isVisible) return;
 
     VertexList_PCU verts;
     float const    eyeHeight         = m_definition->m_eyeHeight;
@@ -163,8 +167,18 @@ EulerAngles Actor::GetOrientation() const
 
 void Actor::UpdatePhysics(float const deltaSeconds)
 {
+    DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
+    DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
+
+    float dragValue = m_definition->m_drag;
+    Vec3  dragForce = -m_velocity * dragValue;
+    AddForce(dragForce);
+
     m_velocity += m_acceleration * deltaSeconds;
     m_position += m_velocity * deltaSeconds;
+    m_acceleration = Vec3::ZERO;
+    DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
+    DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
 }
 
 void Actor::AddForce(Vec3 const& force)
@@ -208,6 +222,7 @@ void Actor::OnUnpossessed()
 
     if (m_aiController != nullptr)
     {
-        m_aiController->Possess(m_handle);
+        m_controller = m_aiController;
+        // m_aiController->Possess(m_handle);
     }
 }

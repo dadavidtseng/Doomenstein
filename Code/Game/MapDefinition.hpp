@@ -19,6 +19,7 @@ struct SpawnInfo
     String      m_name;
     Vec3        m_position    = Vec3::ZERO;
     EulerAngles m_orientation = EulerAngles::ZERO;
+    Vec3        m_velocity    = Vec3::ZERO;
 };
 
 //----------------------------------------------------------------------------------------------------

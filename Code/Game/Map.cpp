@@ -16,6 +16,7 @@
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/FloatRange.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
@@ -36,7 +37,7 @@ Map::Map(Game*                owner,
 
     m_vertexes.reserve(sizeof(AABB3) * m_dimensions.x * m_dimensions.y);
     m_tiles.reserve(static_cast<unsigned int>(m_dimensions.x * m_dimensions.y));
-    m_actors.reserve(5);
+    m_actors.reserve(100);
 
     m_texture = m_mapDefinition->m_spriteSheetTexture;
     m_shader  = m_mapDefinition->m_shader;
@@ -55,7 +56,9 @@ Map::Map(Game*                owner,
         SpawnActor(spawnInfo);
     }
 
-    m_game->SpawnPlayerController();
+    // m_game->SpawnPlayerController();
+    Actor* playerActor = SpawnPlayer(m_game->GetPlayerController());
+    m_game->GetPlayerController()->Possess(playerActor->m_handle);
 
     // for (int actorIndex = 0; actorIndex < 5; ++actorIndex)
     // {
@@ -285,12 +288,12 @@ Tile const* Map::GetTile(IntVec2 const& tileCoords) const
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::Update()
+void Map::Update(float const deltaSeconds)
 {
     CollideActors();
     CollideActorsWithMap();
     UpdateFromKeyboard();
-    UpdateAllActors();
+    UpdateAllActors(deltaSeconds);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -350,13 +353,13 @@ void Map::UpdateFromKeyboard()
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::UpdateAllActors() const
+void Map::UpdateAllActors(float const deltaSeconds) const
 {
     for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
         if (m_actors[i] != nullptr)
         {
-            m_actors[i]->Update();
+            m_actors[i]->Update(deltaSeconds);
         }
     }
 }
@@ -366,11 +369,12 @@ void Map::CollideActors()
 {
     for (int i = 0; i < static_cast<int>(m_actors.size()); ++i)
     {
-        if (m_actors[i] == nullptr) continue;
+        if (m_actors[i] == nullptr && !m_actors[i]->m_handle.IsValid()) continue;
 
         for (int j = i + 1; j < static_cast<int>(m_actors.size()); ++j)
         {
-            if (m_actors[j] == nullptr) continue;
+            // if (i == j) continue;
+            if (m_actors[j] == nullptr && !m_actors[j]->m_handle.IsValid()) continue;
 
             CollideActors(m_actors[i], m_actors[j]);
         }
@@ -382,7 +386,7 @@ void Map::CollideActors(Actor* actorA,
                         Actor* actorB)
 {
     // 1. If neither actor is movable, there will be no collision, so return.
-    if (!actorA->m_isMovable && !actorB->m_isMovable) return;
+    // if (!actorA->m_isMovable && !actorB->m_isMovable) return;
 
     // 2. Get actors' MinMaxZ range.
     FloatRange const actorAMinMaxZ = actorA->m_collisionCylinder.GetFloatRange();
@@ -399,16 +403,16 @@ void Map::CollideActors(Actor* actorA,
     Vec2        actorBPositionXY = Vec2(actorB->m_position.x, actorB->m_position.y);
     float const actorARadius     = actorA->m_radius;
     float const actorBRadius     = actorB->m_radius;
-
+    // PushDiscOutOfDisc2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
+    PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
     // 5. Push movable actor out of immovable actor.
-    if (actorA->m_isMovable && !actorB->m_isMovable)
-    {
-        PushDiscOutOfDisc2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
-    }
-    else if (actorB->m_isMovable && !actorA->m_isMovable)
-    {
-        PushDiscOutOfDisc2D(actorBPositionXY, actorBRadius, actorAPositionXY, actorARadius);
-    }
+    // if (actorA->m_isMovable && !actorB->m_isMovable)
+    // {
+    // }
+    // else if (actorB->m_isMovable && !actorA->m_isMovable)
+    // {
+    //     PushDiscOutOfDisc2D(actorBPositionXY, actorBRadius, actorAPositionXY, actorARadius);
+    // }
 
     // 6. Update actors' position.
     actorA->m_position.x = actorAPositionXY.x;
@@ -814,6 +818,21 @@ void Map::DeleteDestroyedActor()
     //         m_actors[index] = nullptr;
     //     }
     // }
+}
+
+Actor* Map::SpawnPlayer(PlayerController* playerController)
+{
+    SpawnInfo spawnInfo;
+    spawnInfo.m_name = "Marine";
+    std::vector<Actor*> spawnPoints;
+    GetActorsByName(spawnPoints, "SpawnPoint");
+    Actor* spawnPoint       = spawnPoints[g_theRNG->RollRandomIntInRange(0, (int)spawnPoints.size() - 1)];
+    spawnInfo.m_position    = spawnPoint->m_position;
+    spawnInfo.m_orientation = spawnPoint->m_orientation;
+    spawnInfo.m_velocity    = spawnPoint->m_velocity;
+    Actor* playerActor      = SpawnActor(spawnInfo);
+    playerController->m_map = this;
+    return playerActor;
 }
 
 //----------------------------------------------------------------------------------------------------

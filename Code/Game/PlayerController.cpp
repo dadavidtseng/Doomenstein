@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/PlayerController.hpp"
 
+#include "Actor.hpp"
 #include "ActorDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/DevConsole.hpp"
@@ -20,16 +21,16 @@
 PlayerController::PlayerController(Map* owner)
     : Controller(owner)
 {
-    ActorDefinition const* definition = ActorDefinition::GetDefByName("Marine");
-
-    m_eyeHeight = definition->m_eyeHeight;
-    m_cameraFOV = definition->m_cameraFOV;
+    // ActorDefinition const* definition = ActorDefinition::GetDefByName("Marine");
+    //
+    // m_eyeHeight = definition->m_eyeHeight;
+    // m_cameraFOV = definition->m_cameraFOV;
 
     m_worldCamera = new Camera();
-    m_worldCamera->SetPerspectiveGraphicView(2.f, m_cameraFOV, 0.1f, 100.f);
+    m_worldCamera->SetPerspectiveGraphicView(2.f, 60.f, 0.1f, 100.f);
     m_worldCamera->SetPosition(Vec3(-2.f, 0.f, 0.f));
 
-    // m_position = Vec3(2.5f, 8.5f, 0.5f);
+    m_position = Vec3(2.5f, 8.5f, 0.5f);
     m_position.z = m_eyeHeight;
 
     Mat44 c2r;
@@ -61,63 +62,57 @@ void PlayerController::Update(float deltaSeconds)
 
     UpdateFromKeyBoard();
 
-    Vec3 forward;
-    Vec3 left;
-    Vec3 up;
-    m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
+    // if playerController is possessing a valid actor
+    if (!m_actorHandle.IsValid()) return;
 
-    m_velocity                = Vec3::ZERO;
-    float constexpr moveSpeed = 1.f;
-
-    Vec2 const rightStickInput = controller.GetRightStick().GetPosition();
-    m_orientation.m_yawDegrees -= rightStickInput.x * 0.125f;
-    m_orientation.m_pitchDegrees -= rightStickInput.y * 0.125f;
-
-    m_orientation.m_yawDegrees -= g_theInput->GetCursorClientDelta().x * 0.125f;
-    m_orientation.m_pitchDegrees += g_theInput->GetCursorClientDelta().y * 0.125f;
-    m_orientation.m_pitchDegrees = GetClamped(m_orientation.m_pitchDegrees, -85.f, 85.f);
-
-    m_angularVelocity.m_rollDegrees = 0.f;
-
-    float const leftTriggerInput  = controller.GetLeftTrigger();
-    float const rightTriggerInput = controller.GetRightTrigger();
-
-    if (leftTriggerInput != 0.f)
-    {
-        m_angularVelocity.m_rollDegrees -= 90.f;
-    }
-
-    if (rightTriggerInput != 0.f)
-    {
-        m_angularVelocity.m_rollDegrees += 90.f;
-    }
-
-    if (g_theInput->IsKeyDown(KEYCODE_Q)) m_angularVelocity.m_rollDegrees = 90.f;
-    if (g_theInput->IsKeyDown(KEYCODE_E)) m_angularVelocity.m_rollDegrees = -90.f;
-
-    m_orientation.m_rollDegrees += m_angularVelocity.m_rollDegrees * deltaSeconds;
-    m_orientation.m_rollDegrees = GetClamped(m_orientation.m_rollDegrees, -45.f, 45.f);
-
-    m_worldCamera->SetPositionAndOrientation(m_position, m_orientation);
-
+    // if playerController is not camera mode
     if (!m_isCameraMode)
     {
-        return;
+        Actor* possessedActor = GetActor();
+
+        if (possessedActor == nullptr) return;
+        // m_position = possessedActor->GetPosition();
+        // m_orientation = possessedActor->GetOrientation();
+        Vec3 forward;
+        Vec3 left;
+        Vec3 up;
+        m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
+
+        m_velocity                     = Vec3::ZERO;
+        float constexpr moveSpeed      = 1.f;
+
+        if (g_theInput->IsKeyDown(KEYCODE_W)) m_velocity += forward * moveSpeed;
+        if (g_theInput->IsKeyDown(KEYCODE_S)) m_velocity -= forward * moveSpeed;
+        if (g_theInput->IsKeyDown(KEYCODE_A)) m_velocity += left * moveSpeed;
+        if (g_theInput->IsKeyDown(KEYCODE_D)) m_velocity -= left * moveSpeed;
+        if (g_theInput->IsKeyDown(KEYCODE_Z)) m_velocity -= Vec3(0.f, 0.f, 1.f) * moveSpeed;
+        if (g_theInput->IsKeyDown(KEYCODE_C)) m_velocity += Vec3(0.f, 0.f, 1.f) * moveSpeed;
+
+        if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 10.f;
+
+        m_orientation.m_yawDegrees -= g_theInput->GetCursorClientDelta().x * 0.125f;
+        m_orientation.m_pitchDegrees += g_theInput->GetCursorClientDelta().y * 0.125f;
+        m_orientation.m_pitchDegrees = GetClamped(m_orientation.m_pitchDegrees, -85.f, 85.f);
+
+
+        if (g_theInput->IsKeyDown(KEYCODE_Q)) m_orientation.m_rollDegrees = 90.f;
+        if (g_theInput->IsKeyDown(KEYCODE_E)) m_orientation.m_rollDegrees = -90.f;
+
+        m_orientation.m_rollDegrees = GetClamped(m_orientation.m_rollDegrees, -45.f, 45.f);
+
+        m_position += m_velocity * deltaSeconds;
+
+        if (g_theInput->IsKeyDown(KEYCODE_W))
+        {
+            possessedActor->MoveInDirection(m_velocity, 0.01f);
+        }
+
+        // m_worldCamera->SetPositionAndOrientation(m_position + forward, m_orientation);
     }
+    else
+    {
 
-    Vec2 const leftStickInput = controller.GetLeftStick().GetPosition();
-    m_velocity += Vec3(leftStickInput.y, -leftStickInput.x, 0.f) * moveSpeed;
-
-    if (g_theInput->IsKeyDown(KEYCODE_W)) m_velocity += forward * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_S)) m_velocity -= forward * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_A)) m_velocity += left * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_D)) m_velocity -= left * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_Z) || controller.IsButtonDown(XBOX_BUTTON_LSHOULDER)) m_velocity -= Vec3(0.f, 0.f, 1.f) * moveSpeed;
-    if (g_theInput->IsKeyDown(KEYCODE_C) || controller.IsButtonDown(XBOX_BUTTON_RSHOULDER)) m_velocity += Vec3(0.f, 0.f, 1.f) * moveSpeed;
-
-    if (g_theInput->IsKeyDown(KEYCODE_SHIFT) || controller.IsButtonDown(XBOX_BUTTON_A)) deltaSeconds *= 10.f;
-
-    m_position += m_velocity * deltaSeconds;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -132,9 +127,15 @@ void PlayerController::UpdateFromKeyBoard()
     {
         m_map->DebugPossessNext();
     }
-    if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
+    if (g_theInput->WasKeyJustPressed(KEYCODE_F))
     {
         m_isCameraMode = !m_isCameraMode;
+
+        Actor* possessedActor = GetActor();
+
+        if (possessedActor == nullptr) return;
+        // possessedActor->m_isMovable = !possessedActor->m_isMovable;
+        possessedActor->m_isVisible = !possessedActor->m_isVisible;
     }
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
