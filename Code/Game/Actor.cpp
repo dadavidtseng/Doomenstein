@@ -47,10 +47,10 @@ Actor::Actor(SpawnInfo const& spawnInfo)
         ERROR_AND_DIE("Failed to find actor definition")
     }
 
-    m_health      = m_definition->m_health;
-    m_height      = m_definition->m_height;
-    m_eyeHeight   = m_definition->m_eyeHeight;
-    m_cameraFOV   = m_definition->m_cameraFOV;
+    m_health = m_definition->m_health;
+    m_height = m_definition->m_height;
+    // m_eyeHeight   = m_definition->m_eyeHeight;
+    // m_cameraFOV   = m_definition->m_cameraFOV;
     m_radius      = m_definition->m_radius;
     m_position    = spawnInfo.m_position;
     m_orientation = spawnInfo.m_orientation;
@@ -124,8 +124,8 @@ void Actor::UpdatePosition()
 void Actor::Render() const
 {
     if (m_definition->m_name == "SpawnPoint") return;
+    // if (dynamic_cast<PlayerController*>(m_controller) != nullptr && !m_isVisible) return;
     if (!m_isVisible) return;
-
     VertexList_PCU verts;
     float const    eyeHeight         = m_definition->m_eyeHeight;
     Vec3 const     forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
@@ -137,7 +137,7 @@ void Actor::Render() const
 
     g_theRenderer->SetModelConstants();
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
     g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
     g_theRenderer->BindTexture(nullptr);
@@ -155,26 +155,6 @@ Mat44 Actor::GetModelToWorldTransform() const
     m2w.Append(m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
 
     return m2w;
-}
-
-Vec3 Actor::GetPosition() const
-{
-    return m_position;
-}
-
-Vec3 Actor::GetEyePosition() const
-{
-    return m_position + Vec3(0.f, 0.f, m_eyeHeight);
-}
-
-float Actor::GetCameraFOV() const
-{
-    return m_cameraFOV;
-}
-
-EulerAngles Actor::GetOrientation() const
-{
-    return m_orientation;
 }
 
 void Actor::UpdatePhysics(float const deltaSeconds)
@@ -214,18 +194,17 @@ void Actor::MoveInDirection(Vec3 const& direction,
 
 void Actor::TurnInDirection(EulerAngles& direction)
 {
-
-
     m_orientation = direction;
 
     // DebuggerPrintf("Actor Orientation(%f, %f, %f)\n", m_orientation.m_yawDegrees, m_orientation.m_pitchDegrees, m_orientation.m_rollDegrees);
-
 }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::OnPossessed(Controller* controller)
 {
     m_controller = controller;
+    // m_isVisible  = !m_isVisible;
+    m_isVisible = false;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -234,6 +213,7 @@ void Actor::OnPossessed(Controller* controller)
 void Actor::OnUnpossessed()
 {
     m_controller = nullptr;
+    m_isVisible = true;
 
     if (m_aiController != nullptr)
     {

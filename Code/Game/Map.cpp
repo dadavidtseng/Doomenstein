@@ -56,7 +56,7 @@ Map::Map(Game*                owner,
         SpawnActor(spawnInfo);
     }
 
-    // m_game->SpawnPlayerController();
+    m_game->SpawnPlayerController();
     Actor* playerActor = SpawnPlayer(m_game->GetPlayerController());
     m_game->GetPlayerController()->Possess(playerActor->m_handle);
 

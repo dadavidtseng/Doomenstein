@@ -36,8 +36,8 @@ public:
 
     void Update(float deltaSeconds);
     void Render() const;
-    void UpdateFromKeyBoard();
-    void UpdateCamera();
+    void UpdateFromInput();
+    void UpdateWorldCamera();
     void UpdateFromController();
 
     Camera* GetCamera() const;
@@ -52,6 +52,7 @@ public:
     bool        m_isCameraMode = false;
     Rgba8       m_color        = Rgba8::WHITE;
     eCameraMode m_cameraMode   = eCameraMode::PLAYER;
+    float       m_eyeHeight    = 0.f;
     float       m_cameraFOV    = 0.f;
     float       m_speed        = 0.f;
     float       m_turnRate     = 0.f;

@@ -26,7 +26,7 @@
 Game::Game()
 {
     // SpawnPlayer();
-    m_playerController = new PlayerController(m_currentMap);
+    // m_playerController = new PlayerController(m_currentMap);
 
     m_screenCamera = new Camera();
 
@@ -183,6 +183,8 @@ Map* Game::GetCurrentMap() const
 
 PlayerController* Game::GetPlayerController() const
 {
+    if (m_playerController == nullptr) return nullptr;
+
     return m_playerController;
 }
 
@@ -198,9 +200,9 @@ void Game::UpdateFromKeyBoard()
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
         {
-            m_currentGameState = eGameState::INGAME;
-            InitializeMaps();
+            ChangeState(m_currentGameState = eGameState::INGAME);
             // SpawnPlayerController();
+            InitializeMaps();
         }
     }
 
@@ -208,13 +210,7 @@ void Game::UpdateFromKeyBoard()
     {
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
-            m_currentGameState = eGameState::ATTRACT;
-
-            if (m_playerController != nullptr)
-            {
-                delete m_playerController;
-                m_playerController = nullptr;
-            }
+            ChangeState(eGameState::ATTRACT);
 
             if (m_currentMap != nullptr)
             {
@@ -223,6 +219,12 @@ void Game::UpdateFromKeyBoard()
             }
 
             m_maps.clear();
+
+            if (m_playerController != nullptr)
+            {
+                delete m_playerController;
+                m_playerController = nullptr;
+            }
         }
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_P))
@@ -267,9 +269,8 @@ void Game::UpdateFromController()
         if (controller.WasButtonJustPressed(XBOX_BUTTON_START))
         {
             m_currentGameState = eGameState::INGAME;
-            InitializeMaps();
-
             // SpawnPlayerController();
+            InitializeMaps();
         }
     }
 
@@ -277,13 +278,7 @@ void Game::UpdateFromController()
     {
         if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
         {
-            m_currentGameState = eGameState::ATTRACT;
-
-            if (m_playerController != nullptr)
-            {
-                delete m_playerController;
-                m_playerController = nullptr;
-            }
+            ChangeState(eGameState::ATTRACT);
 
             if (m_currentMap != nullptr)
             {
@@ -292,6 +287,12 @@ void Game::UpdateFromController()
             }
 
             m_maps.clear();
+
+            if (m_playerController != nullptr)
+            {
+                delete m_playerController;
+                m_playerController = nullptr;
+            }
         }
 
         if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
@@ -362,23 +363,7 @@ void Game::RenderEntities() const
 //----------------------------------------------------------------------------------------------------
 void Game::SpawnPlayerController()
 {
-    if (m_currentMap == nullptr) return;
-
-    SpawnInfo spawnInfo;
-    spawnInfo.m_name = "Marine";
-    std::vector<Actor*> tempActorList;
-    m_currentMap->GetActorsByName(tempActorList, "SpawnPoint");
-    Actor const* tempActor  = tempActorList[g_theRNG->RollRandomIntInRange(0, static_cast<int>(tempActorList.size()) - 1)];
-    spawnInfo.m_position    = tempActor->GetPosition();
-    spawnInfo.m_orientation = tempActor->GetOrientation();
-
-    Actor const* playerActor = m_currentMap->SpawnActor(spawnInfo);
-
     m_playerController = new PlayerController(m_currentMap);
-    m_playerController->Possess(playerActor->m_handle);
-    m_currentMap->GetActorByHandle(playerActor->m_handle);
-    // m_playerController->m_position    = playerActor->GetPosition() + Vec3(0.f, 0.f, m_playerController->m_eyeHeight);
-    // m_playerController->m_orientation = playerActor->GetOrientation();
 }
 
 //----------------------------------------------------------------------------------------------------
