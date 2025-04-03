@@ -35,8 +35,6 @@ void Controller::Possess(ActorHandle const& actorHandle)
     }
 
     m_actorHandle = actorHandle;
-
-    // DebuggerPrintf("%d\n", m_actorHandle.GetIndex());
 }
 
 //----------------------------------------------------------------------------------------------------

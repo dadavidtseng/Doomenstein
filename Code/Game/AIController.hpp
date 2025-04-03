@@ -1,5 +1,5 @@
 //----------------------------------------------------------------------------------------------------
-// AI.hpp
+// AIController.hpp
 //----------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ class AIController : public Controller
     ~AIController() override;
 
     void Update(float deltaSeconds) override;
-    void DamagedBy();
+    void DamagedBy(ActorHandle const& attacker);
 
     ActorHandle m_targetActorHandle;
 };

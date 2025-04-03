@@ -202,6 +202,12 @@ void Actor::UpdatePhysics(float const deltaSeconds)
     // DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
 }
 
+void Actor::Damage(float const damage,
+                   ActorHandle other)
+{
+    m_health -= damage;
+}
+
 void Actor::AddForce(Vec3 const& force)
 {
     m_acceleration += force;
@@ -221,7 +227,7 @@ void Actor::MoveInDirection(Vec3 const& direction,
     AddForce(force);
 }
 
-void Actor::TurnInDirection(EulerAngles& direction)
+void Actor::TurnInDirection(EulerAngles const& direction)
 {
     m_orientation = direction;
 

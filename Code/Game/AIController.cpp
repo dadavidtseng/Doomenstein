@@ -22,6 +22,9 @@ void AIController::Update(float deltaSeconds)
     m_map->GetClosestVisibleEnemy(m_map->GetActorByHandle(m_actorHandle));
 }
 
-void AIController::DamagedBy()
+//----------------------------------------------------------------------------------------------------
+// Notification that the AI actor was damaged so this AI can target them.
+void AIController::DamagedBy(ActorHandle const& attacker)
 {
+    m_targetActorHandle = attacker;
 }

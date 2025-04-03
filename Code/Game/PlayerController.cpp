@@ -200,10 +200,10 @@ void PlayerController::UpdateFromInput()
 
         if (result.m_didImpact == true)
         {
-            DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.01f, 10.f);
-            DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
-            DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal * 0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
-            DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
+            // DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.01f, 10.f);
+            // DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
+            // DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal * 0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
+            // DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
         }
         else
         {

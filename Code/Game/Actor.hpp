@@ -17,7 +17,7 @@
 class AIController;
 class Controller;
 class Map;
-class PlayerController;
+// class PlayerController;
 class Weapon;
 struct ActorDefinition;
 struct SpawnInfo;
@@ -51,7 +51,7 @@ public:
     void AddForce(Vec3 const& force);
     void AddImpulse(Vec3 const& impulse);
     void MoveInDirection(Vec3 const& direction, float speed);
-    void TurnInDirection(EulerAngles& direction);
+    void TurnInDirection(EulerAngles const& direction);
 
     // Possession
     void OnPossessed(Controller* controller);

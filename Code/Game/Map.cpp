@@ -807,15 +807,15 @@ void Map::GetActorsByName(std::vector<Actor*>& actorList, String const& name)
 // Delete any actors marked as destroyed.
 void Map::DeleteDestroyedActor()
 {
-    // for (Actor* actor : m_actors)
-    // {
-    //     if (actor && actor->m_handle.IsValid() && actor->m_isGarbage)
-    //     {
-    //         unsigned int index = actor->m_handle.GetIndex();
-    //         delete actor;
-    //         m_actors[index] = nullptr;
-    //     }
-    // }
+    for (Actor* actor : m_actors)
+    {
+        if (actor && actor->m_handle.IsValid() && actor->m_isGarbage)
+        {
+            unsigned int index = actor->m_handle.GetIndex();
+            delete actor;
+            m_actors[index] = nullptr;
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -839,7 +839,7 @@ Actor* Map::SpawnPlayer(PlayerController* playerController)
 // Search the actor list to find actors meeting the provided criteria.
 Actor* Map::GetClosestVisibleEnemy(Actor* owner)
 {
-return nullptr;
+    return nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------

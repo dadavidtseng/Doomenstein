@@ -19,5 +19,7 @@ public:
     void GetRandomDirectionInCone();
 
     Actor*                  m_owner      = nullptr;
+    float                   m_refireTime = 0.f;
+    int m_count = 0;
     WeaponDefinition const* m_definition = nullptr;     // Reference to our weapon definition.
 };

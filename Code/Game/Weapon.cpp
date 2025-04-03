@@ -5,15 +5,26 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Weapon.hpp"
 
+#include "Actor.hpp"
+#include "Map.hpp"
+#include "PlayerController.hpp"
 #include "WeaponDefinition.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Math/RaycastUtils.hpp"
+#include "Engine/Renderer/DebugRenderSystem.hpp"
 
 Weapon::Weapon(Actor*                  owner,
                WeaponDefinition const* weaponDef)
     : m_owner(owner),
       m_definition(weaponDef)
 {
-
+    switch (m_definition->m_name)
+    {
+    case "Pistol":
+        {
+            m_refireTime = m_definition.
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -22,7 +33,17 @@ Weapon::Weapon(Actor*                  owner,
 // Needs to pass along its owning actor to be ignored in all raycast and collision checks.
 void Weapon::Fire()
 {
-    DebuggerPrintf("FIRE by: %s\n", m_definition->m_name.c_str());
+    Vec3                    forward, left, up;
+    PlayerController const* playerController = dynamic_cast<PlayerController*>(m_owner->m_controller);
+    Vec3 const              firePosition     = playerController->m_position;
+    EulerAngles const       fireOrientation  = playerController->m_orientation;
+    fireOrientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
+    RaycastResult3D const result = m_owner->m_map->RaycastAll(firePosition, forward, 10.f);
+
+    if (result.m_didImpact)
+    {
+        DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
+    }
 }
 
 //----------------------------------------------------------------------------------------------------

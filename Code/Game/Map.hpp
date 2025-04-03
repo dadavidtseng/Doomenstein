@@ -61,8 +61,10 @@ public:
     void Render() const;
 
     RaycastResult3D RaycastAll(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
+    RaycastResult3D RaycastAll(ActorHandle& out_impactedActorHandle, Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldXY(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldZ(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
+    RaycastResult3D RaycastWorldActors(ActorHandle& out_impactedActorHandle, Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldActors(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
 
     Actor*       SpawnActor(SpawnInfo const& spawnInfo);
@@ -70,8 +72,8 @@ public:
     Actor const* GetActorByName(String const& name);
     void         GetActorsByName(std::vector<Actor*>& actorList, String const& name);
     void         DeleteDestroyedActor();
-    Actor*         SpawnPlayer(PlayerController* playerController);
-    Actor*         GetClosestVisibleEnemy(Actor* owner);
+    Actor*       SpawnPlayer(PlayerController* playerController);
+    Actor*       GetClosestVisibleEnemy(Actor* owner);
     void         DebugPossessNext() const;
 
     Game* m_game = nullptr;
@@ -96,7 +98,7 @@ protected:
 
     // Actor
     std::vector<Actor*>           m_actors;
-    static constexpr unsigned int MAX_ACTOR_UID  = 0x0000fffeu;
-    unsigned int                  m_nextActorUID = 0;
+    static constexpr unsigned int MAX_ACTOR_UID      = 0x0000fffeu;
+    unsigned int                  m_nextActorUID     = 0;
     PlayerController*             m_playerController = nullptr;
 };
