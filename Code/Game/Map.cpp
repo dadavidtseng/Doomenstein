@@ -564,6 +564,63 @@ RaycastResult3D Map::RaycastAll(Vec3 const& startPosition,
     return closestResult;
 }
 
+RaycastResult3D Map::RaycastAll(ActorHandle& out_impactedActorHandle,
+                                Vec3 const&  startPosition,
+                                Vec3 const&  forwardNormal,
+                                float        maxLength) const
+{
+    RaycastResult3D closestResult;
+    Actor const*    impactedActor = nullptr;
+    float           closestLength = maxLength;
+
+    IntVec2 startTileCoords = GetTileCoordsFromWorldPos(startPosition);
+
+    if (!IsTileCoordsOutOfBounds(startTileCoords))
+    {
+        Tile const* startTile       = GetTile(startTileCoords);
+        AABB3 const startTileBounds = startTile->m_bounds;
+
+        if (startTileBounds.IsPointInside(startPosition) &&
+            startTile->m_isSolid)
+        {
+            closestResult.m_didImpact      = false;
+            closestResult.m_impactPosition = startPosition;
+            closestResult.m_impactNormal   = -closestResult.m_rayForwardNormal;
+
+            return closestResult;
+        }
+    }
+
+    RaycastResult3D xyResult = RaycastWorldXY(startPosition, forwardNormal, maxLength);
+
+    if (xyResult.m_didImpact &&
+        xyResult.m_impactLength < closestLength)
+    {
+        closestResult = xyResult;
+        closestLength = xyResult.m_impactLength;
+    }
+
+    RaycastResult3D zResult = RaycastWorldZ(startPosition, forwardNormal, maxLength);
+
+    if (zResult.m_didImpact &&
+        zResult.m_impactLength < closestLength)
+    {
+        closestResult = zResult;
+        closestLength = zResult.m_impactLength;
+    }
+
+    RaycastResult3D actorResult = RaycastWorldActors(out_impactedActorHandle, startPosition, forwardNormal, maxLength);
+
+    if (actorResult.m_didImpact &&
+        actorResult.m_impactLength < closestLength)
+    {
+        closestResult = actorResult;
+        closestLength = actorResult.m_impactLength;
+    }
+
+    return closestResult;
+}
+
 //----------------------------------------------------------------------------------------------------
 RaycastResult3D Map::RaycastWorldXY(Vec3 const& startPosition,
                                     Vec3 const& forwardNormal,
@@ -681,6 +738,37 @@ RaycastResult3D Map::RaycastWorldZ(Vec3 const& startPosition,
     result.m_impactLength   = (forwardNormal * t * maxLength).GetLength();
 
     return result;
+}
+
+RaycastResult3D Map::RaycastWorldActors(ActorHandle& out_impactedActorHandle,
+                                        Vec3 const&  startPosition,
+                                        Vec3 const&  forwardNormal,
+                                        float const  maxLength) const
+{
+    RaycastResult3D closestResult;
+    Actor const*    impactedActor   = nullptr;
+    float           closestDistance = maxLength;
+
+    for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
+    {
+        Cylinder3             cylinder3 = m_actors[i]->m_collisionCylinder;
+        RaycastResult3D const result    = RaycastVsCylinderZ3D(startPosition,
+                                                               forwardNormal, maxLength,
+                                                               cylinder3.GetCenterPositionXY(),
+                                                               cylinder3.GetFloatRange(),
+                                                               cylinder3.m_radius);
+
+        if (result.m_didImpact &&
+            result.m_impactLength < closestDistance)
+        {
+            impactedActor   = m_actors[i];
+            closestResult   = result;
+            closestDistance = result.m_impactLength;
+        }
+    }
+
+    out_impactedActorHandle = impactedActor->m_handle;
+    return closestResult;
 }
 
 

@@ -9,7 +9,6 @@
 #include "Map.hpp"
 #include "PlayerController.hpp"
 #include "WeaponDefinition.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 
@@ -18,13 +17,6 @@ Weapon::Weapon(Actor*                  owner,
     : m_owner(owner),
       m_definition(weaponDef)
 {
-    switch (m_definition->m_name)
-    {
-    case "Pistol":
-        {
-            m_refireTime = m_definition.
-        }
-    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -38,11 +30,18 @@ void Weapon::Fire()
     Vec3 const              firePosition     = playerController->m_position;
     EulerAngles const       fireOrientation  = playerController->m_orientation;
     fireOrientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
-    RaycastResult3D const result = m_owner->m_map->RaycastAll(firePosition, forward, 10.f);
+    ActorHandle           impactedActorHandle;
+    RaycastResult3D const result        = m_owner->m_map->RaycastAll(impactedActorHandle, firePosition, forward, 10.f);
+    Actor*                impactedActor = m_owner->m_map->GetActorByHandle(impactedActorHandle);
 
     if (result.m_didImpact)
     {
         DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
+
+        if (impactedActor != nullptr)
+        {
+            impactedActor->Damage((int)m_definition->m_rayDamage.m_min, m_owner->m_handle);
+        }
     }
 }
 

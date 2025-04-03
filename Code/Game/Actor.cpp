@@ -92,8 +92,7 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     {
         m_color = Rgba8::RED;
     }
-
-
+    m_aiController = new AIController(m_map);
     m_collisionCylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 }
 
@@ -202,10 +201,15 @@ void Actor::UpdatePhysics(float const deltaSeconds)
     // DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
 }
 
-void Actor::Damage(float const damage,
-                   ActorHandle other)
+void Actor::Damage(int const damage,
+                   ActorHandle const& other)
 {
     m_health -= damage;
+
+    if (m_aiController != nullptr)
+    {
+        m_aiController->DamagedBy(other);
+    }
 }
 
 void Actor::AddForce(Vec3 const& force)

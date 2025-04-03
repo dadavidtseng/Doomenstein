@@ -23,6 +23,22 @@ WeaponDefinition::~WeaponDefinition()
 bool WeaponDefinition::LoadFromXmlElement(XmlElement const* element)
 {
     m_name = ParseXmlAttribute(*element, "name", "Unnamed");
+    if (m_name == "Pistol") m_refireTime = ParseXmlAttribute(*element, "refireTime", -1.f);
+    if (m_name == "PlasmaRifle") m_refireTime = ParseXmlAttribute(*element, "refireTime", -1.f);
+    if (m_name == "DemonMelee") m_refireTime = ParseXmlAttribute(*element, "refireTime", -1.f);
+    m_rayCount        = ParseXmlAttribute(*element, "rayCount", -1);
+    m_rayCone         = ParseXmlAttribute(*element, "rayCone", -1.f);
+    m_rayDamage       = ParseXmlAttribute(*element, "rayDamage", FloatRange::ZERO);
+    m_rayImpulse      = ParseXmlAttribute(*element, "rayImpulse", -1.f);
+    m_projectileCount = ParseXmlAttribute(*element, "projectileCount", -1);
+    m_projectileCone  = ParseXmlAttribute(*element, "projectileCone", -1.f);
+    m_projectileSpeed = ParseXmlAttribute(*element, "projectileSpeed", -1.f);
+    m_projectileActor = ParseXmlAttribute(*element, "projectileActor", "Unnamed");
+    m_meleeCount      = ParseXmlAttribute(*element, "meleeCount", -1);
+    m_meleeArc        = ParseXmlAttribute(*element, "meleeArc", -1.f);
+    m_meleeRange      = ParseXmlAttribute(*element, "meleeRange", -1.f);
+    m_meleeDamage     = ParseXmlAttribute(*element, "meleeDamage", FloatRange::ZERO);
+    m_meleeRange      = ParseXmlAttribute(*element, "meleeRange", -1.f);
 
     return true;
 }

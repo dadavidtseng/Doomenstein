@@ -187,28 +187,29 @@ void PlayerController::UpdateFromInput()
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
     {
-        Vec3 const forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
-        Ray3 const ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
-        // RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
-        RaycastResult3D const result = m_map->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
+        // Vec3 const forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+        // Ray3 const ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
+        // // RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
+        // RaycastResult3D const result = m_map->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
 
         Actor* possessedActor = GetActor();
+
         if (possessedActor != nullptr)
         {
             possessedActor->Attack();
         }
 
-        if (result.m_didImpact == true)
-        {
-            // DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.01f, 10.f);
-            // DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
-            // DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal * 0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
-            // DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
-        }
-        else
-        {
-            DebugAddWorldLine(ray.m_startPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f);
-        }
+        // if (result.m_didImpact == true)
+        // {
+        //     // DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.01f, 10.f);
+        //     // DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
+        //     // DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal * 0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
+        //     // DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
+        // }
+        // else
+        // {
+        //     DebugAddWorldLine(ray.m_startPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f);
+        // }
     }
 }
 

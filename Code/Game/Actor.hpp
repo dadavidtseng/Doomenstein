@@ -47,7 +47,7 @@ public:
     Mat44 GetModelToWorldTransform() const;
 
     void UpdatePhysics(float deltaSeconds);
-    void Damage(float damage, ActorHandle other);
+    void Damage(int damage, ActorHandle const& other);
     void AddForce(Vec3 const& force);
     void AddImpulse(Vec3 const& impulse);
     void MoveInDirection(Vec3 const& direction, float speed);
