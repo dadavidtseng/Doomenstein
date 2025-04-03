@@ -397,27 +397,30 @@ void Map::CollideActors(Actor* actorA,
         return;
     }
 
-    // 4. Calculate actors' positionXY and radius.
-    Vec2        actorAPositionXY = Vec2(actorA->m_position.x, actorA->m_position.y);
-    Vec2        actorBPositionXY = Vec2(actorB->m_position.x, actorB->m_position.y);
-    float const actorARadius     = actorA->m_radius;
-    float const actorBRadius     = actorB->m_radius;
-    // PushDiscOutOfDisc2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
-    PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
-    // 5. Push movable actor out of immovable actor.
-    // if (actorA->m_isMovable && !actorB->m_isMovable)
-    // {
-    // }
-    // else if (actorB->m_isMovable && !actorA->m_isMovable)
-    // {
-    //     PushDiscOutOfDisc2D(actorBPositionXY, actorBRadius, actorAPositionXY, actorARadius);
-    // }
 
-    // 6. Update actors' position.
-    actorA->m_position.x = actorAPositionXY.x;
-    actorA->m_position.y = actorAPositionXY.y;
-    actorB->m_position.x = actorBPositionXY.x;
-    actorB->m_position.y = actorBPositionXY.y;
+    actorB->OnCollisionEnterWithActor(actorA);
+
+    // 4. Calculate actors' positionXY and radius.
+    // Vec2        actorAPositionXY = Vec2(actorA->m_position.x, actorA->m_position.y);
+    // Vec2        actorBPositionXY = Vec2(actorB->m_position.x, actorB->m_position.y);
+    // float const actorARadius     = actorA->m_radius;
+    // float const actorBRadius     = actorB->m_radius;
+    // // PushDiscOutOfDisc2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
+    // PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
+    // // 5. Push movable actor out of immovable actor.
+    // // if (actorA->m_isMovable && !actorB->m_isMovable)
+    // // {
+    // // }
+    // // else if (actorB->m_isMovable && !actorA->m_isMovable)
+    // // {
+    // //     PushDiscOutOfDisc2D(actorBPositionXY, actorBRadius, actorAPositionXY, actorARadius);
+    // // }
+    //
+    // // 6. Update actors' position.
+    // actorA->m_position.x = actorAPositionXY.x;
+    // actorA->m_position.y = actorAPositionXY.y;
+    // actorB->m_position.x = actorBPositionXY.x;
+    // actorB->m_position.y = actorBPositionXY.y;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -564,13 +567,13 @@ RaycastResult3D Map::RaycastAll(Vec3 const& startPosition,
     return closestResult;
 }
 
-RaycastResult3D Map::RaycastAll(ActorHandle& out_impactedActorHandle,
+RaycastResult3D Map::RaycastAll(Actor const* attackerActor,
+                                ActorHandle& out_impactedActorHandle,
                                 Vec3 const&  startPosition,
                                 Vec3 const&  forwardNormal,
                                 float        maxLength) const
 {
     RaycastResult3D closestResult;
-    Actor const*    impactedActor = nullptr;
     float           closestLength = maxLength;
 
     IntVec2 startTileCoords = GetTileCoordsFromWorldPos(startPosition);
@@ -609,7 +612,7 @@ RaycastResult3D Map::RaycastAll(ActorHandle& out_impactedActorHandle,
         closestLength = zResult.m_impactLength;
     }
 
-    RaycastResult3D actorResult = RaycastWorldActors(out_impactedActorHandle, startPosition, forwardNormal, maxLength);
+    RaycastResult3D actorResult = RaycastWorldActors(attackerActor, out_impactedActorHandle, startPosition, forwardNormal, maxLength);
 
     if (actorResult.m_didImpact &&
         actorResult.m_impactLength < closestLength)
@@ -740,14 +743,15 @@ RaycastResult3D Map::RaycastWorldZ(Vec3 const& startPosition,
     return result;
 }
 
-RaycastResult3D Map::RaycastWorldActors(ActorHandle& out_impactedActorHandle,
+RaycastResult3D Map::RaycastWorldActors(Actor const* attackerActor,
+                                        ActorHandle& out_impactedActorHandle,
                                         Vec3 const&  startPosition,
                                         Vec3 const&  forwardNormal,
                                         float const  maxLength) const
 {
     RaycastResult3D closestResult;
-    Actor const*    impactedActor   = nullptr;
-    float           closestDistance = maxLength;
+    out_impactedActorHandle = ActorHandle::INVALID;
+    float closestDistance   = maxLength;
 
     for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
@@ -758,16 +762,17 @@ RaycastResult3D Map::RaycastWorldActors(ActorHandle& out_impactedActorHandle,
                                                                cylinder3.GetFloatRange(),
                                                                cylinder3.m_radius);
 
+        if (attackerActor == m_actors[i]) continue;
+
         if (result.m_didImpact &&
             result.m_impactLength < closestDistance)
         {
-            impactedActor   = m_actors[i];
-            closestResult   = result;
-            closestDistance = result.m_impactLength;
+            closestResult           = result;
+            closestDistance         = result.m_impactLength;
+            out_impactedActorHandle = m_actors[i]->m_handle;
         }
     }
 
-    out_impactedActorHandle = impactedActor->m_handle;
     return closestResult;
 }
 

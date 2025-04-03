@@ -58,7 +58,7 @@ public:
     void OnUnpossessed();
 
     // Collision
-    void OnCollisionEnter();
+    void OnCollisionEnterWithActor(Actor* other);
 
 
     void Attack();
@@ -97,4 +97,6 @@ public:
     // Used to keep track of our AI controller if the player possesses this actor,
     // in which case he pushes the AI out of the way until he releases possession.
     AIController* m_aiController = nullptr;    // AI controllers should be constructed by the actor when the actor is spawned and immediately possess that actor.
+
+    bool m_test = false;
 };

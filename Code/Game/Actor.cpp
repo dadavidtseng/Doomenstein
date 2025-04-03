@@ -19,6 +19,7 @@
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
 // //----------------------------------------------------------------------------------------------------
@@ -92,7 +93,7 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     {
         m_color = Rgba8::RED;
     }
-    m_aiController = new AIController(m_map);
+    m_aiController      = new AIController(m_map);
     m_collisionCylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 }
 
@@ -201,7 +202,7 @@ void Actor::UpdatePhysics(float const deltaSeconds)
     // DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
 }
 
-void Actor::Damage(int const damage,
+void Actor::Damage(int const          damage,
                    ActorHandle const& other)
 {
     m_health -= damage;
@@ -257,6 +258,38 @@ void Actor::OnUnpossessed()
     if (m_aiController == nullptr) return;
     m_controller = m_aiController;
     // m_aiController->Possess(m_handle);
+}
+
+void Actor::OnCollisionEnterWithActor(Actor* other)
+{
+    if (this == other) return;
+    if (m_test == false && other->m_test == false) return;
+
+    Vec2        actorAPositionXY = Vec2(m_position.x, m_position.y);
+    Vec2        actorBPositionXY = Vec2(other->m_position.x, other->m_position.y);
+    float const actorARadius     = m_radius;
+    float const actorBRadius     = other->m_radius;
+    // PushDiscOutOfDisc2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
+    PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
+    // 5. Push movable actor out of immovable actor.
+    // if (actorA->m_isMovable && !actorB->m_isMovable)
+    // {
+    // }
+    // else if (actorB->m_isMovable && !actorA->m_isMovable)
+    // {
+    //     PushDiscOutOfDisc2D(actorBPositionXY, actorBRadius, actorAPositionXY, actorARadius);
+    // }
+
+
+    // 6. Update actors' position.
+    m_position.x        = actorAPositionXY.x;
+    m_position.y        = actorAPositionXY.y;
+    other->m_position.x = actorBPositionXY.x;
+    other->m_position.y = actorBPositionXY.y;
+
+    Vec3 forward, left, right;
+    other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+    AddImpulse(forward/10.f);
 }
 
 void Actor::Attack()

@@ -187,6 +187,16 @@ void PlayerController::UpdateFromInput()
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
     {
+        Actor* possessedActor = GetActor();
+
+        if (possessedActor != nullptr)
+        {
+            possessedActor->m_test = !possessedActor->m_test;
+        }
+    }
+
+    if (g_theInput->IsKeyDown(KEYCODE_LEFT_MOUSE))
+    {
         // Vec3 const forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
         // Ray3 const ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
         // // RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);

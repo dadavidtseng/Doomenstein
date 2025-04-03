@@ -61,10 +61,10 @@ public:
     void Render() const;
 
     RaycastResult3D RaycastAll(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
-    RaycastResult3D RaycastAll(ActorHandle& out_impactedActorHandle, Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
+    RaycastResult3D RaycastAll(Actor const* attackerActor, ActorHandle& out_impactedActorHandle, Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldXY(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldZ(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
-    RaycastResult3D RaycastWorldActors(ActorHandle& out_impactedActorHandle, Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
+    RaycastResult3D RaycastWorldActors(Actor const* attackerActor, ActorHandle& out_impactedActorHandle, Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastWorldActors(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
 
     Actor*       SpawnActor(SpawnInfo const& spawnInfo);
