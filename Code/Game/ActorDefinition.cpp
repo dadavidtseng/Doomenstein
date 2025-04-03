@@ -5,11 +5,12 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/ActorDefinition.hpp"
 
+#include "Weapon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
 //----------------------------------------------------------------------------------------------------
-std::vector<ActorDefinition*> ActorDefinition::s_actorDefinitions;
+STATIC std::vector<ActorDefinition*> ActorDefinition::s_actorDefinitions;
 
 //----------------------------------------------------------------------------------------------------
 ActorDefinition::~ActorDefinition()
@@ -59,6 +60,24 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
     {
         m_eyeHeight = ParseXmlAttribute(*cameraElement, "eyeHeight", -1.f);
         m_cameraFOV = ParseXmlAttribute(*cameraElement, "cameraFOV", -1.f);
+    }
+
+    XmlElement const* inventoryElement = element->FirstChildElement("Inventory");
+
+    if (inventoryElement != nullptr)
+    {
+        XmlElement const* weaponElement = inventoryElement->FirstChildElement("Weapon");
+
+        while (weaponElement != nullptr)
+        {
+            String weaponName;
+
+            weaponName = ParseXmlAttribute(*weaponElement, "name", "Unnamed");
+
+            m_inventory.push_back(weaponName);
+
+            weaponElement = weaponElement->NextSiblingElement("Weapon");
+        }
     }
 
     return true;

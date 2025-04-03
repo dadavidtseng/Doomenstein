@@ -62,6 +62,7 @@ void PlayerController::Update(float deltaSeconds)
         if (possessedActor == nullptr) return;
 
         EulerAngles possessedActorOrientation = possessedActor->m_orientation;
+        float       speed                     = possessedActor->m_definition->m_walkSpeed;
 
         possessedActorOrientation.m_yawDegrees -= cursorClientDelta.x * 0.125f;
         possessedActorOrientation.m_yawDegrees -= cursorClientDelta.x * 0.125f;
@@ -74,24 +75,29 @@ void PlayerController::Update(float deltaSeconds)
 
         possessedActor->TurnInDirection(possessedActorOrientation);
 
+        if (g_theInput->IsKeyDown(KEYCODE_SHIFT))
+        {
+            speed = possessedActor->m_definition->m_runSpeed;
+        }
+
         if (g_theInput->IsKeyDown(KEYCODE_W))
         {
-            possessedActor->MoveInDirection(forward, 1.5f);
+            possessedActor->MoveInDirection(forward, speed);
         }
 
         if (g_theInput->IsKeyDown(KEYCODE_S))
         {
-            possessedActor->MoveInDirection(-forward, 1.5f);
+            possessedActor->MoveInDirection(-forward, speed);
         }
 
         if (g_theInput->IsKeyDown(KEYCODE_A))
         {
-            possessedActor->MoveInDirection(left, 1.5f);
+            possessedActor->MoveInDirection(left, speed);
         }
 
         if (g_theInput->IsKeyDown(KEYCODE_D))
         {
-            possessedActor->MoveInDirection(-left, 1.5f);
+            possessedActor->MoveInDirection(-left, speed);
         }
     }
     else
@@ -122,8 +128,8 @@ void PlayerController::Update(float deltaSeconds)
         m_orientation.m_yawDegrees -= rightStickInput.x * 0.125f;
         m_orientation.m_pitchDegrees -= rightStickInput.y * 0.125f;
 
-        m_orientation.m_yawDegrees -= g_theInput->GetCursorClientDelta().x * 0.125f;
-        m_orientation.m_pitchDegrees += g_theInput->GetCursorClientDelta().y * 0.125f;
+        m_orientation.m_yawDegrees -= cursorClientDelta.x * 0.125f;
+        m_orientation.m_pitchDegrees += cursorClientDelta.y * 0.125f;
         m_orientation.m_pitchDegrees = GetClamped(m_orientation.m_pitchDegrees, -85.f, 85.f);
 
 
@@ -152,6 +158,11 @@ void PlayerController::Update(float deltaSeconds)
 //----------------------------------------------------------------------------------------------------
 void PlayerController::Render() const
 {
+    Actor const* possessedActor       = m_map->GetActorByHandle(m_actorHandle);
+    String const possessedActorName   = possessedActor->m_definition->m_name;
+    int const    possessedActorHealth = possessedActor->m_health;
+
+    DebugAddScreenText(Stringf("Name:%s/Health:%d", possessedActorName.c_str(), possessedActorHealth), Vec2(0.f, 20.f), 20.f, Vec2::ZERO, 0.f);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -162,6 +173,7 @@ void PlayerController::UpdateFromInput()
         m_map->DebugPossessNext();
         m_isCameraMode = false;
     }
+
     if (g_theInput->WasKeyJustPressed(KEYCODE_F))
     {
         m_isCameraMode = !m_isCameraMode;
@@ -171,7 +183,6 @@ void PlayerController::UpdateFromInput()
         if (possessedActor == nullptr) return;
 
         possessedActor->m_isVisible = !possessedActor->m_isVisible;
-        DebuggerPrintf("PC: %d, %d\n", possessedActor->m_handle.GetIndex(), possessedActor->m_isVisible);
     }
 
     if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
@@ -180,6 +191,12 @@ void PlayerController::UpdateFromInput()
         Ray3 const ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
         // RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
         RaycastResult3D const result = m_map->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
+
+        Actor* possessedActor = GetActor();
+        if (possessedActor != nullptr)
+        {
+            possessedActor->Attack();
+        }
 
         if (result.m_didImpact == true)
         {
@@ -203,7 +220,7 @@ void PlayerController::UpdateWorldCamera()
     if (!m_isCameraMode)
     {
         Actor const* possessedActor = GetActor();
-        // if (possessActor && !possessActor->m_bIsDead)
+        // if (possessActor && !possessActor->m_isDead)
         if (possessedActor != nullptr)
         {
             m_eyeHeight = possessedActor->m_definition->m_eyeHeight;

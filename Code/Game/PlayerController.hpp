@@ -34,7 +34,7 @@ public:
     PlayerController& operator=(PlayerController& copyFrom)  = delete;
     PlayerController& operator=(PlayerController&& moveFrom) = delete;
 
-    void Update(float deltaSeconds);
+    void Update(float deltaSeconds)override;
     void Render() const;
     void UpdateFromInput();
     void UpdateWorldCamera();

@@ -11,6 +11,8 @@
 #include "GameCommon.hpp"
 #include "MapDefinition.hpp"
 #include "PlayerController.hpp"
+#include "Weapon.hpp"
+#include "WeaponDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -55,6 +57,32 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     m_position    = spawnInfo.m_position;
     m_orientation = spawnInfo.m_orientation;
 
+    for (String const& weapon : m_definition->m_inventory)
+    {
+        if (WeaponDefinition const* weaponDef = WeaponDefinition::GetDefByName(weapon))
+        {
+            m_weapons.push_back(new Weapon(this, weaponDef));
+        }
+    }
+
+    if (!m_weapons.empty() && m_weapons[0] != nullptr)
+    {
+        m_currentWeapon = m_weapons[0];
+    }
+
+    // for (int i = 0; i < (int)m_definition->m_inventory.size(); ++i)
+    // {
+    //     m_weapons.push_back(new Weapon(this, WeaponDefinition::GetDefByName(m_definition->m_inventory[i])));
+    // }
+    //
+    // if (!m_weapons.empty())
+    // {
+    //     m_currentWeapon = m_weapons[0];
+    // }
+
+
+    // m_currentWeapon = new Weapon(this, )
+
     if (spawnInfo.m_name == "Marine")
     {
         m_color = Rgba8::GREEN;
@@ -64,6 +92,7 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     {
         m_color = Rgba8::RED;
     }
+
 
     m_collisionCylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 }
@@ -80,7 +109,6 @@ void Actor::Update(float const deltaSeconds)
         // UpdatePosition();
         UpdatePhysics(deltaSeconds);
     }
-
 
     m_collisionCylinder.m_startPosition = m_position;
     m_collisionCylinder.m_endPosition   = m_position + Vec3(0.f, 0.f, m_height);
@@ -126,6 +154,7 @@ void Actor::Render() const
     if (m_definition->m_name == "SpawnPoint") return;
     // if (dynamic_cast<PlayerController*>(m_controller) != nullptr && !m_isVisible) return;
     if (!m_isVisible) return;
+
     VertexList_PCU verts;
     float const    eyeHeight         = m_definition->m_eyeHeight;
     Vec3 const     forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
@@ -213,11 +242,15 @@ void Actor::OnPossessed(Controller* controller)
 void Actor::OnUnpossessed()
 {
     m_controller = nullptr;
-    m_isVisible = true;
+    m_isVisible  = true;
 
-    if (m_aiController != nullptr)
-    {
-        m_controller = m_aiController;
-        // m_aiController->Possess(m_handle);
-    }
+    if (m_aiController == nullptr) return;
+    m_controller = m_aiController;
+    // m_aiController->Possess(m_handle);
+}
+
+void Actor::Attack()
+{
+    if (m_currentWeapon == nullptr) return;
+    m_currentWeapon->Fire();
 }

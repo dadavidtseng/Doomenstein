@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Engine/Core/Rgba8.hpp"
+#include "Engine/Core/StringUtils.hpp"
 #include "Engine/Math/Cylinder3.hpp"
 #include "Engine/Math/EulerAngles.hpp"
 #include "Engine/Math/Vec3.hpp"
@@ -46,35 +47,43 @@ public:
     Mat44 GetModelToWorldTransform() const;
 
     void UpdatePhysics(float deltaSeconds);
-    void Damage();
+    void Damage(float damage, ActorHandle other);
     void AddForce(Vec3 const& force);
     void AddImpulse(Vec3 const& impulse);
     void MoveInDirection(Vec3 const& direction, float speed);
     void TurnInDirection(EulerAngles& direction);
-    void OnCollide();
+
+    // Possession
     void OnPossessed(Controller* controller);
     void OnUnpossessed();
+
+    // Collision
+    void OnCollisionEnter();
+
+
     void Attack();
-    void EquipWeapon();
-    // SwitchInventory(unsigned int index);
+    void SwitchInventory(unsigned int index);
+    // void EquipWeapon(unsigned int index);
 
     ActorHandle            m_handle;
     ActorDefinition const* m_definition = nullptr;      // A reference to our actor definition.
 
     bool        m_isVisible    = true;
+    bool        m_isStatic     = false;
     Vec3        m_position     = Vec3::ZERO;               // 3D position, as a Vec3, in world units.
     Vec3        m_velocity     = Vec3::ZERO;               // 3D velocity, as a Vec3, in world units per second.
     Vec3        m_acceleration = Vec3::ZERO;                // 3D acceleration, as a Vec3, in world units per second squared.
     EulerAngles m_orientation  = EulerAngles::ZERO;        // 3D orientation, as EulerAngles, in degrees.
 
-    float     m_radius            = 0.f;
-    float     m_height            = 0.f;
+    float m_radius = 0.f;
+    float m_height = 0.f;
     // float     m_eyeHeight         = 0.f;
     // float     m_cameraFOV         = 0.f;
-    Rgba8     m_color             = Rgba8::WHITE;
-    Cylinder3 m_collisionCylinder = Cylinder3();
-
+    Rgba8                m_color             = Rgba8::WHITE;
+    Cylinder3            m_collisionCylinder = Cylinder3();
+    String               m_weaponName;
     bool                 m_isDead         = false;        // Any data needed to track if and how long we have been dead.
+    bool                 m_isGarbage      = false;
     int                  m_health         = 0;            // Current health.
     bool                 m_canBePossessed = false;
     float                m_corpseLifetime = 0.f;

@@ -12,11 +12,12 @@ struct WeaponDefinition;
 //----------------------------------------------------------------------------------------------------
 class Weapon
 {
+public:
     explicit Weapon(Actor* owner, WeaponDefinition const* weaponDef);
 
     void Fire();
-    void getRandomDirectionInCone();
+    void GetRandomDirectionInCone();
 
-    Actor*            m_owner            = nullptr;
-    WeaponDefinition* m_weaponDefinition = nullptr;
+    Actor*                  m_owner      = nullptr;
+    WeaponDefinition const* m_definition = nullptr;     // Reference to our weapon definition.
 };

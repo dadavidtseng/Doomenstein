@@ -373,7 +373,6 @@ void Map::CollideActors()
 
         for (int j = i + 1; j < static_cast<int>(m_actors.size()); ++j)
         {
-            // if (i == j) continue;
             if (m_actors[j] == nullptr && !m_actors[j]->m_handle.IsValid()) continue;
 
             CollideActors(m_actors[i], m_actors[j]);
@@ -684,7 +683,6 @@ RaycastResult3D Map::RaycastWorldZ(Vec3 const& startPosition,
     return result;
 }
 
-//----------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
 RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
@@ -820,6 +818,8 @@ void Map::DeleteDestroyedActor()
     // }
 }
 
+//----------------------------------------------------------------------------------------------------
+// Spawn a marine actor at a random spawn point and possess it with the player.
 Actor* Map::SpawnPlayer(PlayerController* playerController)
 {
     SpawnInfo spawnInfo;
@@ -833,6 +833,13 @@ Actor* Map::SpawnPlayer(PlayerController* playerController)
     Actor* playerActor      = SpawnActor(spawnInfo);
     playerController->m_map = this;
     return playerActor;
+}
+
+//----------------------------------------------------------------------------------------------------
+// Search the actor list to find actors meeting the provided criteria.
+Actor* Map::GetClosestVisibleEnemy(Actor* owner)
+{
+return nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------

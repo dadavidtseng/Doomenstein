@@ -10,6 +10,7 @@
 #include "Map.hpp"
 #include "MapDefinition.hpp"
 #include "TileDefinition.hpp"
+#include "WeaponDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -388,6 +389,7 @@ void Game::InitializeMaps()
 {
     MapDefinition::InitializeMapDefs("Data/Definitions/MapDefinitions.xml");
     TileDefinition::InitializeTileDefs("Data/Definitions/TileDefinitions.xml");
+    WeaponDefinition::InitializeWeaponDefs("Data/Definitions/WeaponDefinitions.xml");
     ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
 
     m_maps.reserve(1);

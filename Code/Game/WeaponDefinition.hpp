@@ -10,11 +10,14 @@
 //----------------------------------------------------------------------------------------------------
 struct WeaponDefinition
 {
-    explicit WeaponDefinition(XmlElement const& mapDefElement);
+    WeaponDefinition() = default;
     ~WeaponDefinition();
 
-    static void                          InitializeActorDefs();
-    static std::vector<WeaponDefinition*> s_actorDefinitions;
+    bool LoadFromXmlElement(XmlElement const* element);
+
+    static void                           InitializeWeaponDefs(char const* path);
+    static WeaponDefinition const*        GetDefByName(String const& name);
+    static std::vector<WeaponDefinition*> s_weaponDefinitions;
 
     String m_name;
 };

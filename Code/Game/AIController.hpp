@@ -13,8 +13,8 @@ class AIController : public Controller
     explicit AIController(Map* map);
     ~AIController() override;
 
+    void Update(float deltaSeconds) override;
     void DamagedBy();
-    void Update();
 
     ActorHandle m_targetActorHandle;
 };

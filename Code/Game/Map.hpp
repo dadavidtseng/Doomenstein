@@ -71,7 +71,7 @@ public:
     void         GetActorsByName(std::vector<Actor*>& actorList, String const& name);
     void         DeleteDestroyedActor();
     Actor*         SpawnPlayer(PlayerController* playerController);
-    void         GetClosestVisibleEnemy();
+    Actor*         GetClosestVisibleEnemy(Actor* owner);
     void         DebugPossessNext() const;
 
     Game* m_game = nullptr;

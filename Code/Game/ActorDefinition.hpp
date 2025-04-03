@@ -49,4 +49,6 @@ struct ActorDefinition
     float m_cameraFOV = 0.f;
 
     // Visuals
+    // Weapons
+    StringList m_inventory;
 };
