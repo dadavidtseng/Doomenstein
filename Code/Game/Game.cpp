@@ -327,7 +327,8 @@ void Game::UpdatePlayerController(float const deltaSeconds) const
     if (m_playerController != nullptr &&
         m_currentGameState == eGameState::INGAME)
     {
-        m_playerController->Update(deltaSeconds);
+        float systemDeltaSeconds = (float)Clock::GetSystemClock().GetDeltaSeconds();
+        m_playerController->Update(systemDeltaSeconds);
     }
 
     DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / deltaSeconds, m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);

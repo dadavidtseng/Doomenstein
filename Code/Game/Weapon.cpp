@@ -87,7 +87,7 @@ void Weapon::Fire()
             spawnInfo.m_faction = m_owner->m_definition->m_faction;
             spawnInfo.m_position = startPos;
             spawnInfo.m_orientation = randomDirection;
-            // spawnInfo.m_speed = projectileSpeed;
+            spawnInfo.m_velocity = projectileSpeed;
             Actor*    projectile = m_owner->m_map->SpawnActor(spawnInfo);
             projectile->m_owner  = m_owner;
             projectileCount--;

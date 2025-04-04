@@ -59,6 +59,7 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     m_radius      = m_definition->m_radius;
     m_position    = spawnInfo.m_position;
     m_orientation = spawnInfo.m_orientation;
+    m_velocity    = spawnInfo.m_velocity;
 
     for (String const& weapon : m_definition->m_inventory)
     {
@@ -95,6 +96,12 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     {
         m_color = Rgba8::RED;
     }
+
+    if (spawnInfo.m_name == "PlasmaProjectile")
+    {
+        m_color = Rgba8::BLUE;
+    }
+
     // m_aiController      = new AIController(m_map);
     // m_controller = m_aiController;
     // m_aiController->Possess(m_handle);
@@ -159,8 +166,12 @@ void Actor::Render() const
     float const    eyeHeight         = m_definition->m_eyeHeight;
     Vec3 const     forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
     Vec3 const     coneStartPosition = m_collisionCylinder.m_startPosition + Vec3(0.f, 0.f, eyeHeight) + forwardNormal * m_radius;
-    AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, m_color);
-    AddVertsForWireframeCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, 0.001f);
+    if (m_definition->m_name != "PlasmaProjectile")
+    {
+        AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, m_color);
+        AddVertsForWireframeCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, 0.001f);
+    }
+
     AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, m_color);
     AddVertsForWireframeCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, 0.001f);
 
@@ -279,6 +290,10 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
 void Actor::OnCollisionEnterWithMap(Actor*         other,
                                     IntVec2 const& tileCoords)
 {
+    if (m_definition->m_dieOnCollide)
+    {
+        DebuggerPrintf("PROJECTILE\n");
+    }
     // TODO: Swap check method for Sprinting if needed (PushCapsuleOutOfAABB2D/DoCapsuleAndAABB2Overlap2D)
 
     AABB3 const aabb3Box = other->m_map->GetTile(tileCoords.x, tileCoords.y)->m_bounds;

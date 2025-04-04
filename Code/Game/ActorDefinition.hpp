@@ -33,6 +33,7 @@ struct ActorDefinition
     float m_height             = 0.f;
     bool  m_collidesWithWorld  = false;
     bool  m_collidesWithActors = false;
+    bool  m_dieOnCollide       = false;
 
     // Physics
     bool  m_isSimulated = false;

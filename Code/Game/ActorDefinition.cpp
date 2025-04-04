@@ -41,6 +41,7 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
         m_height             = ParseXmlAttribute(*collisionElement, "height", -1.f);
         m_collidesWithWorld  = ParseXmlAttribute(*collisionElement, "collidesWithWorld", false);
         m_collidesWithActors = ParseXmlAttribute(*collisionElement, "collidesWithActors", false);
+        m_dieOnCollide       = ParseXmlAttribute(*collisionElement, "dieOnCollide", false);
     }
 
     XmlElement const* physicsElement = element->FirstChildElement("Physics");

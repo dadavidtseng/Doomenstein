@@ -16,8 +16,8 @@ class Shader;
 //----------------------------------------------------------------------------------------------------
 struct SpawnInfo
 {
-    String      m_name;
-    String      m_faction;
+    String      m_name        = "Unnamed";
+    String      m_faction     = "NEUTRAL";
     Vec3        m_position    = Vec3::ZERO;
     EulerAngles m_orientation = EulerAngles::ZERO;
     Vec3        m_velocity    = Vec3::ZERO;
