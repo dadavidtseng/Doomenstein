@@ -60,6 +60,7 @@ void Weapon::Fire()
                 if (impactedActor != nullptr && impactedActor != m_owner)
                 {
                     impactedActor->Damage((int)m_definition->m_rayDamage.m_min, m_owner->m_handle);
+                    impactedActor->AddImpulse(m_definition->m_rayImpulse * forward);
                 }
             }
             rayCount--;

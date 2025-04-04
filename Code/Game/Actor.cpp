@@ -102,13 +102,14 @@ void Actor::Update(float const deltaSeconds)
 {
     // if (!m_isMovable) return;
 
-    PlayerController const* playerController = dynamic_cast<PlayerController*>(m_controller);
-    if (playerController != nullptr &&
-        !playerController->m_isCameraMode)
-    {
-        // UpdatePosition();
-        UpdatePhysics(deltaSeconds);
-    }
+    // PlayerController const* playerController = dynamic_cast<PlayerController*>(m_controller);
+    // if (playerController != nullptr &&
+    //     !playerController->m_isCameraMode)
+    // {
+    //     // UpdatePosition();
+    //     UpdatePhysics(deltaSeconds);
+    // }
+    UpdatePhysics(deltaSeconds);
 
     m_collisionCylinder.m_startPosition = m_position;
     m_collisionCylinder.m_endPosition   = m_position + Vec3(0.f, 0.f, m_height);
@@ -269,16 +270,9 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
     Vec2        actorBPositionXY = Vec2(other->m_position.x, other->m_position.y);
     float const actorARadius     = m_radius;
     float const actorBRadius     = other->m_radius;
-    // PushDiscOutOfDisc2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
-    PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
+
     // 5. Push movable actor out of immovable actor.
-    // if (actorA->m_isMovable && !actorB->m_isMovable)
-    // {
-    // }
-    // else if (actorB->m_isMovable && !actorA->m_isMovable)
-    // {
-    //     PushDiscOutOfDisc2D(actorBPositionXY, actorBRadius, actorAPositionXY, actorARadius);
-    // }
+    PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
 
 
     // 6. Update actors' position.
@@ -287,9 +281,9 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
     other->m_position.x = actorBPositionXY.x;
     other->m_position.y = actorBPositionXY.y;
 
-    Vec3 forward, left, right;
-    other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-    AddImpulse(forward/10.f);
+    // Vec3 forward, left, right;
+    // other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+    // AddImpulse(forward / 10.f);
 }
 
 void Actor::Attack()
