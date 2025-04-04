@@ -28,6 +28,7 @@ bool WeaponDefinition::LoadFromXmlElement(XmlElement const* element)
     if (m_name == "DemonMelee") m_refireTime = ParseXmlAttribute(*element, "refireTime", -1.f);
     m_rayCount        = ParseXmlAttribute(*element, "rayCount", -1);
     m_rayCone         = ParseXmlAttribute(*element, "rayCone", -1.f);
+    m_rayRange        = ParseXmlAttribute(*element, "rayRange", -1.f);
     m_rayDamage       = ParseXmlAttribute(*element, "rayDamage", FloatRange::ZERO);
     m_rayImpulse      = ParseXmlAttribute(*element, "rayImpulse", -1.f);
     m_projectileCount = ParseXmlAttribute(*element, "projectileCount", -1);

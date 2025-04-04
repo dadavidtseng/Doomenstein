@@ -59,6 +59,7 @@ public:
 
     // Collision
     void OnCollisionEnterWithActor(Actor* other);
+    void OnCollisionEnterWithMap(Actor* other, IntVec2 const& tileCoords);
 
 
     void Attack();
@@ -67,6 +68,7 @@ public:
 
     ActorHandle            m_handle;
     ActorDefinition const* m_definition = nullptr;      // A reference to our actor definition.
+    Actor* m_owner = nullptr;
 
     bool        m_isVisible    = true;
     bool        m_isStatic     = false;

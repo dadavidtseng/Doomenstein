@@ -9,8 +9,10 @@
 #include "AIController.hpp"
 #include "Game.hpp"
 #include "GameCommon.hpp"
+#include "Map.hpp"
 #include "MapDefinition.hpp"
 #include "PlayerController.hpp"
+#include "Tile.hpp"
 #include "Weapon.hpp"
 #include "WeaponDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
@@ -93,23 +95,21 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     {
         m_color = Rgba8::RED;
     }
-    m_aiController      = new AIController(m_map);
+    // m_aiController      = new AIController(m_map);
+    // m_controller = m_aiController;
+    // m_aiController->Possess(m_handle);
     m_collisionCylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::Update(float const deltaSeconds)
 {
-    // if (!m_isMovable) return;
-
-    // PlayerController const* playerController = dynamic_cast<PlayerController*>(m_controller);
-    // if (playerController != nullptr &&
-    //     !playerController->m_isCameraMode)
-    // {
-    //     // UpdatePosition();
-    //     UpdatePhysics(deltaSeconds);
-    // }
     UpdatePhysics(deltaSeconds);
+
+    if (m_aiController != nullptr)
+    {
+        m_aiController->Update(deltaSeconds);
+    }
 
     m_collisionCylinder.m_startPosition = m_position;
     m_collisionCylinder.m_endPosition   = m_position + Vec3(0.f, 0.f, m_height);
@@ -153,7 +153,6 @@ void Actor::UpdatePosition()
 void Actor::Render() const
 {
     if (m_definition->m_name == "SpawnPoint") return;
-    // if (dynamic_cast<PlayerController*>(m_controller) != nullptr && !m_isVisible) return;
     if (!m_isVisible) return;
 
     VertexList_PCU verts;
@@ -189,9 +188,6 @@ Mat44 Actor::GetModelToWorldTransform() const
 
 void Actor::UpdatePhysics(float const deltaSeconds)
 {
-    // DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
-    // DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
-
     float dragValue = m_definition->m_drag;
     Vec3  dragForce = -m_velocity * dragValue;
     AddForce(dragForce);
@@ -199,8 +195,6 @@ void Actor::UpdatePhysics(float const deltaSeconds)
     m_velocity += m_acceleration * deltaSeconds;
     m_position += m_velocity * deltaSeconds;
     m_acceleration = Vec3::ZERO;
-    // DebuggerPrintf("%s, %f, %f, %f\n", m_definition->m_name.c_str(), m_position.x, m_position.y, m_position.z);
-    // DebuggerPrintf("%f, %f, %f\n", m_velocity.x, m_velocity.y, m_velocity.z);
 }
 
 void Actor::Damage(int const          damage,
@@ -264,7 +258,7 @@ void Actor::OnUnpossessed()
 void Actor::OnCollisionEnterWithActor(Actor* other)
 {
     if (this == other) return;
-    if (m_test == false && other->m_test == false) return;
+    // if (m_test == false && other->m_test == false) return;
 
     Vec2        actorAPositionXY = Vec2(m_position.x, m_position.y);
     Vec2        actorBPositionXY = Vec2(other->m_position.x, other->m_position.y);
@@ -280,10 +274,22 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
     m_position.y        = actorAPositionXY.y;
     other->m_position.x = actorBPositionXY.x;
     other->m_position.y = actorBPositionXY.y;
+}
 
-    // Vec3 forward, left, right;
-    // other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-    // AddImpulse(forward / 10.f);
+void Actor::OnCollisionEnterWithMap(Actor*         other,
+                                    IntVec2 const& tileCoords)
+{
+    // TODO: Swap check method for Sprinting if needed (PushCapsuleOutOfAABB2D/DoCapsuleAndAABB2Overlap2D)
+
+    AABB3 const aabb3Box = other->m_map->GetTile(tileCoords.x, tileCoords.y)->m_bounds;
+    AABB2 const aabb2Box = AABB2(Vec2(aabb3Box.m_mins.x, aabb3Box.m_mins.y), Vec2(aabb3Box.m_maxs.x, aabb3Box.m_maxs.y));
+
+    Vec2 actorPositionXY = Vec2(other->m_position.x, other->m_position.y);
+
+    PushDiscOutOfAABB2D(actorPositionXY, other->m_radius, aabb2Box);
+
+    other->m_position.x = actorPositionXY.x;
+    other->m_position.y = actorPositionXY.y;
 }
 
 void Actor::Attack()

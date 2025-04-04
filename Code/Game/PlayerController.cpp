@@ -75,6 +75,11 @@ void PlayerController::Update(float deltaSeconds)
 
         possessedActor->TurnInDirection(possessedActorOrientation);
 
+if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
+{
+    possessedActor->m_currentWeapon = possessedActor->m_weapons[1];
+}
+
         if (g_theInput->IsKeyDown(KEYCODE_SHIFT))
         {
             speed = possessedActor->m_definition->m_runSpeed;

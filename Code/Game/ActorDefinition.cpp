@@ -62,6 +62,15 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
         m_cameraFOV = ParseXmlAttribute(*cameraElement, "cameraFOV", -1.f);
     }
 
+    XmlElement const* aiElement = element->FirstChildElement("AI");
+
+    if (aiElement != nullptr)
+    {
+        m_aiEnabled   = ParseXmlAttribute(*aiElement, "aiEnabled", false);
+        m_sightRadius = ParseXmlAttribute(*aiElement, "sightRadius", -1.f);
+        m_sightAngle  = ParseXmlAttribute(*aiElement, "sightAngle", -1.f);
+    }
+
     XmlElement const* inventoryElement = element->FirstChildElement("Inventory");
 
     if (inventoryElement != nullptr)

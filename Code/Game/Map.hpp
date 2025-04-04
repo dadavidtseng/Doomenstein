@@ -77,6 +77,7 @@ public:
     void         DebugPossessNext() const;
 
     Game* m_game = nullptr;
+    std::vector<Actor*>           m_actors;
 
 protected:
     // Map
@@ -97,7 +98,6 @@ protected:
     float m_ambientIntensity = 0.35f;
 
     // Actor
-    std::vector<Actor*>           m_actors;
     static constexpr unsigned int MAX_ACTOR_UID      = 0x0000fffeu;
     unsigned int                  m_nextActorUID     = 0;
     PlayerController*             m_playerController = nullptr;

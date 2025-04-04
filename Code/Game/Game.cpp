@@ -15,8 +15,6 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
-#include "Engine/Math/RandomNumberGenerator.hpp"
-#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Game/App.hpp"
@@ -389,8 +387,9 @@ void Game::InitializeMaps()
 {
     MapDefinition::InitializeMapDefs("Data/Definitions/MapDefinitions.xml");
     TileDefinition::InitializeTileDefs("Data/Definitions/TileDefinitions.xml");
-    WeaponDefinition::InitializeWeaponDefs("Data/Definitions/WeaponDefinitions.xml");
     ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
+    ActorDefinition::InitializeActorDefs("Data/Definitions/ProjectileActorDefinitions.xml");
+    WeaponDefinition::InitializeWeaponDefs("Data/Definitions/WeaponDefinitions.xml");
 
     m_maps.reserve(1);
 

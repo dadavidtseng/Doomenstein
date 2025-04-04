@@ -8,9 +8,6 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 
-
-enum class eActorFaction : int8_t;
-
 //----------------------------------------------------------------------------------------------------
 struct ActorDefinition
 {
@@ -47,6 +44,11 @@ struct ActorDefinition
     // Camera
     float m_eyeHeight = 0.f;
     float m_cameraFOV = 0.f;
+
+    // AI
+    bool  m_aiEnabled   = false;
+    float m_sightRadius = 0.f;
+    float m_sightAngle  = 0.f;
 
     // Visuals
     // Weapons

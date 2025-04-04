@@ -7,6 +7,7 @@
 
 #include "ActorDefinition.hpp"
 #include "ActorHandle.hpp"
+#include "AIController.hpp"
 #include "Game.hpp"
 #include "PlayerController.hpp"
 #include "Engine/Core/Clock.hpp"
@@ -53,7 +54,8 @@ Map::Map(Game*                owner,
 
     for (SpawnInfo const& spawnInfo : m_mapDefinition->m_spawnInfos)
     {
-        SpawnActor(spawnInfo);
+        Actor* actor = SpawnActor(spawnInfo);
+        // actor->m_aiController->Possess(actor->m_handle);
     }
 
     m_game->SpawnPlayerController();
@@ -384,9 +386,6 @@ void Map::CollideActors()
 void Map::CollideActors(Actor* actorA,
                         Actor* actorB)
 {
-    // 1. If neither actor is movable, there will be no collision, so return.
-    // if (!actorA->m_isMovable && !actorB->m_isMovable) return;
-
     // 2. Get actors' MinMaxZ range.
     FloatRange const actorAMinMaxZ = actorA->m_collisionCylinder.GetFloatRange();
     FloatRange const actorBMinMaxZ = actorB->m_collisionCylinder.GetFloatRange();
@@ -397,30 +396,7 @@ void Map::CollideActors(Actor* actorA,
         return;
     }
 
-
     actorB->OnCollisionEnterWithActor(actorA);
-
-    // 4. Calculate actors' positionXY and radius.
-    // Vec2        actorAPositionXY = Vec2(actorA->m_position.x, actorA->m_position.y);
-    // Vec2        actorBPositionXY = Vec2(actorB->m_position.x, actorB->m_position.y);
-    // float const actorARadius     = actorA->m_radius;
-    // float const actorBRadius     = actorB->m_radius;
-    // // PushDiscOutOfDisc2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
-    // PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
-    // // 5. Push movable actor out of immovable actor.
-    // // if (actorA->m_isMovable && !actorB->m_isMovable)
-    // // {
-    // // }
-    // // else if (actorB->m_isMovable && !actorA->m_isMovable)
-    // // {
-    // //     PushDiscOutOfDisc2D(actorBPositionXY, actorBRadius, actorAPositionXY, actorARadius);
-    // // }
-    //
-    // // 6. Update actors' position.
-    // actorA->m_position.x = actorAPositionXY.x;
-    // actorA->m_position.y = actorAPositionXY.y;
-    // actorB->m_position.x = actorBPositionXY.x;
-    // actorB->m_position.y = actorBPositionXY.y;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -464,17 +440,9 @@ void Map::PushActorOutOfTileIfSolid(Actor*         actor,
 
     if (IsTileCoordsOutOfBounds(tileCoords)) return;
 
-    // TODO: Swap check method for Sprinting if needed (PushCapsuleOutOfAABB2D/DoCapsuleAndAABB2Overlap2D)
+    if (actor == nullptr) return;
 
-    AABB3 const aabb3Box = GetTile(tileCoords.x, tileCoords.y)->m_bounds;
-    AABB2 const aabb2Box = AABB2(Vec2(aabb3Box.m_mins.x, aabb3Box.m_mins.y), Vec2(aabb3Box.m_maxs.x, aabb3Box.m_maxs.y));
-
-    Vec2 actorPositionXY = Vec2(actor->m_position.x, actor->m_position.y);
-
-    PushDiscOutOfAABB2D(actorPositionXY, actor->m_radius, aabb2Box);
-
-    actor->m_position.x = actorPositionXY.x;
-    actor->m_position.y = actorPositionXY.y;
+    actor->OnCollisionEnterWithMap(actor, tileCoords);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -574,7 +542,14 @@ RaycastResult3D Map::RaycastAll(Actor const* attackerActor,
                                 float        maxLength) const
 {
     RaycastResult3D closestResult;
-    float           closestLength = maxLength;
+    closestResult.m_didImpact        = false;
+    closestResult.m_impactPosition   = startPosition;
+    closestResult.m_impactNormal     = -forwardNormal;
+    closestResult.m_impactLength     = maxLength;
+    closestResult.m_rayStartPosition = startPosition;
+    closestResult.m_rayForwardNormal = forwardNormal;
+    closestResult.m_rayMaxLength     = maxLength;
+    float closestLength              = maxLength;
 
     IntVec2 startTileCoords = GetTileCoordsFromWorldPos(startPosition);
 
@@ -821,6 +796,9 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
     ActorHandle const handle = ActorHandle(m_nextActorUID, newIndex);
     newActor->m_handle       = handle;
     newActor->m_map          = this;
+    newActor->m_aiController = new AIController(this);
+    newActor->m_controller = newActor->m_aiController;
+    newActor->m_aiController->Possess(newActor->m_handle);
 
     m_actors.push_back(newActor);
     m_nextActorUID++;
