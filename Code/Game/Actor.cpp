@@ -113,10 +113,14 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 void Actor::Update(float const deltaSeconds)
 {
     if (m_isDead) m_dead += deltaSeconds;
-    if (m_dead > m_definition->m_corpseLifetime) m_isGarbage = true;
+    if (m_dead > 3.f) m_isGarbage = true;
+    // if (m_dead > m_definition->m_corpseLifetime) m_isGarbage = true;
 
-
+if (!m_isDead)
+{
     UpdatePhysics(deltaSeconds);
+}
+
 
     if (m_aiController != nullptr)
     {
@@ -274,68 +278,32 @@ void Actor::OnUnpossessed()
 
 void Actor::OnCollisionEnterWithActor(Actor* other)
 {
-    // if (m_isDead || other->m_isDead) return;
+    if (m_isDead || other->m_isDead) return;
     if (m_owner && other->m_owner) return;
-    if (m_definition->m_name!="PlasmaProjectile"||other->m_definition->m_name!="Demon") return;
-    if (this == other) return;
-    float randomDamage = g_theRNG->RollRandomFloatInRange(other->m_definition->m_damageOnCollide.m_min, other->m_definition->m_damageOnCollide.m_max);
-    // Damage((int)randomDamage, other->m_handle);
 
-    // if self not projectile other is
-    // if (!m_owner && other->m_owner)
-    // {
-    //     if (this == other->m_owner)
-    //     {
-    //         return;
-    //     }
-    //     else
-    //     {
-    //         float randomDamage = g_theRNG->RollRandomFloatInRange(other->m_definition->m_damageOnCollide.m_min, other->m_definition->m_damageOnCollide.m_max);
-    //         Damage(randomDamage, other->m_handle);
-    //         Vec3 forward, left, right;
-    //         other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-    //         AddImpulse(other->m_definition->m_impulseOnCollide * forward);
-    //         m_isDead = true;
-    //     }
-    //     return;
-    // }
-    // if (m_test == false && other->m_test == false) return;
+    if (this == other) return;
+
     Vec2 positionXY       = Vec2(m_position.x, m_position.y);
     Vec2 otherPositionXY  = Vec2(other->m_position.x, other->m_position.y);
     Vec2 actorAPositionXY = Vec2(m_position.x, m_position.y);
 
     if (DoDiscsOverlap2D(positionXY, m_radius, otherPositionXY, other->m_radius))
     {
-        other->Damage(10,m_handle);
-        Vec3 forward, left, right;
-        other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-        if (!m_owner && other->m_owner)
+        if (m_definition->m_name == "PlasmaProjectile"&&other->m_definition->m_name =="Demon")
         {
-            Damage(10, m_handle);
-            Vec3 forward, left, right;
-            other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+            m_isDead = true;
         }
-
+        // other->Damage(10,m_handle);
+        // Vec3 forward, left, right;
+        // other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
         // if (!m_owner && other->m_owner)
         // {
-        //     if (m_owner == other->m_owner)
-        //     {
-        //         return;
-        //     }
-        //     else
-        //     {
-        //         float randomDamage = g_theRNG->RollRandomFloatInRange(other->m_definition->m_damageOnCollide.m_min, other->m_definition->m_damageOnCollide.m_max);
-        //         other->Damage((int)randomDamage, other->m_handle);
-        //         Vec3 forward, left, right;
-        //         other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-        //         AddImpulse(other->m_definition->m_impulseOnCollide * forward);
-        //         m_isDead = true;
-        //         DebuggerPrintf("DIE\n");
-        //     }
-        //     return;
+        //     if (m_isDead == true)return;
+        //     Damage(10, m_handle);
+        //     Vec3 forward, left, right;
+        //     other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+        //     m_isDead = true;
         // }
-
-
     }
 
     Vec2        actorBPositionXY = Vec2(other->m_position.x, other->m_position.y);

@@ -356,6 +356,7 @@ void Game::RenderInGame() const
 //----------------------------------------------------------------------------------------------------
 void Game::RenderEntities() const
 {
+    if (m_playerController == nullptr) return;
     // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
     m_playerController->Render();
 }

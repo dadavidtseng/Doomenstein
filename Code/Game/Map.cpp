@@ -296,7 +296,7 @@ void Map::Update(float const deltaSeconds)
     UpdateAllActors(deltaSeconds);
     CollideActors();
     CollideActorsWithMap();
-    // DeleteDestroyedActor();
+    DeleteDestroyedActor();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -372,11 +372,11 @@ void Map::CollideActors()
 {
     for (int i = 0; i < static_cast<int>(m_actors.size()); ++i)
     {
-        if (m_actors[i] == nullptr && !m_actors[i]->m_handle.IsValid()) continue;
+        if (m_actors[i] == nullptr || !m_actors[i]->m_handle.IsValid()) continue;
 
         for (int j = i + 1; j < static_cast<int>(m_actors.size()); ++j)
         {
-            if (m_actors[j] == nullptr && !m_actors[j]->m_handle.IsValid()) continue;
+            if (m_actors[j] == nullptr || !m_actors[j]->m_handle.IsValid()) continue;
 
             CollideActors(m_actors[i], m_actors[j]);
         }
@@ -879,16 +879,17 @@ void Map::GetActorsByName(std::vector<Actor*>& actorList, String const& name)
 // Delete any actors marked as destroyed.
 void Map::DeleteDestroyedActor()
 {
-    for (Actor* actor : m_actors)
+    for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
-        if (actor && actor->m_handle.IsValid() && actor->m_isDead)
-        // if (actor && actor->m_handle.IsValid() && actor->m_isGarbage)
-        {
-            unsigned int index = actor->m_handle.GetIndex();
-            delete actor;
-            m_actors[index] = nullptr;
-        }
+        if (m_actors[i] == nullptr) continue;
+        // if (m_actors[i]->m_handle.IsValid()) continue;
+        if (!m_actors[i]->m_isGarbage) continue;
+
+        unsigned int index = m_actors[i]->m_handle.GetIndex();
+        delete m_actors[i];
+        m_actors[index] = nullptr;
     }
+
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -164,6 +164,7 @@ if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
 void PlayerController::Render() const
 {
     Actor const* possessedActor       = m_map->GetActorByHandle(m_actorHandle);
+    if (possessedActor == nullptr) return;
     String const possessedActorName   = possessedActor->m_definition->m_name;
     int const    possessedActorHealth = possessedActor->m_health;
 
