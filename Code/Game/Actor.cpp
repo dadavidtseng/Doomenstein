@@ -22,6 +22,7 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
 // //----------------------------------------------------------------------------------------------------
@@ -111,6 +112,10 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 //----------------------------------------------------------------------------------------------------
 void Actor::Update(float const deltaSeconds)
 {
+    if (m_isDead) m_dead += deltaSeconds;
+    if (m_dead > m_definition->m_corpseLifetime) m_isGarbage = true;
+
+
     UpdatePhysics(deltaSeconds);
 
     if (m_aiController != nullptr)
@@ -166,6 +171,7 @@ void Actor::Render() const
     float const    eyeHeight         = m_definition->m_eyeHeight;
     Vec3 const     forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
     Vec3 const     coneStartPosition = m_collisionCylinder.m_startPosition + Vec3(0.f, 0.f, eyeHeight) + forwardNormal * m_radius;
+
     if (m_definition->m_name != "PlasmaProjectile")
     {
         AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, m_color);
@@ -268,17 +274,76 @@ void Actor::OnUnpossessed()
 
 void Actor::OnCollisionEnterWithActor(Actor* other)
 {
+    // if (m_isDead || other->m_isDead) return;
+    if (m_owner && other->m_owner) return;
+    if (m_definition->m_name!="PlasmaProjectile"||other->m_definition->m_name!="Demon") return;
     if (this == other) return;
-    // if (m_test == false && other->m_test == false) return;
+    float randomDamage = g_theRNG->RollRandomFloatInRange(other->m_definition->m_damageOnCollide.m_min, other->m_definition->m_damageOnCollide.m_max);
+    // Damage((int)randomDamage, other->m_handle);
 
-    Vec2        actorAPositionXY = Vec2(m_position.x, m_position.y);
+    // if self not projectile other is
+    // if (!m_owner && other->m_owner)
+    // {
+    //     if (this == other->m_owner)
+    //     {
+    //         return;
+    //     }
+    //     else
+    //     {
+    //         float randomDamage = g_theRNG->RollRandomFloatInRange(other->m_definition->m_damageOnCollide.m_min, other->m_definition->m_damageOnCollide.m_max);
+    //         Damage(randomDamage, other->m_handle);
+    //         Vec3 forward, left, right;
+    //         other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+    //         AddImpulse(other->m_definition->m_impulseOnCollide * forward);
+    //         m_isDead = true;
+    //     }
+    //     return;
+    // }
+    // if (m_test == false && other->m_test == false) return;
+    Vec2 positionXY       = Vec2(m_position.x, m_position.y);
+    Vec2 otherPositionXY  = Vec2(other->m_position.x, other->m_position.y);
+    Vec2 actorAPositionXY = Vec2(m_position.x, m_position.y);
+
+    if (DoDiscsOverlap2D(positionXY, m_radius, otherPositionXY, other->m_radius))
+    {
+        other->Damage(10,m_handle);
+        Vec3 forward, left, right;
+        other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+        if (!m_owner && other->m_owner)
+        {
+            Damage(10, m_handle);
+            Vec3 forward, left, right;
+            other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+        }
+
+        // if (!m_owner && other->m_owner)
+        // {
+        //     if (m_owner == other->m_owner)
+        //     {
+        //         return;
+        //     }
+        //     else
+        //     {
+        //         float randomDamage = g_theRNG->RollRandomFloatInRange(other->m_definition->m_damageOnCollide.m_min, other->m_definition->m_damageOnCollide.m_max);
+        //         other->Damage((int)randomDamage, other->m_handle);
+        //         Vec3 forward, left, right;
+        //         other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+        //         AddImpulse(other->m_definition->m_impulseOnCollide * forward);
+        //         m_isDead = true;
+        //         DebuggerPrintf("DIE\n");
+        //     }
+        //     return;
+        // }
+
+
+    }
+
     Vec2        actorBPositionXY = Vec2(other->m_position.x, other->m_position.y);
     float const actorARadius     = m_radius;
     float const actorBRadius     = other->m_radius;
 
     // 5. Push movable actor out of immovable actor.
     PushDiscsOutOfEachOther2D(actorAPositionXY, actorARadius, actorBPositionXY, actorBRadius);
-
 
     // 6. Update actors' position.
     m_position.x        = actorAPositionXY.x;
@@ -290,10 +355,6 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
 void Actor::OnCollisionEnterWithMap(Actor*         other,
                                     IntVec2 const& tileCoords)
 {
-    if (m_definition->m_dieOnCollide)
-    {
-        DebuggerPrintf("PROJECTILE\n");
-    }
     // TODO: Swap check method for Sprinting if needed (PushCapsuleOutOfAABB2D/DoCapsuleAndAABB2Overlap2D)
 
     AABB3 const aabb3Box = other->m_map->GetTile(tileCoords.x, tileCoords.y)->m_bounds;

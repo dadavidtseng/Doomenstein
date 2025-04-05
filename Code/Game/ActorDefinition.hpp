@@ -7,6 +7,7 @@
 
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/XmlUtils.hpp"
+#include "Engine/Math/FloatRange.hpp"
 
 //----------------------------------------------------------------------------------------------------
 struct ActorDefinition
@@ -31,6 +32,8 @@ struct ActorDefinition
     // Collision
     float m_radius             = 0.f;
     float m_height             = 0.f;
+    float m_impulseOnCollide   = 0.f;
+    FloatRange m_damageOnCollide = FloatRange::ZERO;
     bool  m_collidesWithWorld  = false;
     bool  m_collidesWithActors = false;
     bool  m_dieOnCollide       = false;

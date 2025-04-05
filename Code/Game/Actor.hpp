@@ -84,6 +84,7 @@ public:
     Rgba8                m_color             = Rgba8::WHITE;
     Cylinder3            m_collisionCylinder = Cylinder3();
     String               m_weaponName;
+    float m_dead = 0.f;
     bool                 m_isDead         = false;        // Any data needed to track if and how long we have been dead.
     bool                 m_isGarbage      = false;
     int                  m_health         = 0;            // Current health.

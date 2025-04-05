@@ -292,10 +292,11 @@ Tile const* Map::GetTile(IntVec2 const& tileCoords) const
 //----------------------------------------------------------------------------------------------------
 void Map::Update(float const deltaSeconds)
 {
-    CollideActors();
-    CollideActorsWithMap();
     UpdateFromKeyboard();
     UpdateAllActors(deltaSeconds);
+    CollideActors();
+    CollideActorsWithMap();
+    // DeleteDestroyedActor();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -797,7 +798,7 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
     newActor->m_handle       = handle;
     newActor->m_map          = this;
     newActor->m_aiController = new AIController(this);
-    newActor->m_controller = newActor->m_aiController;
+    newActor->m_controller   = newActor->m_aiController;
     newActor->m_aiController->Possess(newActor->m_handle);
 
     m_actors.push_back(newActor);
@@ -880,7 +881,8 @@ void Map::DeleteDestroyedActor()
 {
     for (Actor* actor : m_actors)
     {
-        if (actor && actor->m_handle.IsValid() && actor->m_isGarbage)
+        if (actor && actor->m_handle.IsValid() && actor->m_isDead)
+        // if (actor && actor->m_handle.IsValid() && actor->m_isGarbage)
         {
             unsigned int index = actor->m_handle.GetIndex();
             delete actor;

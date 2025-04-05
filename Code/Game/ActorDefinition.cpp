@@ -39,6 +39,8 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
     {
         m_radius             = ParseXmlAttribute(*collisionElement, "radius", -1.f);
         m_height             = ParseXmlAttribute(*collisionElement, "height", -1.f);
+        m_impulseOnCollide   = ParseXmlAttribute(*collisionElement, "impulseOnCollide", -1.f);
+        m_damageOnCollide    = ParseXmlAttribute(*collisionElement, "damageOnCollide", FloatRange::ZERO);
         m_collidesWithWorld  = ParseXmlAttribute(*collisionElement, "collidesWithWorld", false);
         m_collidesWithActors = ParseXmlAttribute(*collisionElement, "collidesWithActors", false);
         m_dieOnCollide       = ParseXmlAttribute(*collisionElement, "dieOnCollide", false);
