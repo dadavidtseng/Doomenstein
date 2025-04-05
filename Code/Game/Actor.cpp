@@ -112,15 +112,18 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 //----------------------------------------------------------------------------------------------------
 void Actor::Update(float const deltaSeconds)
 {
-    if (m_isDead) m_dead += deltaSeconds;
-    if (m_dead > 3.f) m_isGarbage = true;
-    // if (m_dead > m_definition->m_corpseLifetime) m_isGarbage = true;
+    if (m_isDead||m_health<-1)
+    {
+        m_dead += deltaSeconds;
+    }
+    // if (m_dead > 3.f) m_isGarbage = true;
+    if (m_dead > m_definition->m_corpseLifetime) m_isGarbage = true;
 
-if (!m_isDead)
-{
-    UpdatePhysics(deltaSeconds);
-}
+    if (!m_isDead)
+    {
+        UpdatePhysics(deltaSeconds);
 
+    }
 
     if (m_aiController != nullptr)
     {
@@ -182,7 +185,15 @@ void Actor::Render() const
         AddVertsForWireframeCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, 0.001f);
     }
 
-    AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, m_color);
+    if (m_isDead)
+    {
+        AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, Rgba8::LIGHT_BLUE);
+    }
+    else
+    {
+        AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, m_color);
+    }
+
     AddVertsForWireframeCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, 0.001f);
 
     g_theRenderer->SetModelConstants();
@@ -222,6 +233,11 @@ void Actor::Damage(int const          damage,
                    ActorHandle const& other)
 {
     m_health -= damage;
+
+    if (m_health < 0)
+    {
+        m_dead = true;
+    }
 
     if (m_aiController != nullptr)
     {
@@ -289,8 +305,12 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
 
     if (DoDiscsOverlap2D(positionXY, m_radius, otherPositionXY, other->m_radius))
     {
-        if (m_definition->m_name == "PlasmaProjectile"&&other->m_definition->m_name =="Demon")
+        if (m_definition->m_name == "PlasmaProjectile" && other->m_definition->m_name == "Demon")
         {
+            other->Damage(10, m_owner->m_handle);
+            Vec3 forward, left, right;
+            m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
+            other->AddImpulse(forward);
             m_isDead = true;
         }
         // other->Damage(10,m_handle);
@@ -340,4 +360,9 @@ void Actor::Attack()
 {
     if (m_currentWeapon == nullptr) return;
     m_currentWeapon->Fire();
+}
+
+Vec3 Actor::GetActorEyePosition() const
+{
+    return m_position + Vec3(0.f, 0.f, m_definition->m_eyeHeight);
 }

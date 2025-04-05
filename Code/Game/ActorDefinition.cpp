@@ -27,7 +27,7 @@ ActorDefinition::~ActorDefinition()
 bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
 {
     m_name           = ParseXmlAttribute(*element, "name", "Unnamed");
-    m_faction        = ParseXmlAttribute(*element, "faction", "Unnamed");
+    m_faction        = ParseXmlAttribute(*element, "faction", "NEUTRAL");
     m_health         = ParseXmlAttribute(*element, "health", -1);
     m_canBePossessed = ParseXmlAttribute(*element, "canBePossessed", false);
     m_corpseLifetime = ParseXmlAttribute(*element, "corpseLifetime", -1.f);

@@ -43,7 +43,7 @@ void Weapon::Fire()
     if (m_timer->HasPeriodElapsed())
     {
         m_timer->DecrementPeriodIfElapsed();
-
+        if (m_owner == nullptr) return;
         while (rayCount > 0)
         {
             float             rayRange = m_definition->m_rayRange;
@@ -83,33 +83,60 @@ void Weapon::Fire()
             randomDirection.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
             Vec3      projectileSpeed = forward * m_definition->m_projectileSpeed;
             SpawnInfo spawnInfo;
-            spawnInfo.m_name = m_definition->m_projectileActor;
-            spawnInfo.m_faction = m_owner->m_definition->m_faction;
-            spawnInfo.m_position = startPos;
+            spawnInfo.m_name        = m_definition->m_projectileActor;
+            spawnInfo.m_faction     = m_owner->m_definition->m_faction;
+            spawnInfo.m_position    = startPos;
             spawnInfo.m_orientation = randomDirection;
-            spawnInfo.m_velocity = projectileSpeed;
-            Actor*    projectile = m_owner->m_map->SpawnActor(spawnInfo);
-            projectile->m_owner  = m_owner;
+            spawnInfo.m_velocity    = projectileSpeed;
+            Actor* projectile       = m_owner->m_map->SpawnActor(spawnInfo);
+            projectile->m_owner     = m_owner;
             projectileCount--;
         }
 
         while (meleeCount > 0)
         {
-            Vec2 point = Vec2(m_owner->m_position.x, m_owner->m_position.y);
-            Vec3 forward, left, right;
-            m_owner->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-            Vec2 forwardXY = Vec2(forward.x, forward.y);
-            Vec2 sectorTip = point + forwardXY;
-            for (Actor* actor : m_owner->m_map->m_actors)
+            meleeCount--;
+            if (!m_owner || !m_owner->m_map) continue;
+
+            // Forward vector from the owner's orientation
+            Vec3 fwd, left, up;
+            m_owner->m_orientation.GetAsVectors_IFwd_JLeft_KUp(fwd, left, up);
+
+            Vec2  ownerPos2D = Vec2(m_owner->m_position.x, m_owner->m_position.y);
+            Vec2  forward2D  = Vec2(fwd.x, fwd.y);
+            float halfArc    = m_definition->m_meleeArc * 0.5f;
+
+            Actor* bestTarget   = nullptr;
+            float  bestDistSq   = FLT_MAX;
+            float  meleeRangeSq = m_definition->m_meleeRange * m_definition->m_meleeRange;
+
+            for (Actor* testActor : m_owner->m_map->m_actors)
             {
-                Vec2 actorPosition = Vec2(actor->m_position.x, actor->m_position.y);
-                if (IsPointInsideDirectedSector2D(actorPosition, sectorTip, forwardXY, 120.f, m_owner->m_definition->m_sightRadius))
+                if (!testActor || testActor == m_owner) continue;
+                if (testActor->m_isDead)continue;
+                if (testActor->m_definition->m_faction == m_owner->m_definition->m_faction)continue;
+                if (testActor->m_definition->m_faction == "NEUTRAL" || m_owner->m_definition->m_faction == "NEUTRAL") continue;
+
+                Vec2  testPos2D = Vec2(testActor->m_position.x, testActor->m_position.y);
+                float distSq    = GetDistanceSquared2D(ownerPos2D, testPos2D);
+                if (distSq > meleeRangeSq) continue;
+                Vec2  toTarget2D = (testPos2D - ownerPos2D).GetNormalized();
+                float angle      = GetAngleDegreesBetweenVectors2D(forward2D, toTarget2D);
+                if (angle > halfArc)continue;
+
+                if (distSq < bestDistSq)
                 {
-                    DebuggerPrintf("%s\n", actor->m_definition->m_name.c_str());
+                    bestDistSq = distSq;
+                    bestTarget = testActor;
                 }
             }
+            if (bestTarget)
+            {
+                float damage = g_theRNG->RollRandomFloatInRange(m_definition->m_meleeDamage.m_min, m_definition->m_meleeDamage.m_max);
+                bestTarget->Damage((int)damage*10, m_owner->m_handle);
+                bestTarget->AddImpulse(m_definition->m_meleeImpulse * fwd);
+            }
 
-            meleeCount--;
         }
     }
 }

@@ -40,6 +40,7 @@ bool WeaponDefinition::LoadFromXmlElement(XmlElement const* element)
     m_meleeRange      = ParseXmlAttribute(*element, "meleeRange", -1.f);
     m_meleeDamage     = ParseXmlAttribute(*element, "meleeDamage", FloatRange::ZERO);
     m_meleeRange      = ParseXmlAttribute(*element, "meleeRange", -1.f);
+    m_meleeImpulse    = ParseXmlAttribute(*element, "meleeImpulse", -1.f);
 
     return true;
 }

@@ -296,6 +296,14 @@ void Map::Update(float const deltaSeconds)
     UpdateAllActors(deltaSeconds);
     CollideActors();
     CollideActorsWithMap();
+
+    if (!m_game->GetPlayerController()->GetActor())
+    {
+        Actor* playerActor = SpawnPlayer(m_game->GetPlayerController());
+
+        m_game->GetPlayerController()->Possess(playerActor->m_handle);
+    }
+
     DeleteDestroyedActor();
 }
 
@@ -731,6 +739,9 @@ RaycastResult3D Map::RaycastWorldActors(Actor const* attackerActor,
 
     for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
+        if (m_actors[i] == nullptr)continue;
+        if (attackerActor == m_actors[i]) continue;
+
         Cylinder3             cylinder3 = m_actors[i]->m_collisionCylinder;
         RaycastResult3D const result    = RaycastVsCylinderZ3D(startPosition,
                                                                forwardNormal, maxLength,
@@ -738,7 +749,7 @@ RaycastResult3D Map::RaycastWorldActors(Actor const* attackerActor,
                                                                cylinder3.GetFloatRange(),
                                                                cylinder3.m_radius);
 
-        if (attackerActor == m_actors[i]) continue;
+
 
         if (result.m_didImpact &&
             result.m_impactLength < closestDistance)
@@ -883,6 +894,7 @@ void Map::DeleteDestroyedActor()
     {
         if (m_actors[i] == nullptr) continue;
         // if (m_actors[i]->m_handle.IsValid()) continue;
+        if (m_actors[i]->m_definition->m_name == "SpawnPoint") continue;
         if (!m_actors[i]->m_isGarbage) continue;
 
         unsigned int index = m_actors[i]->m_handle.GetIndex();
@@ -913,7 +925,75 @@ Actor* Map::SpawnPlayer(PlayerController* playerController)
 // Search the actor list to find actors meeting the provided criteria.
 Actor* Map::GetClosestVisibleEnemy(Actor* owner)
 {
-    return nullptr;
+    float  closestDistSq = FLT_MAX;
+    Actor* closestEnemy  = nullptr;
+
+    for (Actor* actor : m_actors)
+    {
+        if (actor == nullptr || actor == owner)
+            continue;
+        // Skip same faction or neutral
+        if (actor->m_definition->m_faction == owner->m_definition->m_faction)
+        {
+            continue;
+        }
+        if (actor->m_definition->m_faction == "NEUTRAL"
+            || owner->m_definition->m_faction == "NEUTRAL")
+        {
+            continue;
+        }
+
+        // Check distance
+        Vec2 actorPos2D      = Vec2(actor->m_position.x, actor->m_position.y);
+        Vec2 instigatorPos2D = Vec2(owner->m_position.x, owner->m_position.y);
+
+        float distanceSq = GetDistanceSquared2D(actorPos2D, instigatorPos2D);
+        float radiusSq   = owner->m_definition->m_sightRadius * owner->m_definition->m_sightRadius;
+        if (distanceSq > radiusSq)
+        {
+            continue; // too far
+        }
+
+        // Check angle
+        Vec3 fwd3, left3, up3;
+        owner->m_orientation.GetAsVectors_IFwd_JLeft_KUp(fwd3, left3, up3);
+
+        Vec3 direction3D = actor->GetActorEyePosition() - owner->GetActorEyePosition();
+
+        Vec2 fwd2D(fwd3.x, fwd3.y);
+        Vec2 dirToActor = (actorPos2D - instigatorPos2D).GetNormalized();
+
+        // The angle between forward vector and direction to the actor
+        float angleBetween = GetAngleDegreesBetweenVectors2D(fwd2D, dirToActor);
+        if (angleBetween > owner->m_definition->m_sightAngle * 0.5f)
+        {
+            continue; // out of FOV cone
+        }
+        /// Line of Sight check: make sure no walls blocking
+        ActorHandle     resultActor;
+        RaycastResult3D result = RaycastAll(owner, resultActor, owner->GetActorEyePosition(), direction3D.GetNormalized(), distanceSq);
+        if (!result.m_didImpact) continue;
+        //DebugAddWorldSphere(result.m_impactPos, 0.1f, 0);
+        if (!IsPointInsideDisc2D(Vec2(result.m_impactPosition.x, result.m_impactPosition.y), Vec2(actor->m_position.x, actor->m_position.y), actor->m_radius + 0.1f))
+        {
+            continue;
+        }
+        /// End of Line of Sight check
+
+        if (distanceSq < closestDistSq)
+        {
+            closestDistSq = distanceSq;
+            closestEnemy  = actor;
+        }
+    }
+
+    if (closestEnemy)
+    {
+        /*printf("Find Enemy: %s, Dist=%.2f\n",
+               closestEnemy->m_definition->m_name.c_str(),
+               sqrtf(closestDistSq));*/
+    }
+    return closestEnemy;
 }
 
 //----------------------------------------------------------------------------------------------------

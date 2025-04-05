@@ -61,6 +61,8 @@ void PlayerController::Update(float deltaSeconds)
 
         if (possessedActor == nullptr) return;
 
+
+
         EulerAngles possessedActorOrientation = possessedActor->m_orientation;
         float       speed                     = possessedActor->m_definition->m_walkSpeed;
 
@@ -75,10 +77,12 @@ void PlayerController::Update(float deltaSeconds)
 
         possessedActor->TurnInDirection(possessedActorOrientation);
 
-if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
-{
-    possessedActor->m_currentWeapon = possessedActor->m_weapons[1];
-}
+
+
+        if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
+        {
+            possessedActor->m_currentWeapon = possessedActor->m_weapons[1];
+        }
 
         if (g_theInput->IsKeyDown(KEYCODE_SHIFT))
         {
@@ -163,7 +167,7 @@ if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
 //----------------------------------------------------------------------------------------------------
 void PlayerController::Render() const
 {
-    Actor const* possessedActor       = m_map->GetActorByHandle(m_actorHandle);
+    Actor const* possessedActor = m_map->GetActorByHandle(m_actorHandle);
     if (possessedActor == nullptr) return;
     String const possessedActorName   = possessedActor->m_definition->m_name;
     int const    possessedActorHealth = possessedActor->m_health;
@@ -233,13 +237,14 @@ void PlayerController::UpdateFromInput()
 void PlayerController::UpdateWorldCamera()
 {
     if (g_theGame->GetGameState() != eGameState::INGAME) return;
+    Actor const* possessedActor = GetActor();
 
     if (!m_isCameraMode)
     {
-        Actor const* possessedActor = GetActor();
         // if (possessActor && !possessActor->m_isDead)
         if (possessedActor != nullptr)
         {
+
             m_eyeHeight = possessedActor->m_definition->m_eyeHeight;
             m_cameraFOV = possessedActor->m_definition->m_cameraFOV;
             m_worldCamera->SetPerspectiveGraphicView(2.0f, m_cameraFOV, 0.1f, 100.f);
@@ -247,13 +252,20 @@ void PlayerController::UpdateWorldCamera()
             m_position = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, m_eyeHeight);
             // m_position += Vec3::X_BASIS;
             m_orientation = possessedActor->m_orientation;
+
         }
         else
         {
+
             m_worldCamera->SetPerspectiveGraphicView(2.0f, m_cameraFOV, 0.1f, 100.f);
         }
     }
+    if (possessedActor->m_isDead||possessedActor->m_health<-1)
+    {
+        m_position = Vec3::Z_BASIS;
 
+        // return;
+    }
     m_worldCamera->SetPositionAndOrientation(m_position, m_orientation);
     Mat44 c2r;
     c2r.SetIJK3D(Vec3::Z_BASIS, -Vec3::X_BASIS, Vec3::Y_BASIS);

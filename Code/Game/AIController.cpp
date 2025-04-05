@@ -25,14 +25,13 @@ AIController::~AIController()
 void AIController::Update(float deltaSeconds)
 {
     Actor* controlledActor = m_map->GetActorByHandle(m_actorHandle);
-    if (controlledActor != nullptr) return;
+    if (controlledActor == nullptr) return;
     if (controlledActor->m_isDead) return;
 
     Actor* target = m_map->GetClosestVisibleEnemy(controlledActor);
     if (target && m_targetActorHandle.IsValid() && m_targetActorHandle != target->m_handle && !target->m_isDead)
     {
         m_targetActorHandle = target->m_handle;
-        printf("AIController::Update > Target actor changed to %s\n", target->m_definition->m_name.c_str());
     }
     Actor* targetActor = m_map->GetActorByHandle(m_targetActorHandle);
     if (!targetActor || targetActor->m_isDead)

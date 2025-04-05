@@ -64,6 +64,7 @@ public:
 
     void Attack();
     void SwitchInventory(unsigned int index);
+    Vec3 GetActorEyePosition() const;
     // void EquipWeapon(unsigned int index);
 
     ActorHandle            m_handle;
