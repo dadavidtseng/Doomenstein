@@ -112,20 +112,22 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 //----------------------------------------------------------------------------------------------------
 void Actor::Update(float const deltaSeconds)
 {
-    if (m_isDead||m_health<-1)
+    if (m_isDead)
     {
         m_dead += deltaSeconds;
     }
     // if (m_dead > 3.f) m_isGarbage = true;
-    if (m_dead > m_definition->m_corpseLifetime) m_isGarbage = true;
+    if (m_dead > m_definition->m_corpseLifetime&&m_definition->m_name!="SpawnPoint")
+    {
+        m_isGarbage = true;
+    }
 
     if (!m_isDead)
     {
         UpdatePhysics(deltaSeconds);
-
     }
 
-    if (m_aiController != nullptr)
+    if (m_aiController != nullptr&&m_definition->m_aiEnabled)
     {
         m_aiController->Update(deltaSeconds);
     }
@@ -236,7 +238,7 @@ void Actor::Damage(int const          damage,
 
     if (m_health < 0)
     {
-        m_dead = true;
+        m_isDead = true;
     }
 
     if (m_aiController != nullptr)
@@ -267,8 +269,6 @@ void Actor::MoveInDirection(Vec3 const& direction,
 void Actor::TurnInDirection(EulerAngles const& direction)
 {
     m_orientation = direction;
-
-    // DebuggerPrintf("Actor Orientation(%f, %f, %f)\n", m_orientation.m_yawDegrees, m_orientation.m_pitchDegrees, m_orientation.m_rollDegrees);
 }
 
 //----------------------------------------------------------------------------------------------------

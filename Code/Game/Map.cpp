@@ -296,7 +296,7 @@ void Map::Update(float const deltaSeconds)
     UpdateAllActors(deltaSeconds);
     CollideActors();
     CollideActorsWithMap();
-
+    DeleteDestroyedActor();
     if (!m_game->GetPlayerController()->GetActor())
     {
         Actor* playerActor = SpawnPlayer(m_game->GetPlayerController());
@@ -304,7 +304,7 @@ void Map::Update(float const deltaSeconds)
         m_game->GetPlayerController()->Possess(playerActor->m_handle);
     }
 
-    DeleteDestroyedActor();
+
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -893,8 +893,7 @@ void Map::DeleteDestroyedActor()
     for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
         if (m_actors[i] == nullptr) continue;
-        // if (m_actors[i]->m_handle.IsValid()) continue;
-        if (m_actors[i]->m_definition->m_name == "SpawnPoint") continue;
+        if (!m_actors[i]->m_handle.IsValid()) continue;
         if (!m_actors[i]->m_isGarbage) continue;
 
         unsigned int index = m_actors[i]->m_handle.GetIndex();

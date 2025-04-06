@@ -69,7 +69,7 @@ public:
 
     ActorHandle            m_handle;
     ActorDefinition const* m_definition = nullptr;      // A reference to our actor definition.
-    Actor* m_owner = nullptr;
+    Actor*                 m_owner      = nullptr;
 
     bool        m_isVisible    = true;
     bool        m_isStatic     = false;
@@ -78,14 +78,12 @@ public:
     Vec3        m_acceleration = Vec3::ZERO;                // 3D acceleration, as a Vec3, in world units per second squared.
     EulerAngles m_orientation  = EulerAngles::ZERO;        // 3D orientation, as EulerAngles, in degrees.
 
-    float m_radius = 0.f;
-    float m_height = 0.f;
-    // float     m_eyeHeight         = 0.f;
-    // float     m_cameraFOV         = 0.f;
+    float                m_radius            = 0.f;
+    float                m_height            = 0.f;
     Rgba8                m_color             = Rgba8::WHITE;
     Cylinder3            m_collisionCylinder = Cylinder3();
     String               m_weaponName;
-    float m_dead = 0.f;
+    float                m_dead           = 0.f;
     bool                 m_isDead         = false;        // Any data needed to track if and how long we have been dead.
     bool                 m_isGarbage      = false;
     int                  m_health         = 0;            // Current health.
@@ -101,6 +99,4 @@ public:
     // Used to keep track of our AI controller if the player possesses this actor,
     // in which case he pushes the AI out of the way until he releases possession.
     AIController* m_aiController = nullptr;    // AI controllers should be constructed by the actor when the actor is spawned and immediately possess that actor.
-
-    bool m_test = false;
 };

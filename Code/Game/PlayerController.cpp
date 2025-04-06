@@ -36,11 +36,7 @@ PlayerController::PlayerController(Map* owner)
 //----------------------------------------------------------------------------------------------------
 PlayerController::~PlayerController()
 {
-    if (m_worldCamera != nullptr)
-    {
-        delete m_worldCamera;
-        m_worldCamera = nullptr;
-    }
+    SafeDeletePointer(m_worldCamera);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -62,7 +58,6 @@ void PlayerController::Update(float deltaSeconds)
         if (possessedActor == nullptr) return;
 
 
-
         EulerAngles possessedActorOrientation = possessedActor->m_orientation;
         float       speed                     = possessedActor->m_definition->m_walkSpeed;
 
@@ -76,7 +71,6 @@ void PlayerController::Update(float deltaSeconds)
         possessedActorOrientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
 
         possessedActor->TurnInDirection(possessedActorOrientation);
-
 
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
@@ -195,41 +189,14 @@ void PlayerController::UpdateFromInput()
         possessedActor->m_isVisible = !possessedActor->m_isVisible;
     }
 
-    if (g_theInput->WasKeyJustPressed(KEYCODE_LEFT_MOUSE))
-    {
-        Actor* possessedActor = GetActor();
-
-        if (possessedActor != nullptr)
-        {
-            possessedActor->m_test = !possessedActor->m_test;
-        }
-    }
-
     if (g_theInput->IsKeyDown(KEYCODE_LEFT_MOUSE))
     {
-        // Vec3 const forwardNormal = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
-        // Ray3 const ray           = Ray3(m_position, m_position + forwardNormal * 10.f);
-        // // RaycastResult3D const result        = m_game->GetCurrentMap()->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
-        // RaycastResult3D const result = m_map->RaycastAll(m_position, forwardNormal, ray.m_maxLength);
-
         Actor* possessedActor = GetActor();
 
         if (possessedActor != nullptr)
         {
             possessedActor->Attack();
         }
-
-        // if (result.m_didImpact == true)
-        // {
-        //     // DebugAddWorldLine(ray.m_startPosition, result.m_impactPosition, 0.01f, 10.f);
-        //     // DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
-        //     // DebugAddWorldArrow(result.m_impactPosition, result.m_impactPosition + result.m_impactNormal * 0.3f, 0.03f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
-        //     // DebugAddWorldLine(result.m_impactPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f, Rgba8::WHITE, Rgba8::WHITE, DebugRenderMode::X_RAY);
-        // }
-        // else
-        // {
-        //     DebugAddWorldLine(ray.m_startPosition, ray.m_startPosition + ray.m_forwardNormal * ray.m_maxLength, 0.01f, 10.f);
-        // }
     }
 }
 
@@ -244,7 +211,6 @@ void PlayerController::UpdateWorldCamera()
         // if (possessActor && !possessActor->m_isDead)
         if (possessedActor != nullptr)
         {
-
             m_eyeHeight = possessedActor->m_definition->m_eyeHeight;
             m_cameraFOV = possessedActor->m_definition->m_cameraFOV;
             m_worldCamera->SetPerspectiveGraphicView(2.0f, m_cameraFOV, 0.1f, 100.f);
@@ -252,17 +218,15 @@ void PlayerController::UpdateWorldCamera()
             m_position = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, m_eyeHeight);
             // m_position += Vec3::X_BASIS;
             m_orientation = possessedActor->m_orientation;
-
         }
         else
         {
-
             m_worldCamera->SetPerspectiveGraphicView(2.0f, m_cameraFOV, 0.1f, 100.f);
         }
     }
-    if (possessedActor->m_isDead||possessedActor->m_health<-1)
+    if (possessedActor->m_isDead || possessedActor->m_health < -1)
     {
-        m_position = Vec3::Z_BASIS;
+        m_position -= Vec3::Z_BASIS;
 
         // return;
     }

@@ -10,6 +10,7 @@
 #include "Map.hpp"
 #include "Weapon.hpp"
 #include "WeaponDefinition.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Math/MathUtils.hpp"
 
 //----------------------------------------------------------------------------------------------------
@@ -29,7 +30,8 @@ void AIController::Update(float deltaSeconds)
     if (controlledActor->m_isDead) return;
 
     Actor* target = m_map->GetClosestVisibleEnemy(controlledActor);
-    if (target && m_targetActorHandle.IsValid() && m_targetActorHandle != target->m_handle && !target->m_isDead)
+
+    if (target  && m_targetActorHandle != target->m_handle && !target->m_isDead)
     {
         m_targetActorHandle = target->m_handle;
     }
