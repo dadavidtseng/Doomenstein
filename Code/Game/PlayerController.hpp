@@ -23,18 +23,14 @@ enum class eCameraMode : int8_t
 
 //----------------------------------------------------------------------------------------------------
 // Player controllers should be constructed by the game and told to possess their actor whenever it is spawned or respawned. Player controller can possess other possessable actors in the game.
-class PlayerController : public Controller
+class PlayerController final : public Controller
 {
 public:
     // Construction / Destruction
     explicit PlayerController(Map* owner);
     ~PlayerController() override;
-    PlayerController(PlayerController& copyFrom)             = delete;
-    PlayerController(PlayerController&& moveFrom)            = delete;
-    PlayerController& operator=(PlayerController& copyFrom)  = delete;
-    PlayerController& operator=(PlayerController&& moveFrom) = delete;
 
-    void Update(float deltaSeconds)override;
+    void Update(float deltaSeconds) override;
     void Render() const;
     void UpdateFromInput();
     void UpdateWorldCamera();

@@ -15,8 +15,10 @@ class Map;
 class Controller
 {
 public:
+    // Construction / Destruction
     explicit     Controller(Map* owner);
     virtual      ~Controller() = default;
+
     virtual void Update(float deltaSeconds) = 0;
 
     virtual void   Possess(ActorHandle const& actorHandle);

@@ -91,13 +91,7 @@ Map::~Map()
 //----------------------------------------------------------------------------------------------------
 void Map::CreateTiles()
 {
-    for (int i = 0; i < m_dimensions.x; ++i)
-    {
-        for (int j = 0; j < m_dimensions.y; ++j)
-        {
-            m_tiles.emplace_back();
-        }
-    }
+    for (int i = 0; i < m_dimensions.x; ++i) { for (int j = 0; j < m_dimensions.y; ++j) { m_tiles.emplace_back(); } }
 
     for (int i = 0; i < m_dimensions.x; ++i)
     {
@@ -195,10 +189,7 @@ void Map::AddGeometryForFloor(VertexList_PCUTBN& verts,
     IntVec2 const currentTileCoords = IntVec2(bounds.m_mins.x, bounds.m_mins.y);
     Tile const*   currentTile       = GetTile(currentTileCoords.x, currentTileCoords.y);
 
-    if (currentTile->m_name == "StoneFloor")
-    {
-        AddVertsForQuad3D(verts, indexes, backBottomLeft, backBottomRight, frontBottomRight, frontBottomLeft, Rgba8::WHITE, UVs);
-    }
+    if (currentTile->m_name == "StoneFloor") { AddVertsForQuad3D(verts, indexes, backBottomLeft, backBottomRight, frontBottomRight, frontBottomLeft, Rgba8::WHITE, UVs); }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -215,10 +206,7 @@ void Map::AddGeometryForCeiling(VertexList_PCUTBN& verts,
     IntVec2 const currentTileCoords = IntVec2(bounds.m_mins.x, bounds.m_mins.y);
     Tile const*   currentTile       = GetTile(currentTileCoords.x, currentTileCoords.y);
 
-    if (currentTile->m_name == "StoneFloor")
-    {
-        AddVertsForQuad3D(verts, indexes, backTopRight, backTopLeft, frontTopLeft, frontTopRight, Rgba8::WHITE, UVs);
-    }
+    if (currentTile->m_name == "StoneFloor") { AddVertsForQuad3D(verts, indexes, backTopRight, backTopLeft, frontTopLeft, frontTopRight, Rgba8::WHITE, UVs); }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -240,10 +228,7 @@ bool Map::IsPositionInBounds(Vec3 const& position,
 }
 
 //----------------------------------------------------------------------------------------------------
-bool Map::IsTileCoordsOutOfBounds(IntVec2 const& tileCoords) const
-{
-    return IsTileCoordsOutOfBounds(tileCoords.x, tileCoords.y);
-}
+bool Map::IsTileCoordsOutOfBounds(IntVec2 const& tileCoords) const { return IsTileCoordsOutOfBounds(tileCoords.x, tileCoords.y); }
 
 //----------------------------------------------------------------------------------------------------
 bool Map::IsTileCoordsOutOfBounds(int const x,
@@ -257,10 +242,7 @@ bool Map::IsTileCoordsOutOfBounds(int const x,
 }
 
 //----------------------------------------------------------------------------------------------------
-bool Map::IsTileSolid(IntVec2 const& tileCoords) const
-{
-    return GetTile(tileCoords.x, tileCoords.y)->m_isSolid;
-}
+bool Map::IsTileSolid(IntVec2 const& tileCoords) const { return GetTile(tileCoords.x, tileCoords.y)->m_isSolid; }
 
 //----------------------------------------------------------------------------------------------------
 IntVec2 const Map::GetTileCoordsFromWorldPos(Vec3 const& worldPosition) const
@@ -275,19 +257,13 @@ IntVec2 const Map::GetTileCoordsFromWorldPos(Vec3 const& worldPosition) const
 Tile const* Map::GetTile(int const x,
                          int const y) const
 {
-    if (IsTileCoordsOutOfBounds(x, y))
-    {
-        ERROR_AND_DIE("tileCoords is out of bound!")
-    }
+    if (IsTileCoordsOutOfBounds(x, y)) { ERROR_AND_DIE("tileCoords is out of bound!") }
 
     return &m_tiles[y + x * m_dimensions.y];
 }
 
 //----------------------------------------------------------------------------------------------------
-Tile const* Map::GetTile(IntVec2 const& tileCoords) const
-{
-    return GetTile(tileCoords.x, tileCoords.y);
-}
+Tile const* Map::GetTile(IntVec2 const& tileCoords) const { return GetTile(tileCoords.x, tileCoords.y); }
 
 //----------------------------------------------------------------------------------------------------
 void Map::Update(float const deltaSeconds)
@@ -303,8 +279,6 @@ void Map::Update(float const deltaSeconds)
 
         m_game->GetPlayerController()->Possess(playerActor->m_handle);
     }
-
-
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -364,16 +338,7 @@ void Map::UpdateFromKeyboard()
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::UpdateAllActors(float const deltaSeconds) const
-{
-    for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
-    {
-        if (m_actors[i] != nullptr)
-        {
-            m_actors[i]->Update(deltaSeconds);
-        }
-    }
-}
+void Map::UpdateAllActors(float const deltaSeconds) const { for (int i = 0; i < static_cast<int>(m_actors.size()); i++) { if (m_actors[i] != nullptr) { m_actors[i]->Update(deltaSeconds); } } }
 
 //----------------------------------------------------------------------------------------------------
 void Map::CollideActors()
@@ -400,25 +365,13 @@ void Map::CollideActors(Actor* actorA,
     FloatRange const actorBMinMaxZ = actorB->m_collisionCylinder.GetFloatRange();
 
     // 3. If actors are not overlapping on their MinMaxZ range, there will be no collision, so return.
-    if (!actorAMinMaxZ.IsOverlappingWith(actorBMinMaxZ))
-    {
-        return;
-    }
+    if (!actorAMinMaxZ.IsOverlappingWith(actorBMinMaxZ)) { return; }
 
     actorB->OnCollisionEnterWithActor(actorA);
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::CollideActorsWithMap() const
-{
-    for (int actorIndex = 0; actorIndex < static_cast<int>(m_actors.size()); ++actorIndex)
-    {
-        if (m_actors[actorIndex] != nullptr)
-        {
-            CollideActorWithMap(m_actors[actorIndex]);
-        }
-    }
-}
+void Map::CollideActorsWithMap() const { for (int actorIndex = 0; actorIndex < static_cast<int>(m_actors.size()); ++actorIndex) { if (m_actors[actorIndex] != nullptr) { CollideActorWithMap(m_actors[actorIndex]); } } }
 
 //----------------------------------------------------------------------------------------------------
 void Map::CollideActorWithMap(Actor* actor) const
@@ -462,16 +415,7 @@ void Map::Render() const
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::RenderAllActors() const
-{
-    for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
-    {
-        if (m_actors[i] != nullptr)
-        {
-            m_actors[i]->Render();
-        }
-    }
-}
+void Map::RenderAllActors() const { for (int i = 0; i < static_cast<int>(m_actors.size()); i++) { if (m_actors[i] != nullptr) { m_actors[i]->Render(); } } }
 
 //----------------------------------------------------------------------------------------------------
 void Map::RenderMap() const
@@ -637,10 +581,7 @@ RaycastResult3D Map::RaycastWorldXY(Vec3 const& startPosition,
         // 5. If the current tile is not in the map, continue the loop.
         IntVec2 currentTileCoords = GetTileCoordsFromWorldPos(currentPosition);
 
-        if (IsTileCoordsOutOfBounds(currentTileCoords))
-        {
-            continue;
-        }
+        if (IsTileCoordsOutOfBounds(currentTileCoords)) { continue; }
 
         Tile const* currentTile         = GetTile(currentTileCoords);
         AABB3 const currentTileBounds3D = currentTile->m_bounds;
@@ -692,10 +633,7 @@ RaycastResult3D Map::RaycastWorldZ(Vec3 const& startPosition,
 
     // 3. If the ray only moves on XY surface, that means it would never impact,
     // return the initial raycastResult3D.
-    if (forwardNormalZ == 0.f)
-    {
-        return result;
-    }
+    if (forwardNormalZ == 0.f) { return result; }
 
     // 4. Calculate the scalar t (0 to 1) based on the ray's forwardNormalZ.
     float const oneOverMaxLengthZ = 1.f / maxLengthZ;
@@ -703,20 +641,14 @@ RaycastResult3D Map::RaycastWorldZ(Vec3 const& startPosition,
 
     // 5. If t is not within 0 to 1, which means the ray impacts before its startPosition or its endPosition,
     // return the initial raycastResult3D.
-    if (t < 0.f || t > 1.f)
-    {
-        return result;
-    }
+    if (t < 0.f || t > 1.f) { return result; }
 
     // 6. Calculate the impactLength and the impactPosition based on t.
     float const impactLength   = maxLength * t;
     Vec3 const  impactPosition = startPosition + forwardNormal * impactLength;
 
     // 7. If the impactPosition is outside the map, return with initial raycastResult3D.
-    if (!IsPositionInBounds(impactPosition))
-    {
-        return result;
-    }
+    if (!IsPositionInBounds(impactPosition)) { return result; }
 
     // RAY HIT
     result.m_didImpact      = true;
@@ -739,7 +671,7 @@ RaycastResult3D Map::RaycastWorldActors(Actor const* attackerActor,
 
     for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
-        if (m_actors[i] == nullptr)continue;
+        if (m_actors[i] == nullptr) continue;
         if (attackerActor == m_actors[i]) continue;
 
         Cylinder3             cylinder3 = m_actors[i]->m_collisionCylinder;
@@ -748,7 +680,6 @@ RaycastResult3D Map::RaycastWorldActors(Actor const* attackerActor,
                                                                cylinder3.GetCenterPositionXY(),
                                                                cylinder3.GetFloatRange(),
                                                                cylinder3.m_radius);
-
 
 
         if (result.m_didImpact &&
@@ -797,10 +728,7 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
 // Should find or add a slot in our actor list, increment our next uid, generate a handle, and construct and return the actor.
 Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
 {
-    if (m_nextActorUID >= MAX_ACTOR_UID)
-    {
-        return nullptr;
-    }
+    if (m_nextActorUID >= MAX_ACTOR_UID) { return nullptr; }
 
     unsigned int const newIndex = static_cast<unsigned int>(m_actors.size());
     Actor*             newActor = new Actor(spawnInfo);
@@ -827,29 +755,17 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
 // Otherwise, return the actor pointer at that index.
 Actor* Map::GetActorByHandle(ActorHandle const handle) const
 {
-    if (!handle.IsValid())
-    {
-        return nullptr;
-    }
+    if (!handle.IsValid()) { return nullptr; }
 
     unsigned int const handleIndex = handle.GetIndex();
 
-    if (handleIndex >= m_actors.size())
-    {
-        return nullptr;
-    }
+    if (handleIndex >= m_actors.size()) { return nullptr; }
 
     Actor* storedActor = m_actors[handleIndex];
 
-    if (storedActor == nullptr)
-    {
-        return nullptr;
-    }
+    if (storedActor == nullptr) { return nullptr; }
 
-    if (storedActor->m_handle != handle)
-    {
-        return nullptr;
-    }
+    if (storedActor->m_handle != handle) { return nullptr; }
 
     return storedActor;
 }
@@ -859,13 +775,7 @@ Actor const* Map::GetActorByName(String const& name)
     for (Actor const* actor : m_actors)
     {
         if (actor != nullptr &&
-            actor->m_handle.IsValid())
-        {
-            if (actor->m_definition->m_name == name)
-            {
-                return actor;
-            }
-        }
+            actor->m_handle.IsValid()) { if (actor->m_definition->m_name == name) { return actor; } }
     }
 
     return nullptr;
@@ -876,13 +786,7 @@ void Map::GetActorsByName(std::vector<Actor*>& actorList, String const& name)
     for (Actor* actor : m_actors)
     {
         if (actor != nullptr &&
-            actor->m_handle.IsValid())
-        {
-            if (actor->m_definition->m_name == name)
-            {
-                actorList.push_back(actor);
-            }
-        }
+            actor->m_handle.IsValid()) { if (actor->m_definition->m_name == name) { actorList.push_back(actor); } }
     }
 }
 
@@ -900,7 +804,6 @@ void Map::DeleteDestroyedActor()
         delete m_actors[i];
         m_actors[index] = nullptr;
     }
-
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -922,25 +825,18 @@ Actor* Map::SpawnPlayer(PlayerController* playerController)
 
 //----------------------------------------------------------------------------------------------------
 // Search the actor list to find actors meeting the provided criteria.
-Actor* Map::GetClosestVisibleEnemy(Actor* owner)
+Actor const* Map::GetClosestVisibleEnemy(Actor const* owner) const
 {
-    float  closestDistSq = FLT_MAX;
-    Actor* closestEnemy  = nullptr;
+    float        closestDistanceSquared = FLOAT_MAX;
+    Actor const* closestEnemy           = nullptr;
 
-    for (Actor* actor : m_actors)
+    for (Actor const* actor : m_actors)
     {
-        if (actor == nullptr || actor == owner)
-            continue;
+        if (actor == nullptr || actor == owner) continue;
         // Skip same faction or neutral
-        if (actor->m_definition->m_faction == owner->m_definition->m_faction)
-        {
-            continue;
-        }
+        if (actor->m_definition->m_faction == owner->m_definition->m_faction) continue;
         if (actor->m_definition->m_faction == "NEUTRAL"
-            || owner->m_definition->m_faction == "NEUTRAL")
-        {
-            continue;
-        }
+            || owner->m_definition->m_faction == "NEUTRAL") { continue; }
 
         // Check distance
         Vec2 actorPos2D      = Vec2(actor->m_position.x, actor->m_position.y);
@@ -973,16 +869,13 @@ Actor* Map::GetClosestVisibleEnemy(Actor* owner)
         RaycastResult3D result = RaycastAll(owner, resultActor, owner->GetActorEyePosition(), direction3D.GetNormalized(), distanceSq);
         if (!result.m_didImpact) continue;
         //DebugAddWorldSphere(result.m_impactPos, 0.1f, 0);
-        if (!IsPointInsideDisc2D(Vec2(result.m_impactPosition.x, result.m_impactPosition.y), Vec2(actor->m_position.x, actor->m_position.y), actor->m_radius + 0.1f))
-        {
-            continue;
-        }
+        if (!IsPointInsideDisc2D(Vec2(result.m_impactPosition.x, result.m_impactPosition.y), Vec2(actor->m_position.x, actor->m_position.y), actor->m_radius + 0.1f)) { continue; }
         /// End of Line of Sight check
 
-        if (distanceSq < closestDistSq)
+        if (distanceSq < closestDistanceSquared)
         {
-            closestDistSq = distanceSq;
-            closestEnemy  = actor;
+            closestDistanceSquared = distanceSq;
+            closestEnemy           = actor;
         }
     }
 
@@ -999,12 +892,9 @@ Actor* Map::GetClosestVisibleEnemy(Actor* owner)
 // Have the player controller possess the next actor in the list that can be possessed.
 void Map::DebugPossessNext() const
 {
-    PlayerController* playerController = m_game->GetPlayerController();
+    PlayerController const* playerController = m_game->GetPlayerController();
 
-    if (playerController == nullptr)
-    {
-        return;
-    }
+    if (playerController == nullptr) return;
 
     Actor const* playerControlledActor = playerController->GetActor();
     unsigned int startIndex            = 0;
@@ -1015,15 +905,13 @@ void Map::DebugPossessNext() const
     }
 
     unsigned int const actorCount = static_cast<unsigned int>(m_actors.size());
-    if (actorCount == 0)
-    {
-        return;
-    }
+
+    if (actorCount == 0) return;
 
     for (unsigned int i = 0; i < actorCount; i++)
     {
         unsigned int const desiredIndex   = (startIndex + i) % actorCount;
-        Actor*             potentialActor = m_actors[desiredIndex];
+        Actor const*       potentialActor = m_actors[desiredIndex];
 
         if (potentialActor &&
             potentialActor->m_handle.IsValid() &&

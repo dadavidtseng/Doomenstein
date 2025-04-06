@@ -8,9 +8,10 @@
 
 //----------------------------------------------------------------------------------------------------
 // AI controllers should be constructed by the actor when the actor is spawned and immediately possess that actor.
-class AIController : public Controller
+class AIController final : public Controller
 {
 public:
+    // Construction / Destruction
     explicit AIController(Map* map);
     ~AIController() override;
 

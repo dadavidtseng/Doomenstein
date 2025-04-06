@@ -73,11 +73,11 @@ public:
     void         GetActorsByName(std::vector<Actor*>& actorList, String const& name);
     void         DeleteDestroyedActor();
     Actor*       SpawnPlayer(PlayerController* playerController);
-    Actor*       GetClosestVisibleEnemy(Actor* owner);
+    Actor const*       GetClosestVisibleEnemy(Actor const* owner) const;
     void         DebugPossessNext() const;
 
-    Game* m_game = nullptr;
-    std::vector<Actor*>           m_actors;
+    Game*               m_game = nullptr;
+    std::vector<Actor*> m_actors;
 
 protected:
     // Map

@@ -5,9 +5,8 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Controller.hpp"
 
-#include "Actor.hpp"
-#include "Map.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Game/Actor.hpp"
+#include "Game/Map.hpp"
 
 //----------------------------------------------------------------------------------------------------
 Controller::Controller(Map* owner)
@@ -20,18 +19,20 @@ Controller::Controller(Map* owner)
 // Notify each actor so it can check for restoring AI controllers or handle other change of possession logic.
 void Controller::Possess(ActorHandle const& actorHandle)
 {
-    Actor* currentPossessActor = m_map->GetActorByHandle(m_actorHandle);
+    Actor* currentPossessedActor = m_map->GetActorByHandle(m_actorHandle);
 
-    if (currentPossessActor && currentPossessActor->m_handle.IsValid())
+    if (currentPossessedActor != nullptr &&
+        currentPossessedActor->m_handle.IsValid())
     {
-        currentPossessActor->OnUnpossessed();
+        currentPossessedActor->OnUnpossessed();
     }
 
-    Actor* newPossessActor = m_map->GetActorByHandle(actorHandle);
+    Actor* newPossessedActor = m_map->GetActorByHandle(actorHandle);
 
-    if (newPossessActor && newPossessActor->m_handle.IsValid())
+    if (newPossessedActor != nullptr &&
+        newPossessedActor->m_handle.IsValid())
     {
-        newPossessActor->OnPossessed(this);
+        newPossessedActor->OnPossessed(this);
     }
 
     m_actorHandle = actorHandle;

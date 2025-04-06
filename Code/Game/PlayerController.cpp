@@ -191,7 +191,7 @@ void PlayerController::UpdateFromInput()
 
     if (g_theInput->IsKeyDown(KEYCODE_LEFT_MOUSE))
     {
-        Actor* possessedActor = GetActor();
+        Actor const* possessedActor = GetActor();
 
         if (possessedActor != nullptr)
         {
