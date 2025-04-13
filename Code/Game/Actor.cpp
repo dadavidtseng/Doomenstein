@@ -117,7 +117,7 @@ void Actor::Update(float const deltaSeconds)
         m_dead += deltaSeconds;
     }
     // if (m_dead > 3.f) m_isGarbage = true;
-    if (m_dead > m_definition->m_corpseLifetime&&m_definition->m_name!="SpawnPoint")
+    if (m_dead > m_definition->m_corpseLifetime && m_definition->m_name != "SpawnPoint")
     {
         m_isGarbage = true;
     }
@@ -127,7 +127,7 @@ void Actor::Update(float const deltaSeconds)
         UpdatePhysics(deltaSeconds);
     }
 
-    if (m_aiController != nullptr&&m_definition->m_aiEnabled)
+    if (m_aiController != nullptr && m_definition->m_aiEnabled)
     {
         m_aiController->Update(deltaSeconds);
     }
@@ -183,7 +183,15 @@ void Actor::Render() const
 
     if (m_definition->m_name != "PlasmaProjectile")
     {
-        AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, m_color);
+        if (m_isDead)
+        {
+            AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, Rgba8::LIGHT_BLUE);
+        }
+        else
+        {
+            AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, m_color);
+        }
+
         AddVertsForWireframeCone3D(verts, coneStartPosition, coneStartPosition + forwardNormal * 0.1f, 0.1f, 0.001f);
     }
 
@@ -296,7 +304,7 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
 {
     if (m_isDead || other->m_isDead) return;
     if (m_owner && other->m_owner) return;
-
+if (m_owner&&other->m_definition->m_name == "Marine")return;
     if (this == other) return;
 
     Vec2 positionXY       = Vec2(m_position.x, m_position.y);
@@ -307,23 +315,13 @@ void Actor::OnCollisionEnterWithActor(Actor* other)
     {
         if (m_definition->m_name == "PlasmaProjectile" && other->m_definition->m_name == "Demon")
         {
-            other->Damage(10, m_owner->m_handle);
+            int randomDamage = (int)g_theRNG->RollRandomFloatInRange(m_definition->m_damageOnCollide.m_min, m_definition->m_damageOnCollide.m_max);
+            other->Damage(randomDamage*10, m_owner->m_handle);
             Vec3 forward, left, right;
             m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
             other->AddImpulse(forward);
             m_isDead = true;
         }
-        // other->Damage(10,m_handle);
-        // Vec3 forward, left, right;
-        // other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-        // if (!m_owner && other->m_owner)
-        // {
-        //     if (m_isDead == true)return;
-        //     Damage(10, m_handle);
-        //     Vec3 forward, left, right;
-        //     other->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, right);
-        //     m_isDead = true;
-        // }
     }
 
     Vec2        actorBPositionXY = Vec2(other->m_position.x, other->m_position.y);
@@ -350,16 +348,55 @@ void Actor::OnCollisionEnterWithMap(Actor*         other,
 
     Vec2 actorPositionXY = Vec2(other->m_position.x, other->m_position.y);
 
-    PushDiscOutOfAABB2D(actorPositionXY, other->m_radius, aabb2Box);
+    bool isPushed = PushDiscOutOfAABB2D(actorPositionXY, other->m_radius, aabb2Box);
+
+    if (isPushed && m_definition->m_dieOnCollide)
+    {
+        m_isDead = true;
+    }
 
     other->m_position.x = actorPositionXY.x;
     other->m_position.y = actorPositionXY.y;
+}
+
+void Actor::OnCollisionEnterWithMap(Actor* other,
+    AABB3 const& bounds)
+{
+    float zCylinderMaxZ, zCylinderMinZ;
+    zCylinderMaxZ = m_position.z +m_height;
+    zCylinderMinZ = m_position.z;
+    if (zCylinderMaxZ > bounds.m_maxs.z || zCylinderMinZ < bounds.m_mins.z)
+    {
+        if (m_definition->m_dieOnCollide)
+            m_isDead = true;
+    }
+    if (zCylinderMaxZ > bounds.m_maxs.z)
+    {
+        zCylinderMaxZ = bounds.m_maxs.z;
+        m_position.z  = zCylinderMaxZ - m_height;
+    }
+    if (zCylinderMinZ < bounds.m_mins.z)
+    {
+        zCylinderMinZ = bounds.m_mins.z;
+        m_position.z  = zCylinderMinZ;
+    }
 }
 
 void Actor::Attack()
 {
     if (m_currentWeapon == nullptr) return;
     m_currentWeapon->Fire();
+}
+
+void Actor::SwitchInventory(unsigned int const index)
+{
+    if (index < m_weapons.size())
+    {
+        if (m_currentWeapon != m_weapons[index])
+        {
+            m_currentWeapon = m_weapons[index];
+        }
+    }
 }
 
 Vec3 Actor::GetActorEyePosition() const

@@ -338,7 +338,16 @@ void Map::UpdateFromKeyboard()
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::UpdateAllActors(float const deltaSeconds) const { for (int i = 0; i < static_cast<int>(m_actors.size()); i++) { if (m_actors[i] != nullptr) { m_actors[i]->Update(deltaSeconds); } } }
+void Map::UpdateAllActors(float const deltaSeconds) const
+{
+    for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
+    {
+        if (m_actors[i] != nullptr)
+        {
+            m_actors[i]->Update(deltaSeconds);
+        }
+    }
+}
 
 //----------------------------------------------------------------------------------------------------
 void Map::CollideActors()
@@ -371,7 +380,16 @@ void Map::CollideActors(Actor* actorA,
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::CollideActorsWithMap() const { for (int actorIndex = 0; actorIndex < static_cast<int>(m_actors.size()); ++actorIndex) { if (m_actors[actorIndex] != nullptr) { CollideActorWithMap(m_actors[actorIndex]); } } }
+void Map::CollideActorsWithMap() const
+{
+    for (int actorIndex = 0; actorIndex < static_cast<int>(m_actors.size()); ++actorIndex)
+    {
+        if (m_actors[actorIndex] != nullptr)
+        {
+            CollideActorWithMap(m_actors[actorIndex]);
+        }
+    }
+}
 
 //----------------------------------------------------------------------------------------------------
 void Map::CollideActorWithMap(Actor* actor) const
@@ -391,7 +409,9 @@ void Map::CollideActorWithMap(Actor* actor) const
     PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(-1, -1));
     PushActorOutOfTileIfSolid(actor, actorTileCoords + IntVec2(1, -1));
 
-    actorPosition.z = GetClamped(actorPosition.z, 0.f, 1.f - actor->m_height);
+actor->OnCollisionEnterWithMap(actor,GetTile(actorTileCoords)->m_bounds);
+
+    // actorPosition.z = GetClamped(actorPosition.z, 0.f, 1.f - actor->m_height);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -728,7 +748,10 @@ RaycastResult3D Map::RaycastWorldActors(Vec3 const& startPosition,
 // Should find or add a slot in our actor list, increment our next uid, generate a handle, and construct and return the actor.
 Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
 {
-    if (m_nextActorUID >= MAX_ACTOR_UID) { return nullptr; }
+    if (m_nextActorUID >= MAX_ACTOR_UID)
+    {
+        return nullptr;
+    }
 
     unsigned int const newIndex = static_cast<unsigned int>(m_actors.size());
     Actor*             newActor = new Actor(spawnInfo);
@@ -892,11 +915,11 @@ Actor const* Map::GetClosestVisibleEnemy(Actor const* owner) const
 // Have the player controller possess the next actor in the list that can be possessed.
 void Map::DebugPossessNext() const
 {
-    PlayerController const* playerController = m_game->GetPlayerController();
+    PlayerController* playerController = m_game->GetPlayerController();
 
     if (playerController == nullptr) return;
 
-    Actor const* playerControlledActor = playerController->GetActor();
+    Actor*       playerControlledActor = playerController->GetActor();
     unsigned int startIndex            = 0;
 
     if (playerControlledActor != nullptr)

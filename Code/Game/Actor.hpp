@@ -13,6 +13,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Game/ActorHandle.hpp"
 
+struct AABB3;
 //-Forward-Declaration--------------------------------------------------------------------------------
 class AIController;
 class Controller;
@@ -60,6 +61,7 @@ public:
     // Collision
     void OnCollisionEnterWithActor(Actor* other);
     void OnCollisionEnterWithMap(Actor* other, IntVec2 const& tileCoords);
+    void OnCollisionEnterWithMap(Actor* other , AABB3 const& bounds);
 
 
     void Attack();

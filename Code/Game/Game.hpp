@@ -45,7 +45,7 @@ private:
     void UpdatePlayerController(float deltaSeconds) const;
     void RenderAttractMode() const;
     void RenderInGame() const;
-    void RenderEntities() const;
+    void RenderPlayerController() const;
 
     void InitializeMaps();
 

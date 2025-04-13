@@ -73,9 +73,14 @@ void PlayerController::Update(float deltaSeconds)
         possessedActor->TurnInDirection(possessedActorOrientation);
 
 
-        if (g_theInput->WasKeyJustPressed(KEYCODE_F1))
+        if (g_theInput->WasKeyJustPressed(NUMCODE_1))
         {
-            possessedActor->m_currentWeapon = possessedActor->m_weapons[1];
+            possessedActor->SwitchInventory(0);
+        }
+
+        if (g_theInput->WasKeyJustPressed(NUMCODE_2))
+        {
+            possessedActor->SwitchInventory(1);
         }
 
         if (g_theInput->IsKeyDown(KEYCODE_SHIFT))
@@ -191,7 +196,7 @@ void PlayerController::UpdateFromInput()
 
     if (g_theInput->IsKeyDown(KEYCODE_LEFT_MOUSE))
     {
-        Actor const* possessedActor = GetActor();
+        Actor* possessedActor = GetActor();
 
         if (possessedActor != nullptr)
         {

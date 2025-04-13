@@ -116,7 +116,7 @@ void Game::Render() const
 
         if (m_currentGameState == eGameState::INGAME)
         {
-            RenderEntities();
+            RenderPlayerController();
 
             if (m_currentMap != nullptr)
             {
@@ -354,7 +354,7 @@ void Game::RenderInGame() const
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::RenderEntities() const
+void Game::RenderPlayerController() const
 {
     if (m_playerController == nullptr) return;
     // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
@@ -389,9 +389,9 @@ void Game::InitializeMaps()
 {
     MapDefinition::InitializeMapDefs("Data/Definitions/MapDefinitions.xml");
     TileDefinition::InitializeTileDefs("Data/Definitions/TileDefinitions.xml");
-    ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
     ActorDefinition::InitializeActorDefs("Data/Definitions/ProjectileActorDefinitions.xml");
     WeaponDefinition::InitializeWeaponDefs("Data/Definitions/WeaponDefinitions.xml");
+    ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
 
     m_maps.reserve(1);
 
