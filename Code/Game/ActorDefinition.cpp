@@ -5,7 +5,6 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/ActorDefinition.hpp"
 
-#include "Weapon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
@@ -51,6 +50,7 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
     if (physicsElement != nullptr)
     {
         m_isSimulated = ParseXmlAttribute(*physicsElement, "simulated", false);
+        m_isFlying = ParseXmlAttribute(*physicsElement, "flying", false);
         m_walkSpeed   = ParseXmlAttribute(*physicsElement, "walkSpeed", -1.f);
         m_runSpeed    = ParseXmlAttribute(*physicsElement, "runSpeed", -1.f);
         m_turnSpeed   = ParseXmlAttribute(*physicsElement, "turnSpeed", -1.f);
@@ -103,14 +103,14 @@ STATIC void ActorDefinition::InitializeActorDefs(char const* path)
 
     if (result != XmlResult::XML_SUCCESS)
     {
-        ERROR_AND_DIE("Failed to load XML file: %s\n", path)
+        ERROR_AND_DIE("Failed to load XML file")
     }
 
     XmlElement const* rootElement = document.RootElement();
 
     if (rootElement == nullptr)
     {
-        ERROR_AND_DIE("XML file %s is missing a root element.\n", path)
+        ERROR_AND_DIE("XML file %s is missing a root element.")
     }
 
     XmlElement const* actorDefinitionElement = rootElement->FirstChildElement();
@@ -127,7 +127,7 @@ STATIC void ActorDefinition::InitializeActorDefs(char const* path)
         else
         {
             delete actorDefinition;
-            ERROR_AND_DIE("Failed to load actor definition: %s\n", elementName.c_str())
+            ERROR_AND_DIE("Failed to load actor definition")
         }
 
         actorDefinitionElement = actorDefinitionElement->NextSiblingElement();

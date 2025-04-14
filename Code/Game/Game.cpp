@@ -5,21 +5,21 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Game.hpp"
 
-#include "Actor.hpp"
-#include "ActorDefinition.hpp"
-#include "Map.hpp"
-#include "MapDefinition.hpp"
-#include "TileDefinition.hpp"
-#include "WeaponDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
+#include "Game/Actor.hpp"
+#include "Game/ActorDefinition.hpp"
 #include "Game/App.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/Map.hpp"
+#include "Game/MapDefinition.hpp"
 #include "Game/PlayerController.hpp"
+#include "Game/TileDefinition.hpp"
+#include "Game/WeaponDefinition.hpp"
 
 //----------------------------------------------------------------------------------------------------
 Game::Game()
@@ -55,29 +55,10 @@ Game::Game()
 //----------------------------------------------------------------------------------------------------
 Game::~Game()
 {
-    if (m_currentMap != nullptr)
-    {
-        delete m_currentMap;
-        m_currentMap = nullptr;
-    }
-
-    if (m_gameClock != nullptr)
-    {
-        delete m_gameClock;
-        m_gameClock = nullptr;
-    }
-
-    if (m_playerController != nullptr)
-    {
-        delete m_playerController;
-        m_playerController = nullptr;
-    }
-
-    if (m_screenCamera != nullptr)
-    {
-        delete m_screenCamera;
-        m_screenCamera = nullptr;
-    }
+    SafeDeletePointer(m_currentMap);
+    SafeDeletePointer(m_gameClock);
+    SafeDeletePointer(m_playerController);
+    SafeDeletePointer(m_screenCamera);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -85,18 +66,12 @@ Game::~Game()
 void Game::Update()
 {
     float const gameDeltaSeconds = static_cast<float>(m_gameClock->GetDeltaSeconds());
-    // float const systemDeltaSeconds = static_cast<float>(Clock::GetSystemClock().GetDeltaSeconds());
 
     // #TODO: Select keyboard or controller
 
     UpdateFromKeyBoard();
     UpdateFromController();
     UpdatePlayerController(gameDeltaSeconds);
-
-    // if (m_currentMap != nullptr)
-    // {
-    //     m_currentMap->Update(gameDeltaSeconds);
-    // }
 
     if (m_currentMap != nullptr &&
         m_playerController != nullptr)
@@ -112,7 +87,7 @@ void Game::Render() const
 
     if (m_playerController != nullptr)
     {
-        g_theRenderer->BeginCamera(*m_playerController->GetCamera());
+        g_theRenderer->BeginCamera(*m_playerController->m_worldCamera);
 
         if (m_currentGameState == eGameState::INGAME)
         {
@@ -124,7 +99,7 @@ void Game::Render() const
             }
         }
 
-        g_theRenderer->EndCamera(*m_playerController->GetCamera());
+        g_theRenderer->EndCamera(*m_playerController->m_worldCamera);
     }
 
     //-End-of-Game-Camera-----------------------------------------------------------------------------
@@ -134,7 +109,7 @@ void Game::Render() const
     {
         if (m_playerController != nullptr)
         {
-            DebugRenderWorld(*m_playerController->GetCamera());
+            DebugRenderWorld(*m_playerController->m_worldCamera);
         }
     }
 
@@ -248,7 +223,7 @@ void Game::UpdateFromKeyBoard()
 
         if (m_playerController != nullptr)
         {
-            DebugAddMessage(Stringf("Player Position: (%.2f, %.2f, %.2f)", m_playerController->m_position.x, m_playerController->m_position.y, m_playerController->m_position.z), 0.f);
+            DebugAddMessage(Stringf("PlayerController Position: (%.2f, %.2f, %.2f)", m_playerController->m_position.x, m_playerController->m_position.y, m_playerController->m_position.z), 0.f);
         }
     }
 }

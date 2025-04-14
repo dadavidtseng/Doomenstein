@@ -13,7 +13,6 @@ class AIController final : public Controller
 public:
     // Construction / Destruction
     explicit AIController(Map* map);
-    ~AIController() override;
 
     void Update(float deltaSeconds) override;
     void DamagedBy(ActorHandle const& attacker);

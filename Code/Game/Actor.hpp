@@ -13,37 +13,24 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Game/ActorHandle.hpp"
 
-struct AABB3;
 //-Forward-Declaration--------------------------------------------------------------------------------
 class AIController;
 class Controller;
 class Map;
-// class PlayerController;
 class Weapon;
+struct AABB3;
 struct ActorDefinition;
 struct SpawnInfo;
-
-// //----------------------------------------------------------------------------------------------------
-// enum class eActorFaction : int8_t
-// {
-//     INVALID = -1,
-//     MARINE,
-//     DEMON,
-//     NEUTRAL,
-//     COUNT
-// };
 
 //----------------------------------------------------------------------------------------------------
 class Actor
 {
     friend class Map;
-    // friend class Game;
+
 public:
-    // Actor(Vec3 const& position, EulerAngles const& orientation, float radius, float height, bool isMovable, Rgba8 const& color);
     explicit Actor(SpawnInfo const& spawnInfo);
 
     void  Update(float deltaSeconds);
-    void  UpdatePosition();
     void  Render() const;
     Mat44 GetModelToWorldTransform() const;
 
@@ -60,14 +47,12 @@ public:
 
     // Collision
     void OnCollisionEnterWithActor(Actor* other);
-    void OnCollisionEnterWithMap(Actor* other, IntVec2 const& tileCoords);
-    void OnCollisionEnterWithMap(Actor* other , AABB3 const& bounds);
+    void OnCollisionEnterWithMap(IntVec2 const& tileCoords);
+    void OnCollisionEnterWithMap(AABB3 const& bounds);
 
-
-    void Attack();
+    void Attack() const;
     void SwitchInventory(unsigned int index);
     Vec3 GetActorEyePosition() const;
-    // void EquipWeapon(unsigned int index);
 
     ActorHandle            m_handle;
     ActorDefinition const* m_definition = nullptr;      // A reference to our actor definition.

@@ -6,7 +6,6 @@
 #pragma once
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Math/AABB3.hpp"
-#include "Engine/Math/IntVec2.hpp"
 
 //----------------------------------------------------------------------------------------------------
 struct Tile

@@ -9,6 +9,7 @@
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/IntVec2.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
+#include "Engine/Renderer/VertexBuffer.hpp"
 
 class PlayerController;
 struct ActorHandle;
@@ -19,7 +20,6 @@ class Game;
 class IndexBuffer;
 class Shader;
 class Texture;
-class VertexBuffer;
 struct MapDefinition;
 struct Tile;
 
@@ -69,11 +69,11 @@ public:
 
     Actor*       SpawnActor(SpawnInfo const& spawnInfo);
     Actor*       GetActorByHandle(ActorHandle handle) const;
-    Actor const* GetActorByName(String const& name);
-    void         GetActorsByName(std::vector<Actor*>& actorList, String const& name);
+    Actor const* GetActorByName(String const& name) const;
+    void         GetActorsByName(std::vector<Actor*>& out_ActorList, String const& name) const;
     void         DeleteDestroyedActor();
     Actor*       SpawnPlayer(PlayerController* playerController);
-    Actor const*       GetClosestVisibleEnemy(Actor const* owner) const;
+    Actor const* GetClosestVisibleEnemy(Actor const* owner) const;
     void         DebugPossessNext() const;
 
     Game*               m_game = nullptr;

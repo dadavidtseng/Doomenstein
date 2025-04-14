@@ -5,12 +5,12 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/AIController.hpp"
 
-#include "Actor.hpp"
-#include "ActorDefinition.hpp"
-#include "Map.hpp"
-#include "Weapon.hpp"
 #include "WeaponDefinition.hpp"
 #include "Engine/Math/MathUtils.hpp"
+#include "Game/Actor.hpp"
+#include "Game/ActorDefinition.hpp"
+#include "Game/Map.hpp"
+#include "Game/Weapon.hpp"
 
 //----------------------------------------------------------------------------------------------------
 AIController::AIController(Map* map)
@@ -18,56 +18,62 @@ AIController::AIController(Map* map)
 {
 }
 
-AIController::~AIController()
+void AIController::Update(float const deltaSeconds)
 {
-}
+    Actor* possessedActor = m_map->GetActorByHandle(m_actorHandle);
 
-void AIController::Update(float deltaSeconds)
-{
-    Actor* controlledActor = m_map->GetActorByHandle(m_actorHandle);
-    if (controlledActor == nullptr) return;
-    if (controlledActor->m_isDead) return;
+    if (possessedActor == nullptr) return;
+    if (possessedActor->m_isDead) return;
 
-    Actor const* target = m_map->GetClosestVisibleEnemy(controlledActor);
+    Actor const* target = m_map->GetClosestVisibleEnemy(possessedActor);
 
-    if (target  && m_targetActorHandle != target->m_handle && !target->m_isDead)
+    if (target != nullptr &&
+        // m_targetActorHandle.IsValid() &&
+        m_targetActorHandle != target->m_handle &&
+        !target->m_isDead)
     {
         m_targetActorHandle = target->m_handle;
     }
-    Actor* targetActor = m_map->GetActorByHandle(m_targetActorHandle);
-    if (!targetActor || targetActor->m_isDead)
+
+    Actor const* targetActor = m_map->GetActorByHandle(m_targetActorHandle);
+
+    if (!targetActor ||
+        targetActor->m_isDead)
     {
         m_targetActorHandle = ActorHandle::INVALID;
         return;
     }
 
-    float turnSpeedDegPerSec      = controlledActor->m_definition->m_turnSpeed;
-    float maxTurnDegreesThisFrame = turnSpeedDegPerSec * deltaSeconds;
-    Vec3  toTarget3D              = targetActor->m_position - controlledActor->m_position;
-    toTarget3D.z                  = 0.f;
+    float const turnSpeedPerSecond          = possessedActor->m_definition->m_turnSpeed;
+    float const maxTurnDegreesThisFrame     = turnSpeedPerSecond * deltaSeconds;
+    Vec3        possessedActorToTargetActor = targetActor->m_position - possessedActor->m_position;
+    possessedActorToTargetActor.z           = 0.f;
 
-    float desiredYaw = Atan2Degrees(toTarget3D.y, toTarget3D.x);
-    float currentYaw = controlledActor->m_orientation.m_yawDegrees;
-    float newYaw     = GetTurnedTowardDegrees(currentYaw, desiredYaw, maxTurnDegreesThisFrame);
+    float const targetActorYaw    = Atan2Degrees(possessedActorToTargetActor.y, possessedActorToTargetActor.x);
+    float const possessedActorYaw = possessedActor->m_orientation.m_yawDegrees;
+    float const newYaw            = GetTurnedTowardDegrees(possessedActorYaw, targetActorYaw, maxTurnDegreesThisFrame);
 
-    // Vec3 newDirectionTurningTo = Vec3(newYaw, controlledActor->m_orientation.m_pitchDegrees, controlledActor->m_orientation.m_rollDegrees);
-    EulerAngles newDirectionTurningTo = EulerAngles (newYaw, controlledActor->m_orientation.m_pitchDegrees, controlledActor->m_orientation.m_rollDegrees);
-    controlledActor->TurnInDirection(newDirectionTurningTo);
+    EulerAngles const newDirection = EulerAngles(newYaw, possessedActor->m_orientation.m_pitchDegrees, possessedActor->m_orientation.m_rollDegrees);
+    possessedActor->TurnInDirection(newDirection);
 
-    float distanceToTarget = toTarget3D.GetLength();
-    float combinedRadius   = controlledActor->m_radius + targetActor->m_radius;
+    float const distanceToTarget = possessedActorToTargetActor.GetLength();
+    float const combinedRadius   = possessedActor->m_radius + targetActor->m_radius;
+
     if (distanceToTarget > combinedRadius + 0.1f)
     {
-        float moveSpeed = controlledActor->m_definition->m_runSpeed;
-        Vec3  forward, left, up;
-        controlledActor->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
-        controlledActor->MoveInDirection(forward, moveSpeed);
+        float const moveSpeed = possessedActor->m_definition->m_runSpeed;
+        Vec3        forward, left, up;
+        possessedActor->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
+        possessedActor->MoveInDirection(forward, moveSpeed);
     }
-    /// Hanlde melee weapon based on melee weapon range
-    if (controlledActor->m_currentWeapon && controlledActor->m_currentWeapon->m_definition->m_meleeCount > 0)
+
+    if (possessedActor->m_currentWeapon &&
+        possessedActor->m_currentWeapon->m_definition->m_meleeCount > 0)
     {
-        if (distanceToTarget < controlledActor->m_currentWeapon->m_definition->m_meleeRange + targetActor->m_radius)
-            controlledActor->m_currentWeapon->Fire();
+        if (distanceToTarget < possessedActor->m_currentWeapon->m_definition->m_meleeRange + targetActor->m_radius)
+        {
+            possessedActor->m_currentWeapon->Fire();
+        }
     }
 }
 

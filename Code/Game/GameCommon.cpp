@@ -1,8 +1,8 @@
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 // GameCommon.cpp
-//
+//----------------------------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 #include "Game/GameCommon.hpp"
 #include "Engine/Core/Rgba8.hpp"
 #include "Engine/Core/Vertex_PCU.hpp"
@@ -10,7 +10,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 // DebugRender color-related
 //
 Rgba8 const DEBUG_RENDER_GREY    = Rgba8(50, 50, 50);
@@ -21,7 +21,7 @@ Rgba8 const DEBUG_RENDER_CYAN    = Rgba8(0, 255, 255);
 Rgba8 const DEBUG_RENDER_YELLOW  = Rgba8(255, 255, 0);
 
 
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 const& color)
 {
     float         halfThickness = 0.5f * thickness;
@@ -79,7 +79,7 @@ void DebugDrawRing(Vec2 const& center, float radius, float thickness, Rgba8 cons
     g_theRenderer->DrawVertexArray(NUM_VERTS, &verts[0]);
 }
 
-//-----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 void DebugDrawLine(Vec2 const& start, Vec2 const& end, float thickness, Rgba8 const& color)
 {
     Vec2 forward = end - start;
@@ -112,7 +112,7 @@ void DebugDrawLine(Vec2 const& start, Vec2 const& end, float thickness, Rgba8 co
     g_theRenderer->DrawVertexArray(6, &verts[0]);
 }
 
-//------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------
 void DebugDrawGlowCircle(Vec2 const& center, float radius, Rgba8 const& color, float glowIntensity)
 {
     constexpr int NUM_SIDES = 32;           // Controls the smoothness of the circle

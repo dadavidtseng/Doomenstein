@@ -1,36 +1,27 @@
 //----------------------------------------------------------------------------------------------------
-// Player.cpp
+// PlayerController.cpp
 //----------------------------------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------------------------------
 #include "Game/PlayerController.hpp"
 
-#include "Actor.hpp"
-#include "ActorDefinition.hpp"
-#include "Game.hpp"
-#include "GameCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
+#include "Game/Actor.hpp"
+#include "Game/ActorDefinition.hpp"
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
 #include "Game/Map.hpp"
 
 //----------------------------------------------------------------------------------------------------
 PlayerController::PlayerController(Map* owner)
     : Controller(owner)
 {
-    // ActorDefinition const* definition = ActorDefinition::GetDefByName("Marine");
-    //
-    // m_eyeHeight = definition->m_eyeHeight;
-    // m_cameraFOV = definition->m_cameraFOV;
-
     m_worldCamera = new Camera();
-    // m_worldCamera->SetPerspectiveGraphicView(2.f, 60.f, 0.1f, 100.f);
-    // m_worldCamera->SetPosition(Vec3(-2.f, 0.f, 0.f));
-
-    // m_position = Vec3(2.5f, 8.5f, 0.5f);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -62,8 +53,9 @@ void PlayerController::Update(float deltaSeconds)
         float       speed                     = possessedActor->m_definition->m_walkSpeed;
 
         possessedActorOrientation.m_yawDegrees -= cursorClientDelta.x * 0.125f;
-        possessedActorOrientation.m_yawDegrees -= cursorClientDelta.x * 0.125f;
         possessedActorOrientation.m_pitchDegrees += cursorClientDelta.y * 0.125f;
+        possessedActorOrientation.m_pitchDegrees = GetClamped(possessedActorOrientation.m_pitchDegrees, -85.f, 85.f);
+
 
         Vec3 forward;
         Vec3 left;
@@ -154,8 +146,8 @@ void PlayerController::Update(float deltaSeconds)
             m_orientation.m_rollDegrees += 90.f;
         }
 
-        if (g_theInput->IsKeyDown(KEYCODE_Q)) m_orientation.m_rollDegrees = 90.f;
-        if (g_theInput->IsKeyDown(KEYCODE_E)) m_orientation.m_rollDegrees = -90.f;
+        // if (g_theInput->IsKeyDown(KEYCODE_Q)) m_orientation.m_rollDegrees = 90.f;
+        // if (g_theInput->IsKeyDown(KEYCODE_E)) m_orientation.m_rollDegrees = -90.f;
 
         m_orientation.m_rollDegrees = GetClamped(m_orientation.m_rollDegrees, -45.f, 45.f);
     }
@@ -196,6 +188,8 @@ void PlayerController::UpdateFromInput()
 
     if (g_theInput->IsKeyDown(KEYCODE_LEFT_MOUSE))
     {
+        if (m_isCameraMode) return;
+
         Actor* possessedActor = GetActor();
 
         if (possessedActor != nullptr)
@@ -209,6 +203,7 @@ void PlayerController::UpdateFromInput()
 void PlayerController::UpdateWorldCamera()
 {
     if (g_theGame->GetGameState() != eGameState::INGAME) return;
+
     Actor const* possessedActor = GetActor();
 
     if (!m_isCameraMode)
@@ -216,40 +211,31 @@ void PlayerController::UpdateWorldCamera()
         // if (possessActor && !possessActor->m_isDead)
         if (possessedActor != nullptr)
         {
-            m_eyeHeight = possessedActor->m_definition->m_eyeHeight;
-            m_cameraFOV = possessedActor->m_definition->m_cameraFOV;
-            m_worldCamera->SetPerspectiveGraphicView(2.0f, m_cameraFOV, 0.1f, 100.f);
+            m_worldCamera->SetPerspectiveGraphicView(2.0f, possessedActor->m_definition->m_cameraFOV, 0.1f, 100.f);
             // Set the world camera to use the possessed actor's eye height and FOV.
-            m_position = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, m_eyeHeight);
+            m_position = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, possessedActor->m_definition->m_eyeHeight);
             // m_position += Vec3::X_BASIS;
             m_orientation = possessedActor->m_orientation;
         }
         else
         {
-            m_worldCamera->SetPerspectiveGraphicView(2.0f, m_cameraFOV, 0.1f, 100.f);
+            m_worldCamera->SetPerspectiveGraphicView(2.0f, possessedActor->m_definition->m_cameraFOV, 0.1f, 100.f);
         }
     }
-    if (possessedActor->m_isDead || possessedActor->m_health < -1)
-    {
-        m_position -= Vec3::Z_BASIS;
 
-        // return;
+    if (possessedActor->m_isDead)
+    {
+        Vec3  startPos      = possessedActor->m_position + Vec3(0.f, 0.f, possessedActor->m_definition->m_eyeHeight);
+        Vec3  endPos        = possessedActor->m_position;
+        float deathFraction = possessedActor->m_dead / possessedActor->m_definition->m_corpseLifetime;
+        float interpolate   = Interpolate(startPos.z, endPos.z, deathFraction);
+        m_position          = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, interpolate);
     }
+
     m_worldCamera->SetPositionAndOrientation(m_position, m_orientation);
     Mat44 c2r;
     c2r.SetIJK3D(Vec3::Z_BASIS, -Vec3::X_BASIS, Vec3::Y_BASIS);
     m_worldCamera->SetCameraToRenderTransform(c2r);
-}
-
-//----------------------------------------------------------------------------------------------------
-void PlayerController::UpdateFromController()
-{
-}
-
-//----------------------------------------------------------------------------------------------------
-Camera* PlayerController::GetCamera() const
-{
-    return m_worldCamera;
 }
 
 Mat44 PlayerController::GetModelToWorldTransform() const
@@ -258,11 +244,7 @@ Mat44 PlayerController::GetModelToWorldTransform() const
 
     m2w.SetTranslation3D(m_position);
 
-    m2w.AppendZRotation(m_orientation.m_yawDegrees);
-    m2w.AppendYRotation(m_orientation.m_pitchDegrees);
-    m2w.AppendXRotation(m_orientation.m_rollDegrees);
-
-    // m2w.Append(m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+    m2w.Append(m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
 
     return m2w;
 }

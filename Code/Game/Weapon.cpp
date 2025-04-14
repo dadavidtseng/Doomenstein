@@ -5,21 +5,20 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Weapon.hpp"
 
-#include "Actor.hpp"
-#include "ActorDefinition.hpp"
-#include "Game.hpp"
-#include "GameCommon.hpp"
-#include "Map.hpp"
-#include "MapDefinition.hpp"
-#include "PlayerController.hpp"
-#include "WeaponDefinition.hpp"
 #include "Engine/Core/Clock.hpp"
-#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
+#include "Game/Actor.hpp"
+#include "Game/ActorDefinition.hpp"
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/Map.hpp"
+#include "Game/MapDefinition.hpp"
+#include "Game/PlayerController.hpp"
+#include "Game/WeaponDefinition.hpp"
 
 Weapon::Weapon(Actor*                  owner,
                WeaponDefinition const* weaponDef)
@@ -58,12 +57,13 @@ void Weapon::Fire()
 
             if (result.m_didImpact)
             {
-                DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
-                DebugAddWorldWireCylinder(fireEyePosition, result.m_impactPosition, 0.01f, 10.f, Rgba8::BLUE, Rgba8::BLUE);
+                // DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
+                DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::X_RAY);
+                DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
             }
             else
             {
-                DebugAddWorldWireCylinder(fireEyePosition, result.m_rayStartPosition + result.m_rayForwardNormal * rayRange, 0.01f, 100.f, Rgba8::YELLOW, Rgba8::YELLOW, DebugRenderMode::X_RAY);
+                DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_rayStartPosition + result.m_rayForwardNormal * rayRange, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
             }
             Actor* impactedActor = m_owner->m_map->GetActorByHandle(impactedActorHandle);
             if (impactedActor != nullptr && impactedActor != m_owner)
@@ -113,30 +113,29 @@ void Weapon::Fire()
             for (Actor* testActor : m_owner->m_map->m_actors)
             {
                 if (!testActor || testActor == m_owner) continue;
-                if (testActor->m_isDead)continue;
-                if (testActor->m_definition->m_faction == m_owner->m_definition->m_faction)continue;
+                if (testActor->m_isDead) continue;
+                if (testActor->m_definition->m_faction == m_owner->m_definition->m_faction) continue;
                 if (testActor->m_definition->m_faction == "NEUTRAL" || m_owner->m_definition->m_faction == "NEUTRAL") continue;
 
-                Vec2  testPos2D = Vec2(testActor->m_position.x, testActor->m_position.y);
-                float distSq    = GetDistanceSquared2D(ownerPos2D, testPos2D);
-                if (distSq > meleeRangeSq) continue;
+                Vec2  testPos2D   = Vec2(testActor->m_position.x, testActor->m_position.y);
+                float distSquared = GetDistanceSquared2D(ownerPos2D, testPos2D);
+                if (distSquared > meleeRangeSq) continue;
                 Vec2  toTarget2D = (testPos2D - ownerPos2D).GetNormalized();
                 float angle      = GetAngleDegreesBetweenVectors2D(forward2D, toTarget2D);
-                if (angle > halfArc)continue;
+                if (angle > halfArc) continue;
 
-                if (distSq < bestDistSq)
+                if (distSquared < bestDistSq)
                 {
-                    bestDistSq = distSq;
+                    bestDistSq = distSquared;
                     bestTarget = testActor;
                 }
             }
             if (bestTarget)
             {
                 float damage = g_theRNG->RollRandomFloatInRange(m_definition->m_meleeDamage.m_min, m_definition->m_meleeDamage.m_max);
-                bestTarget->Damage((int)damage*10, m_owner->m_handle);
+                bestTarget->Damage((int)damage, m_owner->m_handle);
                 bestTarget->AddImpulse(m_definition->m_meleeImpulse * fwd);
             }
-
         }
     }
 }
@@ -145,9 +144,9 @@ void Weapon::Fire()
 // This, and other utility methods, will be helpful for randomizing weapons with a cone.
 EulerAngles Weapon::GetRandomDirectionInCone(EulerAngles weaponOrientation, float degreeOfVariation)
 {
-    float       variationYaw   = g_theRNG->RollRandomFloatInRange(-degreeOfVariation, degreeOfVariation);
-    float       variationPitch = g_theRNG->RollRandomFloatInRange(-degreeOfVariation, degreeOfVariation);
-    float       variationRow   = g_theRNG->RollRandomFloatInRange(-degreeOfVariation, degreeOfVariation);
-    EulerAngles newDirection   = EulerAngles(weaponOrientation.m_yawDegrees + variationYaw, weaponOrientation.m_pitchDegrees + variationPitch, weaponOrientation.m_rollDegrees + variationRow);
-    return newDirection;
+    float const       randomYaw       = g_theRNG->RollRandomFloatInRange(-degreeOfVariation, degreeOfVariation);
+    float const       randomPitch     = g_theRNG->RollRandomFloatInRange(-degreeOfVariation, degreeOfVariation);
+    float const       randomRow       = g_theRNG->RollRandomFloatInRange(-degreeOfVariation, degreeOfVariation);
+    EulerAngles const randomDirection = EulerAngles(weaponOrientation.m_yawDegrees + randomYaw, weaponOrientation.m_pitchDegrees + randomPitch, weaponOrientation.m_rollDegrees + randomRow);
+    return randomDirection;
 }

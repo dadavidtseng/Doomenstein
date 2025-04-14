@@ -26,5 +26,4 @@ public:
     // The reference to controller's actor is by actor handle.
     ActorHandle m_actorHandle;           // Handle of our currently possessed actor or INVALID if no actor is possessed.
     Map*        m_map = nullptr;    // Reference to the current map for purposes of dereferencing actor handles.
-protected:
 };

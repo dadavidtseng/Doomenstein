@@ -4,22 +4,13 @@
 
 //----------------------------------------------------------------------------------------------------
 #pragma once
-#include <cstdint>
 
-#include "Engine/Core/Rgba8.hpp"
 #include "Engine/Math/EulerAngles.hpp"
 #include "Game/Controller.hpp"
 
 //----------------------------------------------------------------------------------------------------
 class Camera;
 class Game;
-
-//----------------------------------------------------------------------------------------------------
-enum class eCameraMode : int8_t
-{
-    PLAYER,
-    ACTOR
-};
 
 //----------------------------------------------------------------------------------------------------
 // Player controllers should be constructed by the game and told to possess their actor whenever it is spawned or respawned. Player controller can possess other possessable actors in the game.
@@ -31,28 +22,15 @@ public:
     ~PlayerController() override;
 
     void Update(float deltaSeconds) override;
-    void Render() const;
     void UpdateFromInput();
     void UpdateWorldCamera();
-    void UpdateFromController();
+    void Render() const;
 
-    Camera* GetCamera() const;
     Mat44   GetModelToWorldTransform() const;
 
-
-    // Game*       m_game              = nullptr;
-    Vec3        m_position    = Vec3::ZERO;
-    Vec3        m_velocity    = Vec3::ZERO;
-    EulerAngles m_orientation = EulerAngles::ZERO;
-    // EulerAngles m_angularVelocity = EulerAngles::ZERO;
+    Vec3        m_position     = Vec3::ZERO;
+    Vec3        m_velocity     = Vec3::ZERO;
+    EulerAngles m_orientation  = EulerAngles::ZERO;
     bool        m_isCameraMode = false;
-    Rgba8       m_color        = Rgba8::WHITE;
-    eCameraMode m_cameraMode   = eCameraMode::PLAYER;
-    float       m_eyeHeight    = 0.f;
-    float       m_cameraFOV    = 0.f;
-    float       m_speed        = 0.f;
-    float       m_turnRate     = 0.f;
-
-private:
     Camera* m_worldCamera = nullptr;
 };

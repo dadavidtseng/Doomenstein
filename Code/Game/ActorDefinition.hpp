@@ -30,16 +30,17 @@ struct ActorDefinition
     bool   m_isVisible      = false;        // Specifies whether the actor should render.
 
     // Collision
-    float m_radius             = 0.f;
-    float m_height             = 0.f;
-    float m_impulseOnCollide   = 0.f;
-    FloatRange m_damageOnCollide = FloatRange::ZERO;
-    bool  m_collidesWithWorld  = false;
-    bool  m_collidesWithActors = false;
-    bool  m_dieOnCollide       = false;
+    float      m_radius             = 0.f;
+    float      m_height             = 0.f;
+    float      m_impulseOnCollide   = 0.f;
+    FloatRange m_damageOnCollide    = FloatRange::ZERO;
+    bool       m_collidesWithWorld  = false;
+    bool       m_collidesWithActors = false;
+    bool       m_dieOnCollide       = false;
 
     // Physics
     bool  m_isSimulated = false;
+    bool  m_isFlying    = false;
     float m_walkSpeed   = 0.f;
     float m_runSpeed    = 0.f;
     float m_turnSpeed   = 0.f;

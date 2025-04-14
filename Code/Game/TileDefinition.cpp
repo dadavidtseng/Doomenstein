@@ -38,14 +38,14 @@ STATIC void TileDefinition::InitializeTileDefs(char const* path)
 
     if (result != XmlResult::XML_SUCCESS)
     {
-        ERROR_AND_DIE("Failed to load XML file: %s\n", path)
+        ERROR_AND_DIE("Failed to load XML file")
     }
 
     XmlElement const* rootElement = document.RootElement();
 
     if (rootElement == nullptr)
     {
-        ERROR_AND_DIE("XML file %s is missing a root element.\n", path)
+        ERROR_AND_DIE("XML file %s is missing a root element.")
     }
 
     XmlElement const* tileDefinitionElement = rootElement->FirstChildElement();
@@ -62,7 +62,7 @@ STATIC void TileDefinition::InitializeTileDefs(char const* path)
         else
         {
             delete tileDefinition;
-            ERROR_AND_DIE("Failed to load actor definition: %s\n", elementName.c_str())
+            ERROR_AND_DIE("Failed to load actor definition")
         }
 
         tileDefinitionElement = tileDefinitionElement->NextSiblingElement();
