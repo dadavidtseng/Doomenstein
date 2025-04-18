@@ -1,5 +1,5 @@
 <Definitions>
-  <MapDefinition name="TestMap" image="Data/Maps/TestMap.png" shader="Diffuse" spriteSheetTexture="Data/Images/Terrain_8x8.png" spriteSheetCellCount="8,8">
+  <MapDefinition name="TestMap" image="Data/Maps/TestMap.png" shader="Data/Shaders/Diffuse" spriteSheetTexture="Data/Images/Terrain_8x8.png" spriteSheetCellCount="8,8">
     <SpawnInfos>
       <SpawnInfo actor="SpawnPoint" position="25.5,15.5,0.0" orientation="270.0,0.0,0.0" />
       <SpawnInfo actor="SpawnPoint" position="26.5,15.5,0.0" orientation="270.0,0.0,0.0" />
@@ -15,7 +15,7 @@
     </SpawnInfos>
   </MapDefinition>
 
-  <MapDefinition name="MPMap" image="Data/Maps/MPMap.png" shader="Diffuse" spriteSheetTexture="Data/Images/Terrain_8x8.png" spriteSheetCellCount="8,8">
+  <MapDefinition name="MPMap" image="Data/Maps/MPMap.png" shader="Data/Shaders/Diffuse" spriteSheetTexture="Data/Images/Terrain_8x8.png" spriteSheetCellCount="8,8">
     <SpawnInfos>
       <SpawnInfo actor="Demon" faction="Demon" position="15.0,7.0,0.0" />
       <SpawnInfo actor="Demon" faction="Demon" position="20.0,15.0,0.0" />

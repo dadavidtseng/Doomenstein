@@ -193,6 +193,8 @@
     <ClCompile Include="ActorDefinition.cpp" />
     <ClCompile Include="ActorHandle.cpp" />
     <ClCompile Include="AIController.cpp" />
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationGroup.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -205,12 +207,16 @@
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponDefinition.cpp" />
+    <ClCompile Include="Widget.cpp" />
+    <ClCompile Include="WidgetSubsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Actor.hpp" />
     <ClInclude Include="ActorDefinition.hpp" />
     <ClInclude Include="ActorHandle.hpp" />
     <ClInclude Include="AIController.hpp" />
+    <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="AnimationGroup.hpp" />
     <ClInclude Include="App.hpp" />
     <ClInclude Include="Controller.hpp" />
     <ClInclude Include="EngineBuildPreferences.hpp" />
@@ -223,6 +229,8 @@
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="Weapon.hpp" />
     <ClInclude Include="WeaponDefinition.hpp" />
+    <ClInclude Include="Widget.hpp" />
+    <ClInclude Include="WidgetSubsystem.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Docs\README.md" />

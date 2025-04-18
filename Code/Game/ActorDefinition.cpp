@@ -5,8 +5,11 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/ActorDefinition.hpp"
 
+#include "AnimationGroup.hpp"
+#include "GameCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
+#include "Engine/Renderer/Renderer.hpp"
 
 //----------------------------------------------------------------------------------------------------
 STATIC std::vector<ActorDefinition*> ActorDefinition::s_actorDefinitions;
@@ -25,7 +28,7 @@ ActorDefinition::~ActorDefinition()
 //----------------------------------------------------------------------------------------------------
 bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
 {
-    m_name           = ParseXmlAttribute(*element, "name", "Unnamed");
+    m_name           = ParseXmlAttribute(*element, "name", "Default");
     m_faction        = ParseXmlAttribute(*element, "faction", "NEUTRAL");
     m_health         = ParseXmlAttribute(*element, "health", -1);
     m_canBePossessed = ParseXmlAttribute(*element, "canBePossessed", false);
@@ -49,12 +52,12 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
 
     if (physicsElement != nullptr)
     {
-        m_isSimulated = ParseXmlAttribute(*physicsElement, "simulated", false);
-        m_isFlying = ParseXmlAttribute(*physicsElement, "flying", false);
-        m_walkSpeed   = ParseXmlAttribute(*physicsElement, "walkSpeed", -1.f);
-        m_runSpeed    = ParseXmlAttribute(*physicsElement, "runSpeed", -1.f);
-        m_turnSpeed   = ParseXmlAttribute(*physicsElement, "turnSpeed", -1.f);
-        m_drag        = ParseXmlAttribute(*physicsElement, "drag", -1.f);
+        m_simulated = ParseXmlAttribute(*physicsElement, "simulated", false);
+        m_flying    = ParseXmlAttribute(*physicsElement, "flying", false);
+        m_walkSpeed = ParseXmlAttribute(*physicsElement, "walkSpeed", -1.f);
+        m_runSpeed  = ParseXmlAttribute(*physicsElement, "runSpeed", -1.f);
+        m_turnSpeed = ParseXmlAttribute(*physicsElement, "turnSpeed", -1.f);
+        m_drag      = ParseXmlAttribute(*physicsElement, "drag", -1.f);
     }
 
     XmlElement const* cameraElement = element->FirstChildElement("Camera");
@@ -74,6 +77,39 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
         m_sightAngle  = ParseXmlAttribute(*aiElement, "sightAngle", -1.f);
     }
 
+    XmlElement const* visualElement = element->FirstChildElement("Visuals");
+
+    if (visualElement != nullptr)
+    {
+        m_size                     = ParseXmlAttribute(*visualElement, "size", Vec2::ZERO);
+        m_pivot                    = ParseXmlAttribute(*visualElement, "pivot", Vec2::ZERO);
+        String const billboardType = ParseXmlAttribute(*visualElement, "billboardType", "Default");
+        if (billboardType == "FullFacing") m_billboardType = eBillboardType::FULL_FACING;
+        if (billboardType == "FullOpposing") m_billboardType = eBillboardType::FULL_OPPOSING;
+        if (billboardType == "WorldUpFacing") m_billboardType = eBillboardType::WORLD_UP_FACING;
+        if (billboardType == "WorldUpOpposing") m_billboardType = eBillboardType::WORLD_UP_OPPOSING;
+        m_renderLit                       = ParseXmlAttribute(*visualElement, "renderLit", false);
+        m_renderRounded                   = ParseXmlAttribute(*visualElement, "renderRounded", false);
+        m_cellCount                       = ParseXmlAttribute(*visualElement, "cellCount", IntVec2::ZERO);
+        String const shaderPath           = ParseXmlAttribute(*visualElement, "shader", "Default");
+        m_shader                          = g_theRenderer->CreateOrGetShaderFromFile(shaderPath.c_str(), eVertexType::VERTEX_PCUTBN);
+        String const   spriteSheetPath    = ParseXmlAttribute(*visualElement, "spriteSheet", "Default");
+        Texture const* spriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile(spriteSheetPath.c_str());
+        m_spriteSheet                     = new SpriteSheet(*spriteSheetTexture, m_cellCount);
+
+        if (visualElement->ChildElementCount() > 0)
+        {
+            XmlElement const* visualChildElement = visualElement->FirstChildElement();
+            while (visualChildElement != nullptr)
+            {
+                AnimationGroup animationGroup = AnimationGroup(*visualChildElement, *m_spriteSheet);
+                m_animationGroup.push_back(animationGroup);
+
+                visualChildElement = visualChildElement->NextSiblingElement();
+            }
+        }
+    }
+
     XmlElement const* inventoryElement = element->FirstChildElement("Inventory");
 
     if (inventoryElement != nullptr)
@@ -84,7 +120,7 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
         {
             String weaponName;
 
-            weaponName = ParseXmlAttribute(*weaponElement, "name", "Unnamed");
+            weaponName = ParseXmlAttribute(*weaponElement, "name", "Default");
 
             m_inventory.push_back(weaponName);
 
@@ -126,7 +162,7 @@ STATIC void ActorDefinition::InitializeActorDefs(char const* path)
         }
         else
         {
-            delete actorDefinition;
+            delete &actorDefinition;
             ERROR_AND_DIE("Failed to load actor definition")
         }
 

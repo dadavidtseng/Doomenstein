@@ -140,7 +140,7 @@ void Actor::Render() const
     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
     g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
     g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Default", eVertexType::VERTEX_PCU));
+    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default", eVertexType::VERTEX_PCU));
 
     g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());
 }
@@ -165,7 +165,7 @@ void Actor::UpdatePhysics(float const deltaSeconds)
     m_velocity += m_acceleration * deltaSeconds;
     m_position += m_velocity * deltaSeconds;
 
-    if (!m_definition->m_isFlying)
+    if (!m_definition->m_flying)
     {
         m_position.z = 0.f;
     }

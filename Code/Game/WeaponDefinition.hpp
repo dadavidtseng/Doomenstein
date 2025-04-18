@@ -9,8 +9,9 @@
 #include "Engine/Math/FloatRange.hpp"
 
 //----------------------------------------------------------------------------------------------------
-struct WeaponDefinition
+class WeaponDefinition
 {
+public:
     WeaponDefinition() = default;
     ~WeaponDefinition();
 

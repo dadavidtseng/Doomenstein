@@ -61,6 +61,18 @@
     <ClCompile Include="PlayerController.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimationGroup.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="WidgetSubsystem.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.hpp">
@@ -109,6 +121,18 @@
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="PlayerController.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationGroup.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Widget.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="WidgetSubsystem.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>

@@ -364,7 +364,7 @@ void Game::InitializeMaps()
 {
     MapDefinition::InitializeMapDefs("Data/Definitions/MapDefinitions.xml");
     TileDefinition::InitializeTileDefs("Data/Definitions/TileDefinitions.xml");
-    ActorDefinition::InitializeActorDefs("Data/Definitions/ProjectileActorDefinitions.xml");
+     ActorDefinition::InitializeActorDefs("Data/Definitions/ProjectileActorDefinitions.xml");
     WeaponDefinition::InitializeWeaponDefs("Data/Definitions/WeaponDefinitions.xml");
     ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
 

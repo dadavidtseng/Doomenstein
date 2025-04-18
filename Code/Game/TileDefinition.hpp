@@ -9,8 +9,9 @@
 #include "Engine/Math/IntVec2.hpp"
 
 //----------------------------------------------------------------------------------------------------
-struct TileDefinition
+class TileDefinition
 {
+public:
     TileDefinition() = default;
     ~TileDefinition();
 

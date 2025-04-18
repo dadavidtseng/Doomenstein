@@ -24,8 +24,9 @@ struct SpawnInfo
 };
 
 //----------------------------------------------------------------------------------------------------
-struct MapDefinition
+class MapDefinition
 {
+public:
     MapDefinition() = default;
     ~MapDefinition();
 

@@ -8,10 +8,19 @@
 #include "Engine/Core/StringUtils.hpp"
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Math/FloatRange.hpp"
+#include "Engine/Math/IntVec2.hpp"
+#include "Engine/Math/MathUtils.hpp"
+#include "Engine/Math/Vec2.hpp"
+#include "Engine/Renderer/Shader.hpp"
+#include "Engine/Renderer/SpriteSheet.hpp"
+
+class AnimationGroup;
+enum class eBillboardType : int8_t;
 
 //----------------------------------------------------------------------------------------------------
-struct ActorDefinition
+class ActorDefinition
 {
+public:
     ActorDefinition() = default;
     ~ActorDefinition();
 
@@ -39,12 +48,12 @@ struct ActorDefinition
     bool       m_dieOnCollide       = false;
 
     // Physics
-    bool  m_isSimulated = false;
-    bool  m_isFlying    = false;
-    float m_walkSpeed   = 0.f;
-    float m_runSpeed    = 0.f;
-    float m_turnSpeed   = 0.f;
-    float m_drag        = 0.f;
+    bool  m_simulated = false;
+    bool  m_flying    = false;
+    float m_walkSpeed = 0.f;
+    float m_runSpeed  = 0.f;
+    float m_turnSpeed = 0.f;
+    float m_drag      = 0.f;
 
     // Camera
     float m_eyeHeight = 0.f;
@@ -56,6 +65,16 @@ struct ActorDefinition
     float m_sightAngle  = 0.f;
 
     // Visuals
+    Vec2                        m_size          = Vec2::ZERO;
+    Vec2                        m_pivot         = Vec2::ZERO;
+    eBillboardType              m_billboardType = eBillboardType::NONE;
+    bool                        m_renderLit     = false;
+    bool                        m_renderRounded = false;
+    IntVec2                     m_cellCount     = IntVec2::ZERO;
+    Shader*                     m_shader        = nullptr;
+    SpriteSheet*                m_spriteSheet   = nullptr;
+    std::vector<AnimationGroup> m_animationGroup;
+
     // Weapons
     StringList m_inventory;
 };
