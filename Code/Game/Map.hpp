@@ -20,7 +20,7 @@ class Game;
 class IndexBuffer;
 class Shader;
 class Texture;
-struct MapDefinition;
+class MapDefinition;
 struct Tile;
 
 //----------------------------------------------------------------------------------------------------
@@ -55,10 +55,10 @@ public:
     void CollideActorWithMap(Actor* actor) const;
 
     void PushActorOutOfTileIfSolid(Actor* actor, IntVec2 const& tileCoords) const;
-    void RenderAllActors() const;
+    void RenderAllActors(PlayerController const* toPlayer) const;
     void RenderMap() const;
 
-    void Render() const;
+    void Render(PlayerController const* toPlayer) const;
 
     RaycastResult3D RaycastAll(Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
     RaycastResult3D RaycastAll(Actor const* attackerActor, ActorHandle& out_impactedActorHandle, Vec3 const& startPosition, Vec3 const& forwardNormal, float maxLength) const;
@@ -79,6 +79,10 @@ public:
     Game*               m_game = nullptr;
     std::vector<Actor*> m_actors;
 
+    Vec3  m_sunDirection     = Vec3(2.f, 1.f, -1.f).GetNormalized();
+    float m_sunIntensity     = 0.85f;
+    float m_ambientIntensity = 0.35f;
+
 protected:
     // Map
     MapDefinition const* m_mapDefinition = nullptr;
@@ -93,9 +97,7 @@ protected:
     VertexBuffer*     m_vertexBuffer = nullptr;
     IndexBuffer*      m_indexBuffer  = nullptr;
 
-    Vec3  m_sunDirection     = Vec3(2.f, 1.f, -1.f).GetNormalized();
-    float m_sunIntensity     = 0.85f;
-    float m_ambientIntensity = 0.35f;
+
 
     // Actor
     static constexpr unsigned int MAX_ACTOR_UID      = 0x0000fffeu;

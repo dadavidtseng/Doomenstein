@@ -97,7 +97,7 @@ void Game::Render() const
 
             if (m_currentMap != nullptr)
             {
-                m_currentMap->Render();
+                m_currentMap->Render(m_playerController);
             }
         }
 

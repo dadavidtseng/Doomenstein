@@ -418,20 +418,20 @@ void Map::PushActorOutOfTileIfSolid(Actor*         actor,
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::Render() const
+void Map::Render(PlayerController const* toPlayer) const
 {
-    RenderAllActors();
+    RenderAllActors(toPlayer);
     RenderMap();
 }
 
 //----------------------------------------------------------------------------------------------------
-void Map::RenderAllActors() const
+void Map::RenderAllActors(PlayerController const* toPlayer) const
 {
     for (int i = 0; i < static_cast<int>(m_actors.size()); i++)
     {
         if (m_actors[i] != nullptr)
         {
-            m_actors[i]->Render();
+            m_actors[i]->Render(toPlayer);
         }
     }
 }

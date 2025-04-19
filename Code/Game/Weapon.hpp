@@ -9,7 +9,7 @@
 //-Forward-Declaration--------------------------------------------------------------------------------
 class Actor;
 class Timer;
-struct WeaponDefinition;
+class WeaponDefinition;
 
 //----------------------------------------------------------------------------------------------------
 class Weapon

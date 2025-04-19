@@ -13,6 +13,7 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Game/ActorHandle.hpp"
 
+class PlayerController;
 class Timer;
 class AnimationGroup;
 class Texture;
@@ -22,7 +23,7 @@ class Controller;
 class Map;
 class Weapon;
 struct AABB3;
-struct ActorDefinition;
+class ActorDefinition;
 struct SpawnInfo;
 
 //----------------------------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ public:
     explicit Actor(SpawnInfo const& spawnInfo);
 
     void  Update(float deltaSeconds);
-    void  Render() const;
+    void  Render(PlayerController const* toPlayer) const;
     Mat44 GetModelToWorldTransform() const;
 
     void UpdatePhysics(float deltaSeconds);

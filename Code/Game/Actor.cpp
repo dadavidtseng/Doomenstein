@@ -12,6 +12,7 @@
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Core/VertexUtils.hpp"
+#include "Engine/Core/Vertex_PCUTBN.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Renderer/Renderer.hpp"
@@ -105,20 +106,49 @@ void Actor::Update(float const deltaSeconds)
 
 //----------------------------------------------------------------------------------------------------
 // If visible, we will need vertexes and any other information necessary for rendering.
-void Actor::Render() const
+void Actor::Render(PlayerController const* toPlayer) const
 {
     if (m_definition->m_name == "SpawnPoint") return;
-    if (!m_isVisible) return;
+    // if (!m_isVisible) return;
 
     Mat44 localToWorldMat;
+    // if (m_definition->m_billboardType == eBillboardType::NONE)localToWorldMat = GetModelToWorldTransform();
+    // if (m_definition->m_billboardType == eBillboardType::WORLD_UP_FACING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_FACING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
+    // if (m_definition->m_billboardType == eBillboardType::FULL_OPPOSING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::FULL_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
+    // if (m_definition->m_billboardType == eBillboardType::WORLD_UP_OPPOSING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
+    if (m_definition->m_billboardType == eBillboardType::NONE) localToWorldMat = GetModelToWorldTransform();
+    else
+    {
+        if (m_definition->m_billboardType == eBillboardType::WORLD_UP_FACING)
+        {
+            // Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
+            // cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+            // localToWorldMat = Mat44::MakeTranslation3D(m_position);
+            localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_FACING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
+        }
+        else if (m_definition->m_billboardType == eBillboardType::FULL_OPPOSING)
+        {
+            // Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
+            // cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+            localToWorldMat.Append(GetBillboardMatrix(eBillboardType::FULL_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
+        }
+        else if (m_definition->m_billboardType == eBillboardType::WORLD_UP_OPPOSING)
+        {
+            // Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
+            // cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+            localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
+        }
+        else
+        {
+            localToWorldMat = GetModelToWorldTransform();
+        }
+    }
 
-        localToWorldMat = GetModelToWorldTransform();
-
-    VertexList_PCU verts;
-    float const    eyeHeight         = m_definition->m_eyeHeight;
-    Vec3 const     forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
-    Vec3 const     forwardNormalXY   = Vec3(forwardNormal.x, forwardNormal.y, 0.f).GetNormalized();
-    Vec3 const     coneStartPosition = m_collisionCylinder.m_startPosition + Vec3(0.f, 0.f, eyeHeight) + forwardNormalXY * m_collisionCylinder.m_radius;
+    // verts.reserve(8192);
+    float const eyeHeight         = m_definition->m_eyeHeight;
+    Vec3 const  forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+    Vec3 const  forwardNormalXY   = Vec3(forwardNormal.x, forwardNormal.y, 0.f).GetNormalized();
+    Vec3 const  coneStartPosition = m_collisionCylinder.m_startPosition + Vec3(0.f, 0.f, eyeHeight) + forwardNormalXY * m_collisionCylinder.m_radius;
 
     if (m_definition->m_name != "PlasmaProjectile")
     {
@@ -144,16 +174,21 @@ void Actor::Render() const
     }
     // AddVertsForWireframeCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, 0.001f);
 
+    /// Get facing sprite UVs.
+    Vec2 dirCameraToActorXY = Vec2(m_position.x - toPlayer->m_position.x, m_position.y - toPlayer->m_position.y).GetNormalized();
+    Vec3 dirCameraToActor   = Vec3(dirCameraToActorXY.x, dirCameraToActorXY.y, 0.f).GetNormalized();
+    Vec3 viewingDirection   = GetModelToWorldTransform().GetOrthonormalInverse().TransformVectorQuantity3D(dirCameraToActor);
+
     AnimationGroup const* animationGroup = m_currentPlayingAnimationGroup;
     if (animationGroup == nullptr && (int)m_definition->m_animationGroup.size() > 0) // We use the index 0 animation group
     {
         animationGroup = &m_definition->m_animationGroup[0];
     }
 
-    // const SpriteAnimDefinition* anim         = &animationGroup->GetSpriteAnimation(viewingDirection);
-    SpriteAnimDefinition const* anim         = &animationGroup->GetSpriteAnimation(-Vec3::ONE);
-    SpriteDefinition const      spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime() * 1); // TODO: Handle animation speed.
-    AABB2                       uvAtTime     = spriteAtTime.GetUVs();
+    const SpriteAnimDefinition* anim = &animationGroup->GetSpriteAnimation(viewingDirection);
+
+    SpriteDefinition const spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime() * 1); // TODO: Handle animation speed.
+    AABB2                  uvAtTime     = spriteAtTime.GetUVs();
 
     Vec2 spriteOffSet = -m_definition->m_size * m_definition->m_pivot;
     Vec3 bottomLeft   = Vec3(0.f, spriteOffSet.x, spriteOffSet.y);
@@ -161,18 +196,128 @@ void Actor::Render() const
     Vec3 topLeft      = bottomLeft + Vec3(0.f, 0.f, m_definition->m_size.y);
     Vec3 topRight     = bottomRight + Vec3(0.f, 0.f, m_definition->m_size.y);
 
-AddVertsForQuad3D(verts,bottomRight, bottomLeft, topRight, topLeft, Rgba8::WHITE, uvAtTime );
+    bool const        bIsLit = m_definition->m_renderLit;
+    VertexList_PCU    unlitVerts;
+    VertexList_PCUTBN litVerts;
 
-    g_theRenderer->SetModelConstants(localToWorldMat);
-    g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
-    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
-    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
-    g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
-    g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
-    // g_theRenderer->BindTexture(nullptr);
-    g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default", eVertexType::VERTEX_PCU));
+    if (bIsLit)
+    {
+        if (m_definition->m_renderRounded)
+        {
+            litVerts.reserve(12000);
+            AddVertsForRoundedQuad3D(litVerts, topRight, bottomRight, bottomLeft, topLeft, Rgba8::WHITE, uvAtTime);
+            g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
+            g_theRenderer->SetLightConstants(m_map->m_sunDirection, m_map->m_sunIntensity, m_map->m_ambientIntensity);
+            g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+            g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
+            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+            g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+            g_theRenderer->BindShader(m_definition->m_shader);
+            g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+            g_theRenderer->DrawVertexArray(litVerts);
+            return;
+        }
 
-    g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());
+        litVerts.reserve(12000);
+        AddVertsForQuad3D(unlitVerts, bottomLeft, bottomRight, topLeft, topRight, Rgba8::WHITE, uvAtTime);
+        g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
+        g_theRenderer->SetLightConstants(m_map->m_sunDirection, m_map->m_sunIntensity, m_map->m_ambientIntensity);
+        g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+        g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
+        g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+        g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+        g_theRenderer->BindShader(m_definition->m_shader);
+        g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+        g_theRenderer->DrawVertexArray(litVerts);
+        return;
+    }
+    else
+    {
+        if (m_definition->m_renderRounded)
+        {
+            unlitVerts.reserve(12000);
+            AddVertsForRoundedQuad3D(litVerts, topRight, bottomRight, bottomLeft, topLeft, Rgba8::WHITE, uvAtTime);
+            g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
+            g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+            g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
+            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+            g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+            g_theRenderer->BindShader(m_definition->m_shader);
+            g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+            g_theRenderer->DrawVertexArray(unlitVerts);
+            return;
+        }
+        else
+        {
+            unlitVerts.reserve(12000);
+            AddVertsForQuad3D(unlitVerts, bottomLeft, bottomRight, topLeft, topRight, Rgba8::WHITE, uvAtTime);
+            g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
+            g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+            g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
+            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+            g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+            g_theRenderer->BindShader(m_definition->m_shader);
+            g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+            g_theRenderer->DrawVertexArray(unlitVerts);
+            return;
+        }
+    }
+
+    // bool const bIsLit = m_definition->m_renderLit;
+    // bool const renderRounded = m_definition->m_renderRounded;
+    //
+    // VertexList_PCUTBN litVerts;
+    // VertexList_PCU    unlitVerts;
+    //
+    // Rgba8 const color = Rgba8::WHITE;
+    //
+    // if (bIsLit)
+    // {
+    //     litVerts.reserve(12000);
+    //
+    //     if (renderRounded)
+    //     {
+    //         AddVertsForRoundedQuad3D(litVerts, topRight, bottomRight, bottomLeft, topLeft, color, uvAtTime);
+    //     }
+    //     else
+    //     {
+    //         AddVertsForQuad3D(unlitVerts, bottomLeft, bottomRight, topLeft, topRight, color, uvAtTime);
+    //     }
+    //
+    //     g_theRenderer->SetModelConstants(localToWorldMat, color);
+    //     g_theRenderer->SetLightConstants(m_map->m_sunDirection, m_map->m_sunIntensity, m_map->m_ambientIntensity);
+    //     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+    //     g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
+    //     g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+    //     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+    //     g_theRenderer->BindShader(m_definition->m_shader);
+    //     g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+    //     g_theRenderer->DrawVertexArray(renderRounded ? litVerts : litVerts); // always litVerts in lit path
+    //     return;
+    // }
+    // else
+    // {
+    //     unlitVerts.reserve(12000);
+    //
+    //     if (renderRounded)
+    //     {
+    //         AddVertsForRoundedQuad3D(unlitVerts, topRight, bottomRight, bottomLeft, topLeft, color, uvAtTime);
+    //     }
+    //     else
+    //     {
+    //         AddVertsForQuad3D(unlitVerts, bottomLeft, bottomRight, topLeft, topRight, color, uvAtTime);
+    //     }
+    //
+    //     g_theRenderer->SetModelConstants(localToWorldMat, color);
+    //     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+    //     g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
+    //     g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+    //     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+    //     g_theRenderer->BindShader(m_definition->m_shader);
+    //     g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+    //     g_theRenderer->DrawVertexArray(unlitVerts);
+    //     return;
+    // }
 }
 
 //----------------------------------------------------------------------------------------------------
