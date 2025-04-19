@@ -33,7 +33,7 @@ private:
 
     void UpdateCursorMode();
     void DeleteAndCreateNewGame();
-    void LoadGameConfig(char const* path);
+    void LoadGameConfig(char const* gameConfigXmlFilePath);
 
     Camera* m_devConsoleCamera = nullptr;
 };

@@ -30,7 +30,9 @@ Game::Game()
     m_screenCamera = new Camera();
 
     Vec2 const bottomLeft     = Vec2::ZERO;
-    Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
+    float const screenSizeX = g_gameConfigBlackboard.GetValue("screenSizeX",-1.f);
+    float const screenSizeY = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
+    Vec2 const screenTopRight = Vec2(screenSizeX, screenSizeY);
 
     m_screenCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
 
@@ -312,7 +314,16 @@ void Game::UpdatePlayerController(float const deltaSeconds) const
 //----------------------------------------------------------------------------------------------------
 void Game::RenderAttractMode() const
 {
-    DebugDrawRing(Vec2(800.f, 400.f), 300.f, 10.f, Rgba8::YELLOW);
+    VertexList_PCU verts;
+    AddVertsForDisc2D(verts, Vec2(800.f, 400.f), 300.f, 10.f, Rgba8::YELLOW);
+
+    g_theRenderer->SetModelConstants();
+    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+    g_theRenderer->BindTexture(nullptr);
+    g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());
 }
 
 //----------------------------------------------------------------------------------------------------

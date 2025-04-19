@@ -44,11 +44,11 @@ AnimationGroup::AnimationGroup(XmlElement const& animationGroupElement, SpriteSh
     }
 }
 
-SpriteAnimDefinition const& AnimationGroup::GetSpriteAnimation(Vec3 direction)
+SpriteAnimDefinition const& AnimationGroup::GetSpriteAnimation(Vec3 const& direction) const
 {
     Vec3  leastOffset     = direction;
     float directionScalar = -FLT_MAX;
-    for (std::pair<const Vec3, SpriteAnimDefinition>& animation : m_animations)
+    for (std::pair<const Vec3, SpriteAnimDefinition> const& animation : m_animations)
     {
         float scalar = DotProduct3D(direction, animation.first);
         if (scalar > directionScalar)

@@ -5,9 +5,12 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Actor.hpp"
 
+#include "AnimationGroup.hpp"
+#include "Game.hpp"
 #include "PlayerController.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/EventSystem.hpp"
+#include "Engine/Core/Timer.hpp"
 #include "Engine/Core/VertexUtils.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
@@ -21,6 +24,7 @@
 #include "Game/Weapon.hpp"
 #include "Game/WeaponDefinition.hpp"
 
+class SpriteAnimDefinition;
 //----------------------------------------------------------------------------------------------------
 Actor::Actor(SpawnInfo const& spawnInfo)
 {
@@ -67,6 +71,9 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     }
 
     m_collisionCylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
+
+    m_animationTimer = new Timer(0, g_theGame->m_gameClock); // Create timer
+    m_animationTimer->Start();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -103,6 +110,10 @@ void Actor::Render() const
     if (m_definition->m_name == "SpawnPoint") return;
     if (!m_isVisible) return;
 
+    Mat44 localToWorldMat;
+
+        localToWorldMat = GetModelToWorldTransform();
+
     VertexList_PCU verts;
     float const    eyeHeight         = m_definition->m_eyeHeight;
     Vec3 const     forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
@@ -113,33 +124,52 @@ void Actor::Render() const
     {
         if (m_isDead)
         {
-            AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormalXY * 0.1f, 0.1f, Interpolate(m_color, Rgba8::BLACK, 0.5f));
+            // AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormalXY * 0.1f, 0.1f, Interpolate(m_color, Rgba8::BLACK, 0.5f));
         }
         else
         {
-            AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormalXY * 0.1f, 0.1f, m_color);
+            // AddVertsForCone3D(verts, coneStartPosition, coneStartPosition + forwardNormalXY * 0.1f, 0.1f, m_color);
         }
 
-        AddVertsForWireframeCone3D(verts, coneStartPosition, coneStartPosition + forwardNormalXY * 0.1f, 0.1f, 0.001f);
+        // AddVertsForWireframeCone3D(verts, coneStartPosition, coneStartPosition + forwardNormalXY * 0.1f, 0.1f, 0.001f);
     }
 
     if (m_isDead)
     {
-        AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, Interpolate(m_color, Rgba8::BLACK, 0.5f));
+        // AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, Interpolate(m_color, Rgba8::BLACK, 0.5f));
     }
     else
     {
-        AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, m_color);
+        // AddVertsForCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, m_color);
+    }
+    // AddVertsForWireframeCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, 0.001f);
+
+    AnimationGroup const* animationGroup = m_currentPlayingAnimationGroup;
+    if (animationGroup == nullptr && (int)m_definition->m_animationGroup.size() > 0) // We use the index 0 animation group
+    {
+        animationGroup = &m_definition->m_animationGroup[0];
     }
 
-    AddVertsForWireframeCylinder3D(verts, m_collisionCylinder.m_startPosition, m_collisionCylinder.m_endPosition, m_collisionCylinder.m_radius, 0.001f);
+    // const SpriteAnimDefinition* anim         = &animationGroup->GetSpriteAnimation(viewingDirection);
+    SpriteAnimDefinition const* anim         = &animationGroup->GetSpriteAnimation(-Vec3::ONE);
+    SpriteDefinition const      spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime() * 1); // TODO: Handle animation speed.
+    AABB2                       uvAtTime     = spriteAtTime.GetUVs();
 
-    g_theRenderer->SetModelConstants();
+    Vec2 spriteOffSet = -m_definition->m_size * m_definition->m_pivot;
+    Vec3 bottomLeft   = Vec3(0.f, spriteOffSet.x, spriteOffSet.y);
+    Vec3 bottomRight  = bottomLeft + Vec3(0.f, m_definition->m_size.x, 0.f);
+    Vec3 topLeft      = bottomLeft + Vec3(0.f, 0.f, m_definition->m_size.y);
+    Vec3 topRight     = bottomRight + Vec3(0.f, 0.f, m_definition->m_size.y);
+
+AddVertsForQuad3D(verts,bottomRight, bottomLeft, topRight, topLeft, Rgba8::WHITE, uvAtTime );
+
+    g_theRenderer->SetModelConstants(localToWorldMat);
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
     g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
     g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
     g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
-    g_theRenderer->BindTexture(nullptr);
+    g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+    // g_theRenderer->BindTexture(nullptr);
     g_theRenderer->BindShader(g_theRenderer->CreateOrGetShaderFromFile("Data/Shaders/Default", eVertexType::VERTEX_PCU));
 
     g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());

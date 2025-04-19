@@ -13,6 +13,9 @@
 #include "Engine/Math/Vec3.hpp"
 #include "Game/ActorHandle.hpp"
 
+class Timer;
+class AnimationGroup;
+class Texture;
 //-Forward-Declaration--------------------------------------------------------------------------------
 class AIController;
 class Controller;
@@ -80,6 +83,11 @@ public:
     std::vector<Weapon*> m_weapons;
     Weapon*              m_currentWeapon = nullptr;
     Controller*          m_controller    = nullptr;          // A reference to the controller currently possessing us, if any.
+    Texture*             m_texture       = nullptr;
+
+    AnimationGroup* m_currentPlayingAnimationGroup  = nullptr;
+    Timer*          m_animationTimer                = nullptr;
+    float           m_animationTimerSpeedMultiplier = 1.f;
 
     //----------------------------------------------------------------------------------------------------
     // A reference to our default AI controller, if any.

@@ -19,7 +19,7 @@ public:
     AnimationGroup(XmlElement const& animationGroupElement, SpriteSheet const& spriteSheet);
 
     /// Getter
-    SpriteAnimDefinition const& GetSpriteAnimation(Vec3 direction);
+    SpriteAnimDefinition const& GetSpriteAnimation(Vec3 const& direction) const;
     float                       GetAnimationLength();
     int                         GetAnimationTotalFrame();
 
@@ -27,6 +27,6 @@ public:
     float                                m_scaleBySpeed    = true;
     float                                m_secondsPerFrame = 0.25f;
     SpriteAnimPlaybackType               m_playbackType    = SpriteAnimPlaybackType::LOOP;
-    SpriteSheet             const&             m_spriteSheet;
+    SpriteSheet const&                   m_spriteSheet;
     std::map<Vec3, SpriteAnimDefinition> m_animations;
 };

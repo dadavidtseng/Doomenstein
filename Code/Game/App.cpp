@@ -34,7 +34,7 @@ STATIC bool App::m_isQuitting = false;
 //----------------------------------------------------------------------------------------------------
 void App::Startup()
 {
-    LoadGameConfig("Run/Data/GameConfig.xml");
+    LoadGameConfig("Data/GameConfig.xml");
 
     // Create All Engine Subsystems
     EventSystemConfig eventSystemConfig;
@@ -63,7 +63,9 @@ void App::Startup()
     m_devConsoleCamera = new Camera();
 
     Vec2 const bottomLeft     = Vec2::ZERO;
-    Vec2 const screenTopRight = Vec2(SCREEN_SIZE_X, SCREEN_SIZE_Y);
+    float const screenSizeX = g_gameConfigBlackboard.GetValue("screenSizeX",-1.f);
+    float const screenSizeY = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
+    Vec2 const screenTopRight = Vec2(screenSizeX, screenSizeY);
 
     m_devConsoleCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
 
@@ -261,10 +263,10 @@ void App::DeleteAndCreateNewGame()
     g_theGame = new Game();
 }
 
-void App::LoadGameConfig(char const* path)
+void App::LoadGameConfig(char const* gameConfigXmlFilePath)
 {
     XmlDocument     gameConfigXml;
-    XmlResult const result = gameConfigXml.LoadFile(path);
+    XmlResult const result = gameConfigXml.LoadFile(gameConfigXmlFilePath);
 
     if (result == XmlResult::XML_SUCCESS)
     {
@@ -274,11 +276,11 @@ void App::LoadGameConfig(char const* path)
         }
         else
         {
-            DebuggerPrintf("WARNING: game config from file \"%s\" was invalid (missing root element)\n", path);
+            DebuggerPrintf("WARNING: game config from file \"%s\" was invalid (missing root element)\n", gameConfigXmlFilePath);
         }
     }
     else
     {
-        DebuggerPrintf("WARNING: failed to load game config from file \"%s\"\n", path);
+        DebuggerPrintf("WARNING: failed to load game config from file \"%s\"\n", gameConfigXmlFilePath);
     }
 }
