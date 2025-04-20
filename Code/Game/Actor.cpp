@@ -8,6 +8,7 @@
 #include "AnimationGroup.hpp"
 #include "Game.hpp"
 #include "PlayerController.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/EventSystem.hpp"
 #include "Engine/Core/Timer.hpp"
@@ -74,14 +75,16 @@ Actor::Actor(SpawnInfo const& spawnInfo)
     m_collisionCylinder = Cylinder3(m_position, m_position + Vec3(0.f, 0.f, m_height), m_radius);
 
     m_animationTimer = new Timer(0, g_theGame->m_gameClock); // Create timer
-    m_animationTimer->Start();
 }
 
 //----------------------------------------------------------------------------------------------------
 void Actor::Update(float const deltaSeconds)
 {
-    if (m_isDead)
+    if (m_isDead || m_definition->m_dieOnSpawn)
+    // if (m_isDead)
     {
+        PlayAnimationByName("Death", true);
+        m_isDead = true;
         m_dead += deltaSeconds;
     }
 
@@ -109,9 +112,10 @@ void Actor::Update(float const deltaSeconds)
 void Actor::Render(PlayerController const* toPlayer) const
 {
     if (m_definition->m_name == "SpawnPoint") return;
-    // if (!m_isVisible) return;
+    if (!m_isVisible) return;
 
     Mat44 localToWorldMat;
+    Vec3  eyeHeight = Vec3(0.f, 0.f, m_definition->m_eyeHeight);
     // if (m_definition->m_billboardType == eBillboardType::NONE)localToWorldMat = GetModelToWorldTransform();
     // if (m_definition->m_billboardType == eBillboardType::WORLD_UP_FACING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_FACING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
     // if (m_definition->m_billboardType == eBillboardType::FULL_OPPOSING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::FULL_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
@@ -136,7 +140,7 @@ void Actor::Render(PlayerController const* toPlayer) const
         {
             // Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
             // cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
-            localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
+            localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position + eyeHeight));
         }
         else
         {
@@ -145,10 +149,10 @@ void Actor::Render(PlayerController const* toPlayer) const
     }
 
     // verts.reserve(8192);
-    float const eyeHeight         = m_definition->m_eyeHeight;
-    Vec3 const  forwardNormal     = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
-    Vec3 const  forwardNormalXY   = Vec3(forwardNormal.x, forwardNormal.y, 0.f).GetNormalized();
-    Vec3 const  coneStartPosition = m_collisionCylinder.m_startPosition + Vec3(0.f, 0.f, eyeHeight) + forwardNormalXY * m_collisionCylinder.m_radius;
+    // float const eyeHeight         = m_definition->m_eyeHeight;
+    Vec3 const forwardNormal   = m_orientation.GetAsMatrix_IFwd_JLeft_KUp().GetIBasis3D().GetNormalized();
+    Vec3 const forwardNormalXY = Vec3(forwardNormal.x, forwardNormal.y, 0.f).GetNormalized();
+    // Vec3 const  coneStartPosition = m_collisionCylinder.m_startPosition + Vec3(0.f, 0.f, eyeHeight) + forwardNormalXY * m_collisionCylinder.m_radius;
 
     if (m_definition->m_name != "PlasmaProjectile")
     {
@@ -210,7 +214,8 @@ void Actor::Render(PlayerController const* toPlayer) const
             g_theRenderer->SetLightConstants(m_map->m_sunDirection, m_map->m_sunIntensity, m_map->m_ambientIntensity);
             g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
             g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
-            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+            // g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
             g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
             g_theRenderer->BindShader(m_definition->m_shader);
             g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
@@ -219,12 +224,13 @@ void Actor::Render(PlayerController const* toPlayer) const
         }
 
         litVerts.reserve(12000);
-        AddVertsForQuad3D(unlitVerts, bottomLeft, bottomRight, topLeft, topRight, Rgba8::WHITE, uvAtTime);
+        AddVertsForQuad3D(litVerts, bottomLeft, bottomRight, topLeft, topRight, Rgba8::WHITE, uvAtTime);
         g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
         g_theRenderer->SetLightConstants(m_map->m_sunDirection, m_map->m_sunIntensity, m_map->m_ambientIntensity);
         g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
         g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
-        g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+        g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+        // g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
         g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
         g_theRenderer->BindShader(m_definition->m_shader);
         g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
@@ -235,16 +241,17 @@ void Actor::Render(PlayerController const* toPlayer) const
     {
         if (m_definition->m_renderRounded)
         {
-            unlitVerts.reserve(12000);
-            AddVertsForRoundedQuad3D(litVerts, topRight, bottomRight, bottomLeft, topLeft, Rgba8::WHITE, uvAtTime);
-            g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
-            g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
-            g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
-            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
-            g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
-            g_theRenderer->BindShader(m_definition->m_shader);
-            g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
-            g_theRenderer->DrawVertexArray(unlitVerts);
+            // unlitVerts.reserve(12000);
+            // AddVertsForRoundedQuad3D(litVerts, topRight, bottomRight, bottomLeft, topLeft, Rgba8::WHITE, uvAtTime);
+            // g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
+            // g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+            // g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
+            // g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+            // // g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+            // g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+            // g_theRenderer->BindShader(m_definition->m_shader);
+            // g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+            // g_theRenderer->DrawVertexArray(unlitVerts);
             return;
         }
         else
@@ -254,7 +261,8 @@ void Actor::Render(PlayerController const* toPlayer) const
             g_theRenderer->SetModelConstants(localToWorldMat, Rgba8::WHITE);
             g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
             g_theRenderer->SetDepthMode(eDepthMode::READ_WRITE_LESS_EQUAL);
-            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
+            g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+            // g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_BACK);
             g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
             g_theRenderer->BindShader(m_definition->m_shader);
             g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
@@ -262,6 +270,7 @@ void Actor::Render(PlayerController const* toPlayer) const
             return;
         }
     }
+
 
     // bool const bIsLit = m_definition->m_renderLit;
     // bool const renderRounded = m_definition->m_renderRounded;
@@ -342,10 +351,27 @@ void Actor::UpdatePhysics(float const deltaSeconds)
 
     if (!m_definition->m_flying)
     {
-        m_position.z = 0.f;
+        if (m_definition->m_name != "BulletHit" &&
+            m_definition->m_name != "BloodSplatter")
+        {
+            m_position.z = 0.f;
+        }
     }
 
     m_acceleration = Vec3::ZERO;
+}
+
+void Actor::UpdateAnimation(float const deltaSeconds)
+{
+    UNUSED(deltaSeconds)
+    if (!m_currentPlayingAnimationGroup) return;
+    if (m_animationTimer->GetElapsedTime() > m_currentPlayingAnimationGroup->GetAnimationLength())
+    {
+        m_currentPlayingAnimationGroup = nullptr;
+        m_animationTimer->Stop();
+    }
+    if (m_definition->m_runSpeed != 0.f) // Zero safe check
+        m_animationTimerSpeedMultiplier = m_velocity.GetLength() / m_definition->m_runSpeed;
 }
 
 void Actor::Damage(int const          damage,
@@ -509,4 +535,48 @@ void Actor::SwitchInventory(unsigned int const index)
 Vec3 Actor::GetActorEyePosition() const
 {
     return m_position + Vec3(0.f, 0.f, m_definition->m_eyeHeight);
+}
+
+AnimationGroup* Actor::PlayAnimationByName(String const& animationName,
+                                           bool const    force)
+{
+    AnimationGroup* foundedGroup = m_definition->GetAnimationGroupByName(animationName);
+
+    if (foundedGroup)
+    {
+        if (foundedGroup == m_currentPlayingAnimationGroup)
+        {
+            return foundedGroup;
+        }
+        else
+        {
+            /// We want to replace to new animation, force update it whether or not it finished
+            if (force)
+            {
+                m_currentPlayingAnimationGroup = foundedGroup;
+                m_animationTimer->Start();
+                return foundedGroup;
+            }
+            else
+            {
+                if (m_currentPlayingAnimationGroup)
+                {
+                    bool isCurrentAnimFinished = m_animationTimer->GetElapsedTime() >= m_currentPlayingAnimationGroup->GetAnimationLength();
+                    if (isCurrentAnimFinished)
+                    {
+                        m_currentPlayingAnimationGroup = foundedGroup;
+                        m_animationTimer->Start();
+                        return foundedGroup;
+                    }
+                }
+                else
+                {
+                    m_currentPlayingAnimationGroup = foundedGroup;
+                    m_animationTimer->Start();
+                    return foundedGroup;
+                }
+            }
+        }
+    }
+    return nullptr;
 }

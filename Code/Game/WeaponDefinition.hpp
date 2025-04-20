@@ -8,10 +8,12 @@
 #include "Engine/Core/XmlUtils.hpp"
 #include "Engine/Math/FloatRange.hpp"
 
+class HUD;
+class Sound;
+
 //----------------------------------------------------------------------------------------------------
-class WeaponDefinition
+struct WeaponDefinition
 {
-public:
     WeaponDefinition() = default;
     ~WeaponDefinition();
 
@@ -37,4 +39,8 @@ public:
     float      m_meleeRange   = 0.f;                    // Range of each melee attack, in world units.
     FloatRange m_meleeDamage  = FloatRange::ZERO;       // Minimum and maximum damage expressed as a float range. Each melee attack should do a random amount of damage in this range.
     float      m_meleeImpulse = 0.f;                    // The amount of impulse to impart to any actor hit by a melee attack. Impulse should be in the forward direction of the firing actor.
+    // The Hud of weapon
+    HUD* m_hud = nullptr;
+    // Sound list of weapon
+    std::vector<Sound> m_sounds;
 };

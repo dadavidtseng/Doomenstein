@@ -23,7 +23,7 @@ class Controller;
 class Map;
 class Weapon;
 struct AABB3;
-class ActorDefinition;
+struct ActorDefinition;
 struct SpawnInfo;
 
 //----------------------------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ public:
     Mat44 GetModelToWorldTransform() const;
 
     void UpdatePhysics(float deltaSeconds);
+    void UpdateAnimation(float deltaSeconds);
     void Damage(int damage, ActorHandle const& other);
     void AddForce(Vec3 const& force);
     void AddImpulse(Vec3 const& impulse);
@@ -58,8 +59,10 @@ public:
     void SwitchInventory(unsigned int index);
     Vec3 GetActorEyePosition() const;
 
+    AnimationGroup* PlayAnimationByName(String const& animationName, bool force=false);
+
     ActorHandle            m_handle;
-    ActorDefinition const* m_definition = nullptr;      // A reference to our actor definition.
+    ActorDefinition * m_definition = nullptr;      // A reference to our actor definition.
     Actor*                 m_owner      = nullptr;
 
     bool        m_isVisible    = true;

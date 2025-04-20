@@ -45,10 +45,18 @@ Map::Map(Game*                owner,
     CreateTiles();
     CreateGeometry();
 
+    // SpawnInfo particleSpawnInfo;
+    // particleSpawnInfo.m_position  = Vec3(29.5f,10.5f,0.f);
+    // particleSpawnInfo.m_name = "BulletHit";
+    // SpawnActor(particleSpawnInfo);
+
     for (SpawnInfo const& spawnInfo : m_mapDefinition->m_spawnInfos)
     {
-        SpawnActor(spawnInfo);
+SpawnActor(spawnInfo);
     }
+
+
+
 
     m_game->SpawnPlayerController();
     Actor const* playerActor = SpawnPlayer(m_game->GetPlayerController());
@@ -277,6 +285,11 @@ void Map::Update(float const deltaSeconds)
 //----------------------------------------------------------------------------------------------------
 void Map::UpdateFromKeyboard()
 {
+    if (g_theInput->WasKeyJustPressed(KEYCODE_I))
+    {
+        DebugAddMessage(Stringf("Sun Direction: (%.2f, %.2f, %.2f)", m_sunDirection.x, m_sunDirection.y, m_sunDirection.z), 5.f);
+    }
+
     if (g_theInput->WasKeyJustPressed(KEYCODE_F2))
     {
         m_sunDirection.x -= 1.f;

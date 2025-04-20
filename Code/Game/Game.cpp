@@ -34,6 +34,12 @@ Game::Game()
     float const screenSizeY = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
     Vec2 const screenTopRight = Vec2(screenSizeX, screenSizeY);
 
+    /// Spaces
+    m_screenSpace.m_mins = Vec2::ZERO;
+    m_screenSpace.m_maxs = Vec2(g_gameConfigBlackboard.GetValue("screenSizeX", 1600.f), g_gameConfigBlackboard.GetValue("screenSizeY", 800.f));
+    // m_worldSpace.m_mins  = Vec2::ZERO;
+    // m_worldSpace.m_maxs  = Vec2(g_gameConfigBlackboard.GetValue("worldSizeX", 200.f), g_gameConfigBlackboard.GetValue("worldSizeY", 100.f));
+
     m_screenCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
 
     m_gameClock = new Clock(Clock::GetSystemClock());
@@ -93,7 +99,6 @@ void Game::Render() const
 
         if (m_currentGameState == eGameState::INGAME)
         {
-            RenderPlayerController();
 
             if (m_currentMap != nullptr)
             {
@@ -128,6 +133,7 @@ void Game::Render() const
     if (m_currentGameState == eGameState::INGAME)
     {
         RenderInGame();
+        RenderPlayerController();
     }
 
     g_theRenderer->EndCamera(*m_screenCamera);

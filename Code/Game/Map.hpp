@@ -20,7 +20,7 @@ class Game;
 class IndexBuffer;
 class Shader;
 class Texture;
-class MapDefinition;
+struct MapDefinition;
 struct Tile;
 
 //----------------------------------------------------------------------------------------------------

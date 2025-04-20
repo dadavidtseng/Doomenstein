@@ -5,11 +5,11 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/ActorDefinition.hpp"
 
-#include "AnimationGroup.hpp"
-#include "GameCommon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/Renderer.hpp"
+#include "Game/AnimationGroup.hpp"
+#include "Game/GameCommon.hpp"
 
 //----------------------------------------------------------------------------------------------------
 STATIC std::vector<ActorDefinition*> ActorDefinition::s_actorDefinitions;
@@ -28,12 +28,13 @@ ActorDefinition::~ActorDefinition()
 //----------------------------------------------------------------------------------------------------
 bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
 {
-    m_name           = ParseXmlAttribute(*element, "name", "Default");
+    m_name           = ParseXmlAttribute(*element, "name", "DEFAULT");
     m_faction        = ParseXmlAttribute(*element, "faction", "NEUTRAL");
     m_health         = ParseXmlAttribute(*element, "health", -1);
     m_canBePossessed = ParseXmlAttribute(*element, "canBePossessed", false);
     m_corpseLifetime = ParseXmlAttribute(*element, "corpseLifetime", -1.f);
     m_isVisible      = ParseXmlAttribute(*element, "isVisible", false);
+    m_dieOnSpawn     = ParseXmlAttribute(*element, "dieOnSpawn", false);
 
     XmlElement const* collisionElement = element->FirstChildElement("Collision");
 
@@ -83,7 +84,7 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
     {
         m_size                     = ParseXmlAttribute(*visualElement, "size", Vec2::ZERO);
         m_pivot                    = ParseXmlAttribute(*visualElement, "pivot", Vec2::ZERO);
-        String const billboardType = ParseXmlAttribute(*visualElement, "billboardType", "Default");
+        String const billboardType = ParseXmlAttribute(*visualElement, "billboardType", "DEFAULT");
         if (billboardType == "FullFacing") m_billboardType = eBillboardType::FULL_FACING;
         if (billboardType == "FullOpposing") m_billboardType = eBillboardType::FULL_OPPOSING;
         if (billboardType == "WorldUpFacing") m_billboardType = eBillboardType::WORLD_UP_FACING;
@@ -91,20 +92,20 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
         m_renderLit                       = ParseXmlAttribute(*visualElement, "renderLit", false);
         m_renderRounded                   = ParseXmlAttribute(*visualElement, "renderRounded", false);
         m_cellCount                       = ParseXmlAttribute(*visualElement, "cellCount", IntVec2::ZERO);
-        String const shaderPath           = ParseXmlAttribute(*visualElement, "shader", "Default");
+        String const shaderPath           = ParseXmlAttribute(*visualElement, "shader", "DEFAULT");
         m_shader                          = g_theRenderer->CreateOrGetShaderFromFile(shaderPath.c_str(), eVertexType::VERTEX_PCUTBN);
-        String const   spriteSheetPath    = ParseXmlAttribute(*visualElement, "spriteSheet", "Default");
+        String const   spriteSheetPath    = ParseXmlAttribute(*visualElement, "spriteSheet", "DEFAULT");
         Texture const* spriteSheetTexture = g_theRenderer->CreateOrGetTextureFromFile(spriteSheetPath.c_str());
         m_spriteSheet                     = new SpriteSheet(*spriteSheetTexture, m_cellCount);
 
         if (visualElement->ChildElementCount() > 0)
         {
             XmlElement const* visualChildElement = visualElement->FirstChildElement();
+
             while (visualChildElement != nullptr)
             {
                 AnimationGroup animationGroup = AnimationGroup(*visualChildElement, *m_spriteSheet);
                 m_animationGroup.push_back(animationGroup);
-
                 visualChildElement = visualChildElement->NextSiblingElement();
             }
         }
@@ -120,7 +121,7 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
         {
             String weaponName;
 
-            weaponName = ParseXmlAttribute(*weaponElement, "name", "Default");
+            weaponName = ParseXmlAttribute(*weaponElement, "name", "DEFAULT");
 
             m_inventory.push_back(weaponName);
 
@@ -170,9 +171,9 @@ STATIC void ActorDefinition::InitializeActorDefs(char const* path)
     }
 }
 
-ActorDefinition const* ActorDefinition::GetDefByName(String const& name)
+ActorDefinition* ActorDefinition::GetDefByName(String const& name)
 {
-    for (ActorDefinition const* actorDef : s_actorDefinitions)
+    for (ActorDefinition* actorDef : s_actorDefinitions)
     {
         if (actorDef->m_name == name)
         {
@@ -180,5 +181,14 @@ ActorDefinition const* ActorDefinition::GetDefByName(String const& name)
         }
     }
 
+    return nullptr;
+}
+
+AnimationGroup* ActorDefinition::GetAnimationGroupByName(String const& name)
+{
+    for (AnimationGroup& animGroup : m_animationGroup)
+    {
+        if (animGroup.m_name == name) return &animGroup;
+    }
     return nullptr;
 }

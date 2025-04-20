@@ -7,6 +7,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "Engine/Math/AABB2.hpp"
+
 //----------------------------------------------------------------------------------------------------
 class Map;
 class Camera;
@@ -38,6 +40,9 @@ public:
     void              ChangeState(eGameState nextState);
     void              SpawnPlayerController();
     Clock*            m_gameClock = nullptr;
+    AABB2             m_screenSpace;
+    AABB2             m_worldSpace;
+    Map*              m_currentMap = nullptr;
 
 private:
     void UpdateFromKeyBoard();
@@ -53,5 +58,4 @@ private:
     PlayerController* m_playerController = nullptr;
     eGameState        m_currentGameState = eGameState::ATTRACT;
     std::vector<Map*> m_maps;
-    Map*              m_currentMap = nullptr;
 };

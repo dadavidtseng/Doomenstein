@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/PlayerController.hpp"
 
+#include "Weapon.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
@@ -47,7 +48,11 @@ void PlayerController::Update(float deltaSeconds)
         Actor* possessedActor = GetActor();
 
         if (possessedActor == nullptr) return;
-
+        if (possessedActor->m_definition->m_name == "Marine")
+        {
+            if (possessedActor->m_currentWeapon)
+                possessedActor->m_currentWeapon->Update(deltaSeconds);
+        }
 
         EulerAngles possessedActorOrientation = possessedActor->m_orientation;
         float       speed                     = possessedActor->m_definition->m_walkSpeed;
@@ -83,6 +88,7 @@ void PlayerController::Update(float deltaSeconds)
         if (g_theInput->IsKeyDown(KEYCODE_W))
         {
             possessedActor->MoveInDirection(forward, speed);
+            possessedActor->PlayAnimationByName("Walk");
         }
 
         if (g_theInput->IsKeyDown(KEYCODE_S))
@@ -164,6 +170,9 @@ void PlayerController::Render() const
     int const    possessedActorHealth = possessedActor->m_health;
 
     DebugAddScreenText(Stringf("Name:%s/Health:%d", possessedActorName.c_str(), possessedActorHealth), Vec2(0.f, 20.f), 20.f, Vec2::ZERO, 0.f);
+
+    if (possessedActor->m_currentWeapon)
+        possessedActor->m_currentWeapon->Render();
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -18,7 +18,7 @@ class AnimationGroup;
 enum class eBillboardType : int8_t;
 
 //----------------------------------------------------------------------------------------------------
-class ActorDefinition
+struct ActorDefinition
 {
 public:
     ActorDefinition() = default;
@@ -26,8 +26,10 @@ public:
 
     bool LoadFromXmlElement(XmlElement const* element);
 
-    static void                   InitializeActorDefs(char const* path);
-    static ActorDefinition const* GetDefByName(String const& name);
+    static void             InitializeActorDefs(char const* path);
+    static ActorDefinition* GetDefByName(String const& name);
+    AnimationGroup*         GetAnimationGroupByName(String const& name);
+    // Sound*          GetSoundByName(std::string& name);
 
     static std::vector<ActorDefinition*> s_actorDefinitions;
 
@@ -37,6 +39,7 @@ public:
     bool   m_canBePossessed = false;        // Determines whether this actor can be possessed, by either the player or an AI.
     float  m_corpseLifetime = 0.f;          // Time that the actor should linger after death, in seconds. For purposes of playing death animations and effects.
     bool   m_isVisible      = false;        // Specifies whether the actor should render.
+    bool   m_dieOnSpawn     = false;
 
     // Collision
     float      m_radius             = 0.f;

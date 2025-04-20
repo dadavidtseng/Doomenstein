@@ -5,12 +5,16 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Weapon.hpp"
 
+#include "Animation.hpp"
+#include "HUD.hpp"
 #include "Engine/Core/Clock.hpp"
+#include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
+#include "Engine/Renderer/Renderer.hpp"
 #include "Game/Actor.hpp"
 #include "Game/ActorDefinition.hpp"
 #include "Game/Game.hpp"
@@ -27,7 +31,142 @@ Weapon::Weapon(Actor*                  owner,
 {
     m_timer              = new Timer(m_definition->m_refireTime, g_theGame->m_gameClock);
     m_timer->m_startTime = g_theGame->m_gameClock->GetTotalSeconds();
+    m_animationTimer = new Timer(0, g_theGame->m_gameClock);
+
+    /// Init hud base bound
+    if (m_definition->m_hud != nullptr)
+    {
+        Texture* baseTexture   = m_definition->m_hud->m_baseTexture;
+        IntVec2  baseDimension = baseTexture->GetDimensions();
+        float    multiplier    = g_theGame->m_screenSpace.m_maxs.x / (float)baseDimension.x;
+        m_hudBaseBound         = AABB2(Vec2(0.0f, 0.0f), Vec2(g_theGame->m_screenSpace.m_maxs.x, (float)baseDimension.y * multiplier));
+    }
 }
+
+void Weapon::Update(float const deltaSeconds)
+{
+    UpdateAnimation(deltaSeconds);
+}
+
+void Weapon::UpdateAnimation(float const deltaSeconds)
+{
+    UNUSED(deltaSeconds)
+    if (!m_currentPlayingAnimation)
+        return;
+    if (m_animationTimer->GetElapsedTime() > m_currentPlayingAnimation->GetAnimationLength())
+    {
+        m_currentPlayingAnimation = nullptr;
+        m_animationTimer->Stop();
+    }
+}
+
+void Weapon::Render() const
+{
+    g_theRenderer->BindShader(m_definition->m_hud->m_shader);
+    g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
+    RenderWeaponBase();
+    RenderWeaponReticle();
+    RenderWeaponAnim();
+    RenderWeaponHudText();
+}
+
+void Weapon::RenderWeaponBase() const
+{
+    std::vector<Vertex_PCU> vertexes;
+    vertexes.reserve(12000);
+
+    //Vec2 spriteOffSet = -Vec2(m_definition->m_hud->m_spriteSize) * m_definition->m_hud->m_spritePivot;
+    /// Hud Base TODO: Handle multiplayer
+    Texture* baseTexture = m_definition->m_hud->m_baseTexture;
+    AddVertsForAABB2D(vertexes, m_hudBaseBound, Rgba8::WHITE);
+    g_theRenderer->BindTexture(baseTexture);
+    g_theRenderer->DrawVertexArray(vertexes);
+}
+
+void Weapon::RenderWeaponReticle() const
+{
+    std::vector<Vertex_PCU> vertexes;
+    vertexes.reserve(1024);
+    /// Reticle
+    Texture* reticleTexture   = m_definition->m_hud->m_reticleTexture;
+    Vec2     reticleDimension = Vec2(reticleTexture->GetDimensions().x, reticleTexture->GetDimensions().y);
+
+    Vec2  reticleSpriteOffSet = -reticleDimension * m_definition->m_hud->m_spritePivot;
+
+    // AABB2 reticleBound        = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
+    AABB2 reticleBound        = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
+
+
+    /// Change the dimension base on split screen y
+    // Vec2  dim            = reticleBound.GetDimensions();
+    // AABB2 screenViewport = m_owner->m_controller->m_screenViewport;
+    // float multiplier     = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
+    // dim.x /= multiplier;
+    // reticleBound.SetDimensions(dim);
+    /// End of Change
+
+    AddVertsForAABB2D(vertexes, reticleBound, Rgba8::WHITE);
+    g_theRenderer->BindTexture(reticleTexture);
+    g_theRenderer->DrawVertexArray(vertexes);
+}
+
+void Weapon::RenderWeaponHudText() const
+{
+    g_theRenderer->BindTexture(nullptr);
+    PlayerController* player = dynamic_cast<PlayerController*>(m_owner->m_controller);
+    if (!player) return;
+    std::vector<Vertex_PCU> vertexes;
+    vertexes.reserve(1024);
+    BitmapFont* g_testFont     = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont");
+    AABB2       boundingBox    = m_hudBaseBound;
+    Vec2        dim            = boundingBox.GetDimensions();
+    AABB2       screenViewport = m_owner->m_controller->m_screenViewport;
+    float       multiplier     = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
+    // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", (int)m_owner->m_health), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier, Vec2(0.29f, 0.5f));
+    // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", PlayerSaveSubsystem::GetPlayerSaveData(player->m_index)->m_numOfKilled), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier,
+    //                                    Vec2(0.05f, 0.5f));
+    // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", PlayerSaveSubsystem::GetPlayerSaveData(player->m_index)->m_numOfDeaths), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier,
+    //                                    Vec2(0.95f, 0.5f));
+    // g_theRenderer->BindTexture(&g_testFont->GetTexture());
+    // g_theRenderer->DrawVertexArray(vertexes);
+    // g_theRenderer->BindTexture(nullptr);
+}
+
+void Weapon::RenderWeaponAnim() const
+{
+    std::vector<Vertex_PCU> vertexes;
+    vertexes.reserve(1024);
+    Animation* animation = m_currentPlayingAnimation;
+    if (animation == nullptr && (int)m_definition->m_hud->GetAnimations().size() > 0) // We use the index 0 animation group
+    {
+        animation = &m_definition->m_hud->GetAnimations()[0];
+    }
+    const SpriteAnimDefinition* anim         = animation->GetAnimationDefinition();
+    const SpriteDefinition      spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime());
+    AABB2                       uvAtTime     = spriteAtTime.GetUVs();
+
+    Vec2 spriteOffSet = -Vec2(m_definition->m_hud->m_spriteSize) * m_definition->m_hud->m_spritePivot;
+
+    IntVec2 boundSize = m_definition->m_hud->m_spriteSize;
+    AABB2   bound     = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs.x / 2.0f, 0.f), Vec2(g_theGame->m_screenSpace.m_maxs.x / 2.0f, 0.f) + Vec2(boundSize));
+
+    /// Change the dimension base on split screen y
+    // Vec2  dim            = bound.GetDimensions();
+    // AABB2 screenViewport = m_owner->m_controller->m_screenViewport;
+    // float multiplier     = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
+    // dim.x /= multiplier;
+    // bound.SetDimensions(dim);
+    /// End of Change
+
+    bound.m_mins += spriteOffSet;
+    bound.m_maxs += spriteOffSet;
+    bound.Translate(Vec2(0.f, m_hudBaseBound.m_maxs.y)); // Shitty hardcode
+    AddVertsForAABB2D(vertexes, bound, Rgba8::WHITE, uvAtTime.m_mins, uvAtTime.m_maxs);
+    AddVertsForAABB2D(vertexes, uvAtTime, Rgba8::WHITE);
+    g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
+    g_theRenderer->DrawVertexArray(vertexes);
+}
+
 
 //----------------------------------------------------------------------------------------------------
 // Checks if the weapon is ready to fire.
@@ -41,6 +180,18 @@ void Weapon::Fire()
 
     if (m_timer->HasPeriodElapsed())
     {
+        // m_owner->m_controller->m_state = "Attack";
+        if (m_definition->m_hud)
+        {
+            PlayAnimationByName("Attack");
+        }
+
+        PlayerController* player = dynamic_cast<PlayerController*>(m_owner->m_controller);
+        if (player)
+        {
+            player->GetActor()->PlayAnimationByName("Attack");
+        }
+
         m_timer->DecrementPeriodIfElapsed();
         if (m_owner == nullptr) return;
         while (rayCount > 0)
@@ -53,23 +204,35 @@ void Weapon::Fire()
             fireOrientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
             ActorHandle           impactedActorHandle;
             RaycastResult3D const result = m_owner->m_map->RaycastAll(m_owner, impactedActorHandle, fireEyePosition, forward, 10.f);
-
+            Actor* impactedActor = m_owner->m_map->GetActorByHandle(impactedActorHandle);
 
             if (result.m_didImpact)
             {
                 // DebugAddWorldPoint(result.m_impactPosition, 0.06f, 10.f);
-                DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::X_RAY);
-                DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
+                // DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::X_RAY);
+                // DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
+                SpawnInfo particleSpawnInfo;
+                particleSpawnInfo.m_position  = result.m_impactPosition;
+                particleSpawnInfo.m_name = "BulletHit";
+                g_theGame->m_currentMap->SpawnActor(particleSpawnInfo);
             }
             else
             {
-                DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_rayStartPosition + result.m_rayForwardNormal * rayRange, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
+                // DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_rayStartPosition + result.m_rayForwardNormal * rayRange, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
             }
-            Actor* impactedActor = m_owner->m_map->GetActorByHandle(impactedActorHandle);
+
             if (impactedActor != nullptr && impactedActor != m_owner)
             {
                 impactedActor->Damage((int)m_definition->m_rayDamage.m_min, m_owner->m_handle);
                 impactedActor->AddImpulse(m_definition->m_rayImpulse * forward);
+
+                float damage = g_theRNG->RollRandomFloatInRange(m_definition->m_rayDamage.m_min, m_definition->m_rayDamage.m_max);
+
+                SpawnInfo particleSpawnInfo;
+                particleSpawnInfo.m_position  =result.m_impactPosition;
+                particleSpawnInfo.m_name = "BulletHit";
+                g_theGame->m_currentMap->SpawnActor(particleSpawnInfo);
+
             }
             rayCount--;
         }
@@ -138,6 +301,48 @@ void Weapon::Fire()
             }
         }
     }
+}
+
+Animation* Weapon::PlayAnimationByName(std::string animationName, bool force)
+{
+    Animation* weaponAnim = m_definition->m_hud->GetAnimationByName(animationName);
+    if (weaponAnim)
+    {
+        if (weaponAnim == m_currentPlayingAnimation)
+        {
+            return weaponAnim;
+        }
+        else
+        {
+            /// We want to replace to new animation, force update it whether or not it finished
+            if (force)
+            {
+                m_currentPlayingAnimation = weaponAnim;
+                m_animationTimer->Start();
+                return weaponAnim;
+            }
+            else
+            {
+                if (m_currentPlayingAnimation)
+                {
+                    bool isCurrentAnimFinished = m_animationTimer->GetElapsedTime() >= m_currentPlayingAnimation->GetAnimationLength();
+                    if (isCurrentAnimFinished)
+                    {
+                        m_currentPlayingAnimation = weaponAnim;
+                        m_animationTimer->Start();
+                        return weaponAnim;
+                    }
+                }
+                else
+                {
+                    m_currentPlayingAnimation = weaponAnim;
+                    m_animationTimer->Start();
+                    return weaponAnim;
+                }
+            }
+        }
+    }
+    return nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------

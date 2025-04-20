@@ -65,6 +65,7 @@ void AIController::Update(float const deltaSeconds)
         Vec3        forward, left, up;
         possessedActor->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
         possessedActor->MoveInDirection(forward, moveSpeed);
+        possessedActor->PlayAnimationByName("Walk");
     }
 
     if (possessedActor->m_currentWeapon &&
