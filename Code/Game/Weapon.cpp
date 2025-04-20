@@ -5,10 +5,9 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Weapon.hpp"
 
-#include "Animation.hpp"
-#include "HUD.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Core/Timer.hpp"
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
@@ -17,13 +16,16 @@
 #include "Engine/Renderer/Renderer.hpp"
 #include "Game/Actor.hpp"
 #include "Game/ActorDefinition.hpp"
+#include "Game/Animation.hpp"
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
+#include "Game/HUD.hpp"
 #include "Game/Map.hpp"
 #include "Game/MapDefinition.hpp"
 #include "Game/PlayerController.hpp"
 #include "Game/WeaponDefinition.hpp"
 
+//----------------------------------------------------------------------------------------------------
 Weapon::Weapon(Actor*                  owner,
                WeaponDefinition const* weaponDef)
     : m_owner(owner),
@@ -31,7 +33,7 @@ Weapon::Weapon(Actor*                  owner,
 {
     m_timer              = new Timer(m_definition->m_refireTime, g_theGame->m_gameClock);
     m_timer->m_startTime = g_theGame->m_gameClock->GetTotalSeconds();
-    m_animationTimer = new Timer(0, g_theGame->m_gameClock);
+    m_animationTimer     = new Timer(0, g_theGame->m_gameClock);
 
     /// Init hud base bound
     if (m_definition->m_hud != nullptr)
@@ -43,6 +45,11 @@ Weapon::Weapon(Actor*                  owner,
     }
 }
 
+Weapon::~Weapon()
+{
+    m_owner = nullptr;
+}
+
 void Weapon::Update(float const deltaSeconds)
 {
     UpdateAnimation(deltaSeconds);
@@ -51,8 +58,7 @@ void Weapon::Update(float const deltaSeconds)
 void Weapon::UpdateAnimation(float const deltaSeconds)
 {
     UNUSED(deltaSeconds)
-    if (!m_currentPlayingAnimation)
-        return;
+    if (!m_currentPlayingAnimation) return;
     if (m_animationTimer->GetElapsedTime() > m_currentPlayingAnimation->GetAnimationLength())
     {
         m_currentPlayingAnimation = nullptr;
@@ -62,6 +68,9 @@ void Weapon::UpdateAnimation(float const deltaSeconds)
 
 void Weapon::Render() const
 {
+	if (m_definition == nullptr || m_definition->m_hud == nullptr)
+		return;
+
     g_theRenderer->BindShader(m_definition->m_hud->m_shader);
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
     RenderWeaponBase();
@@ -91,10 +100,10 @@ void Weapon::RenderWeaponReticle() const
     Texture* reticleTexture   = m_definition->m_hud->m_reticleTexture;
     Vec2     reticleDimension = Vec2(reticleTexture->GetDimensions().x, reticleTexture->GetDimensions().y);
 
-    Vec2  reticleSpriteOffSet = -reticleDimension * m_definition->m_hud->m_spritePivot;
+    Vec2 reticleSpriteOffSet = -reticleDimension * m_definition->m_hud->m_spritePivot;
 
     // AABB2 reticleBound        = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
-    AABB2 reticleBound        = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
+    AABB2 reticleBound = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
 
 
     /// Change the dimension base on split screen y
@@ -161,6 +170,7 @@ void Weapon::RenderWeaponAnim() const
     bound.m_mins += spriteOffSet;
     bound.m_maxs += spriteOffSet;
     bound.Translate(Vec2(0.f, m_hudBaseBound.m_maxs.y)); // Shitty hardcode
+    DebuggerPrintf("UVMin(%f, %f)|UVMax(%f, %f)\n", uvAtTime.m_mins.x, uvAtTime.m_mins.y, uvAtTime.m_maxs.x, uvAtTime.m_maxs.y);
     AddVertsForAABB2D(vertexes, bound, Rgba8::WHITE, uvAtTime.m_mins, uvAtTime.m_maxs);
     AddVertsForAABB2D(vertexes, uvAtTime, Rgba8::WHITE);
     g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
@@ -203,8 +213,8 @@ void Weapon::Fire()
             EulerAngles const fireOrientation = m_owner->m_orientation;
             fireOrientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
             ActorHandle           impactedActorHandle;
-            RaycastResult3D const result = m_owner->m_map->RaycastAll(m_owner, impactedActorHandle, fireEyePosition, forward, 10.f);
-            Actor* impactedActor = m_owner->m_map->GetActorByHandle(impactedActorHandle);
+            RaycastResult3D const result        = m_owner->m_map->RaycastAll(m_owner, impactedActorHandle, fireEyePosition, forward, 10.f);
+            Actor*                impactedActor = m_owner->m_map->GetActorByHandle(impactedActorHandle);
 
             if (result.m_didImpact)
             {
@@ -212,8 +222,10 @@ void Weapon::Fire()
                 // DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::X_RAY);
                 // DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
                 SpawnInfo particleSpawnInfo;
-                particleSpawnInfo.m_position  = result.m_impactPosition;
-                particleSpawnInfo.m_name = "BulletHit";
+                particleSpawnInfo.m_position = result.m_impactPosition;
+                particleSpawnInfo.m_position.x = GetClamped(particleSpawnInfo.m_position.x, 0.f, 31.f);
+                particleSpawnInfo.m_position.y = GetClamped(particleSpawnInfo.m_position.y, 0.f, 31.f);
+                particleSpawnInfo.m_name     = "BulletHit";
                 g_theGame->m_currentMap->SpawnActor(particleSpawnInfo);
             }
             else
@@ -229,10 +241,9 @@ void Weapon::Fire()
                 float damage = g_theRNG->RollRandomFloatInRange(m_definition->m_rayDamage.m_min, m_definition->m_rayDamage.m_max);
 
                 SpawnInfo particleSpawnInfo;
-                particleSpawnInfo.m_position  =result.m_impactPosition;
-                particleSpawnInfo.m_name = "BulletHit";
+                particleSpawnInfo.m_position   = result.m_impactPosition;
+                particleSpawnInfo.m_name       = "BloodSplatter";
                 g_theGame->m_currentMap->SpawnActor(particleSpawnInfo);
-
             }
             rayCount--;
         }

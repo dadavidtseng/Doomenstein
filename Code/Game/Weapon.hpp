@@ -20,6 +20,7 @@ class Weapon
 {
 public:
     explicit Weapon(Actor* owner, WeaponDefinition const* weaponDef);
+    ~Weapon();
     void Update(float deltaSeconds) ;
     void UpdateAnimation(float deltaSeconds) ;
     void     Render() const;

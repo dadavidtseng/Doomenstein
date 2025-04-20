@@ -45,17 +45,15 @@ Map::Map(Game*                owner,
     CreateTiles();
     CreateGeometry();
 
-    // SpawnInfo particleSpawnInfo;
-    // particleSpawnInfo.m_position  = Vec3(29.5f,10.5f,0.f);
-    // particleSpawnInfo.m_name = "BulletHit";
-    // SpawnActor(particleSpawnInfo);
+    SpawnInfo particleSpawnInfo;
+    particleSpawnInfo.m_position = Vec3(29.5f, 10.5f, 0.f);
+    particleSpawnInfo.m_name     = "BulletHit";
+    SpawnActor(particleSpawnInfo);
 
     for (SpawnInfo const& spawnInfo : m_mapDefinition->m_spawnInfos)
     {
-SpawnActor(spawnInfo);
+        SpawnActor(spawnInfo);
     }
-
-
 
 
     m_game->SpawnPlayerController();
@@ -77,7 +75,13 @@ Map::~Map()
 //----------------------------------------------------------------------------------------------------
 void Map::CreateTiles()
 {
-    for (int i = 0; i < m_dimensions.x; ++i) { for (int j = 0; j < m_dimensions.y; ++j) { m_tiles.emplace_back(); } }
+    for (int i = 0; i < m_dimensions.x; ++i)
+    {
+        for (int j = 0; j < m_dimensions.y; ++j)
+        {
+            m_tiles.emplace_back();
+        }
+    }
 
     for (int i = 0; i < m_dimensions.x; ++i)
     {
@@ -220,7 +224,10 @@ bool Map::IsPositionInBounds(Vec3 const& position,
 }
 
 //----------------------------------------------------------------------------------------------------
-bool Map::IsTileCoordsOutOfBounds(IntVec2 const& tileCoords) const { return IsTileCoordsOutOfBounds(tileCoords.x, tileCoords.y); }
+bool Map::IsTileCoordsOutOfBounds(IntVec2 const& tileCoords) const
+{
+    return IsTileCoordsOutOfBounds(tileCoords.x, tileCoords.y);
+}
 
 //----------------------------------------------------------------------------------------------------
 bool Map::IsTileCoordsOutOfBounds(int const x,
@@ -421,9 +428,9 @@ void Map::CollideActorWithMap(Actor* actor) const
 void Map::PushActorOutOfTileIfSolid(Actor*         actor,
                                     IntVec2 const& tileCoords) const
 {
-    if (!IsTileSolid(tileCoords)) return;
-
     if (IsTileCoordsOutOfBounds(tileCoords)) return;
+
+    if (!IsTileSolid(tileCoords)) return;
 
     if (actor == nullptr) return;
 
@@ -772,9 +779,9 @@ Actor* Map::SpawnActor(SpawnInfo const& spawnInfo)
     newActor->m_handle       = handle;
     newActor->m_map          = this;
 
-        newActor->m_aiController = new AIController(this);
-        newActor->m_controller   = newActor->m_aiController;
-        newActor->m_aiController->Possess(newActor->m_handle);
+    newActor->m_aiController = new AIController(this);
+    newActor->m_controller   = newActor->m_aiController;
+    newActor->m_aiController->Possess(newActor->m_handle);
 
 
     m_actors.push_back(newActor);

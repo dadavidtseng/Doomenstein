@@ -81,7 +81,6 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 void Actor::Update(float const deltaSeconds)
 {
     if (m_isDead || m_definition->m_dieOnSpawn)
-    // if (m_isDead)
     {
         PlayAnimationByName("Death", true);
         m_isDead = true;
