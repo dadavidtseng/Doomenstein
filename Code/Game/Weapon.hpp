@@ -35,7 +35,8 @@ public:
 
     Actor*                  m_owner      = nullptr;
     WeaponDefinition const* m_definition = nullptr;     // Reference to our weapon definition.
-    Timer*                  m_timer      = nullptr;
+    // Timer*                  m_timer      = nullptr;
+    float                   m_lastFireTime = 0.f;
 
     AABB2 m_hudBaseBound; // we calculate the bound that Seamlessly connect the weapon texture
 

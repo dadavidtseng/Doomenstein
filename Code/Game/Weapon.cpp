@@ -31,9 +31,9 @@ Weapon::Weapon(Actor*                  owner,
     : m_owner(owner),
       m_definition(weaponDef)
 {
-    m_timer              = new Timer(m_definition->m_refireTime, g_theGame->m_gameClock);
-    m_timer->m_startTime = g_theGame->m_gameClock->GetTotalSeconds();
-    m_animationTimer     = new Timer(0, g_theGame->m_gameClock);
+    // m_timer              = new Timer(m_definition->m_refireTime, g_theGame->m_gameClock);
+    // m_timer->m_startTime = g_theGame->m_gameClock->GetTotalSeconds();
+    m_animationTimer     = new Timer(2.f, g_theGame->m_gameClock);
 
     /// Init hud base bound
     if (m_definition->m_hud != nullptr)
@@ -59,8 +59,10 @@ void Weapon::UpdateAnimation(float const deltaSeconds)
 {
     UNUSED(deltaSeconds)
     if (!m_currentPlayingAnimation) return;
+    DebuggerPrintf("(%d, %d)\n",m_currentPlayingAnimation->m_cellCount.x, m_currentPlayingAnimation->m_cellCount.y);
     if (m_animationTimer->GetElapsedTime() > m_currentPlayingAnimation->GetAnimationLength())
     {
+        // DebuggerPrintf("(%d, %d)\n",m_currentPlayingAnimation->m_cellCount.x, m_currentPlayingAnimation->m_cellCount.y);
         m_currentPlayingAnimation = nullptr;
         m_animationTimer->Stop();
     }
@@ -68,8 +70,7 @@ void Weapon::UpdateAnimation(float const deltaSeconds)
 
 void Weapon::Render() const
 {
-	if (m_definition == nullptr || m_definition->m_hud == nullptr)
-		return;
+    if (m_definition == nullptr || m_definition->m_hud == nullptr) return;
 
     g_theRenderer->BindShader(m_definition->m_hud->m_shader);
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
@@ -150,8 +151,8 @@ void Weapon::RenderWeaponAnim() const
     {
         animation = &m_definition->m_hud->GetAnimations()[0];
     }
-    const SpriteAnimDefinition* anim         = animation->GetAnimationDefinition();
-    const SpriteDefinition      spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime());
+    SpriteAnimDefinition const* anim         = animation->GetAnimationDefinition();
+    SpriteDefinition const      spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime());
     AABB2                       uvAtTime     = spriteAtTime.GetUVs();
 
     Vec2 spriteOffSet = -Vec2(m_definition->m_hud->m_spriteSize) * m_definition->m_hud->m_spritePivot;
@@ -170,7 +171,6 @@ void Weapon::RenderWeaponAnim() const
     bound.m_mins += spriteOffSet;
     bound.m_maxs += spriteOffSet;
     bound.Translate(Vec2(0.f, m_hudBaseBound.m_maxs.y)); // Shitty hardcode
-    DebuggerPrintf("UVMin(%f, %f)|UVMax(%f, %f)\n", uvAtTime.m_mins.x, uvAtTime.m_mins.y, uvAtTime.m_maxs.x, uvAtTime.m_maxs.y);
     AddVertsForAABB2D(vertexes, bound, Rgba8::WHITE, uvAtTime.m_mins, uvAtTime.m_maxs);
     AddVertsForAABB2D(vertexes, uvAtTime, Rgba8::WHITE);
     g_theRenderer->BindTexture(&spriteAtTime.GetTexture());
@@ -188,7 +188,11 @@ void Weapon::Fire()
     int projectileCount = m_definition->m_projectileCount;
     int meleeCount      = m_definition->m_meleeCount;
 
-    if (m_timer->HasPeriodElapsed())
+    // if (m_timer->HasPeriodElapsed())
+
+    float m_currentFireTime   = (float)g_theGame->m_gameClock->GetTotalSeconds();
+    float m_timeSinceLastFire = m_currentFireTime - m_lastFireTime;
+    if (m_timeSinceLastFire > m_definition->m_refireTime)
     {
         // m_owner->m_controller->m_state = "Attack";
         if (m_definition->m_hud)
@@ -202,7 +206,8 @@ void Weapon::Fire()
             player->GetActor()->PlayAnimationByName("Attack");
         }
 
-        m_timer->DecrementPeriodIfElapsed();
+        // m_timer->DecrementPeriodIfElapsed();
+        m_lastFireTime = m_currentFireTime;
         if (m_owner == nullptr) return;
         while (rayCount > 0)
         {
@@ -222,10 +227,10 @@ void Weapon::Fire()
                 // DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::X_RAY);
                 // DebugAddWorldCylinder(fireEyePosition - Vec3::Z_BASIS * 0.05f, result.m_impactPosition, 0.01f, 10.f, false, Rgba8::BLUE, Rgba8::BLUE, DebugRenderMode::USE_DEPTH);
                 SpawnInfo particleSpawnInfo;
-                particleSpawnInfo.m_position = result.m_impactPosition;
+                particleSpawnInfo.m_position   = result.m_impactPosition;
                 particleSpawnInfo.m_position.x = GetClamped(particleSpawnInfo.m_position.x, 0.f, 31.f);
                 particleSpawnInfo.m_position.y = GetClamped(particleSpawnInfo.m_position.y, 0.f, 31.f);
-                particleSpawnInfo.m_name     = "BulletHit";
+                particleSpawnInfo.m_name       = "BulletHit";
                 g_theGame->m_currentMap->SpawnActor(particleSpawnInfo);
             }
             else
@@ -241,8 +246,8 @@ void Weapon::Fire()
                 float damage = g_theRNG->RollRandomFloatInRange(m_definition->m_rayDamage.m_min, m_definition->m_rayDamage.m_max);
 
                 SpawnInfo particleSpawnInfo;
-                particleSpawnInfo.m_position   = result.m_impactPosition;
-                particleSpawnInfo.m_name       = "BloodSplatter";
+                particleSpawnInfo.m_position = result.m_impactPosition;
+                particleSpawnInfo.m_name     = "BloodSplatter";
                 g_theGame->m_currentMap->SpawnActor(particleSpawnInfo);
             }
             rayCount--;
