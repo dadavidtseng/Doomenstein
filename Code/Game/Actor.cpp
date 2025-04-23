@@ -188,7 +188,7 @@ void Actor::Render(PlayerController const* toPlayer) const
         animationGroup = &m_definition->m_animationGroup[0];
     }
 
-    const SpriteAnimDefinition* anim = &animationGroup->GetSpriteAnimation(viewingDirection);
+    SpriteAnimDefinition const* anim = &animationGroup->GetSpriteAnimation(viewingDirection);
 
     SpriteDefinition const spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime() * 1); // TODO: Handle animation speed.
     AABB2                  uvAtTime     = spriteAtTime.GetUVs();

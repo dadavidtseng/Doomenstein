@@ -33,7 +33,7 @@ Weapon::Weapon(Actor*                  owner,
 {
     // m_timer              = new Timer(m_definition->m_refireTime, g_theGame->m_gameClock);
     // m_timer->m_startTime = g_theGame->m_gameClock->GetTotalSeconds();
-    m_animationTimer     = new Timer(2.f, g_theGame->m_gameClock);
+    m_animationTimer = new Timer(3.f, g_theGame->m_gameClock);
 
     /// Init hud base bound
     if (m_definition->m_hud != nullptr)
@@ -52,6 +52,8 @@ Weapon::~Weapon()
 
 void Weapon::Update(float const deltaSeconds)
 {
+    // DebuggerPrintf("(%f)Weapon::Update\n", m_currentPlayingAnimation.Get);
+
     UpdateAnimation(deltaSeconds);
 }
 
@@ -59,10 +61,10 @@ void Weapon::UpdateAnimation(float const deltaSeconds)
 {
     UNUSED(deltaSeconds)
     if (!m_currentPlayingAnimation) return;
-    DebuggerPrintf("(%d, %d)\n",m_currentPlayingAnimation->m_cellCount.x, m_currentPlayingAnimation->m_cellCount.y);
+    // DebuggerPrintf("(%f, %f)\n", m_animationTimer->GetElapsedTime(), m_currentPlayingAnimation->GetAnimationLength());
     if (m_animationTimer->GetElapsedTime() > m_currentPlayingAnimation->GetAnimationLength())
     {
-        // DebuggerPrintf("(%d, %d)\n",m_currentPlayingAnimation->m_cellCount.x, m_currentPlayingAnimation->m_cellCount.y);
+        // DebuggerPrintf("(%d, %d)\n",m_animationTimer->GetElapsedTime(), m_currentPlayingAnimation->GetAnimationLength());
         m_currentPlayingAnimation = nullptr;
         m_animationTimer->Stop();
     }
@@ -154,7 +156,7 @@ void Weapon::RenderWeaponAnim() const
     SpriteAnimDefinition const* anim         = animation->GetAnimationDefinition();
     SpriteDefinition const      spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime());
     AABB2                       uvAtTime     = spriteAtTime.GetUVs();
-
+// DebuggerPrintf("(RenderWeaponAnim   %f\n", m_animationTimer->GetElapsedTime());
     Vec2 spriteOffSet = -Vec2(m_definition->m_hud->m_spriteSize) * m_definition->m_hud->m_spritePivot;
 
     IntVec2 boundSize = m_definition->m_hud->m_spriteSize;
@@ -208,7 +210,7 @@ void Weapon::Fire()
 
         // m_timer->DecrementPeriodIfElapsed();
         m_lastFireTime = m_currentFireTime;
-        if (m_owner == nullptr) return;
+        // if (m_owner == nullptr) return;
         while (rayCount > 0)
         {
             float             rayRange = m_definition->m_rayRange;
@@ -321,41 +323,44 @@ void Weapon::Fire()
 
 Animation* Weapon::PlayAnimationByName(std::string animationName, bool force)
 {
+
     Animation* weaponAnim = m_definition->m_hud->GetAnimationByName(animationName);
     if (weaponAnim)
     {
         if (weaponAnim == m_currentPlayingAnimation)
         {
+            DebuggerPrintf("CHECK C %f\n", m_animationTimer->GetElapsedTime());
+
             return weaponAnim;
         }
-        else
+
+        /// We want to replace to new animation, force update it whether or not it finished
+        if (force)
         {
-            /// We want to replace to new animation, force update it whether or not it finished
-            if (force)
+            m_currentPlayingAnimation = weaponAnim;
+            m_animationTimer->Start();
+            return weaponAnim;
+        }
+
+        if (m_currentPlayingAnimation)
+        {
+            DebuggerPrintf("CHECK A %f\n", m_animationTimer->GetElapsedTime());
+
+            bool isCurrentAnimFinished = m_animationTimer->GetElapsedTime() >= m_currentPlayingAnimation->GetAnimationLength();
+            if (isCurrentAnimFinished)
             {
                 m_currentPlayingAnimation = weaponAnim;
                 m_animationTimer->Start();
                 return weaponAnim;
             }
-            else
-            {
-                if (m_currentPlayingAnimation)
-                {
-                    bool isCurrentAnimFinished = m_animationTimer->GetElapsedTime() >= m_currentPlayingAnimation->GetAnimationLength();
-                    if (isCurrentAnimFinished)
-                    {
-                        m_currentPlayingAnimation = weaponAnim;
-                        m_animationTimer->Start();
-                        return weaponAnim;
-                    }
-                }
-                else
-                {
-                    m_currentPlayingAnimation = weaponAnim;
-                    m_animationTimer->Start();
-                    return weaponAnim;
-                }
-            }
+        }
+        else
+        {
+            DebuggerPrintf("CHECK B %f\n", m_animationTimer->GetElapsedTime());
+
+            m_currentPlayingAnimation = weaponAnim;
+            m_animationTimer->Start();
+            return weaponAnim;
         }
     }
     return nullptr;
