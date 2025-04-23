@@ -54,8 +54,9 @@ private:
 
     void InitializeMaps();
 
-    Camera*           m_screenCamera     = nullptr;
-    PlayerController* m_playerController = nullptr;
-    eGameState        m_currentGameState = eGameState::ATTRACT;
-    std::vector<Map*> m_maps;
+    Camera*                        m_screenCamera     = nullptr;
+    PlayerController*              m_playerController = nullptr;
+    eGameState                     m_currentGameState = eGameState::ATTRACT;
+    std::vector<Map*>              m_maps;
+    std::vector<PlayerController*> m_localPlayerControllerList;
 };

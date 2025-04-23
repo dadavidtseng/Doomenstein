@@ -172,7 +172,10 @@ void PlayerController::Render() const
 
     DebugAddScreenText(Stringf("Name:%s/Health:%d", possessedActorName.c_str(), possessedActorHealth), Vec2(0.f, 20.f), 20.f, Vec2::ZERO, 0.f);
 
-    if (possessedActor->m_currentWeapon) possessedActor->m_currentWeapon->Render();
+    if (possessedActor->m_currentWeapon)
+    {
+        possessedActor->m_currentWeapon->Render();
+    }
 }
 
 //----------------------------------------------------------------------------------------------------

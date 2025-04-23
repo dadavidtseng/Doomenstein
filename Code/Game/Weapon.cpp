@@ -12,6 +12,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Math/RandomNumberGenerator.hpp"
 #include "Engine/Math/RaycastUtils.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Game/Actor.hpp"
@@ -132,15 +133,16 @@ void Weapon::RenderWeaponHudText() const
     BitmapFont* g_testFont     = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont");
     AABB2       boundingBox    = m_hudBaseBound;
     Vec2        dim            = boundingBox.GetDimensions();
+    m_owner->m_controller->m_screenViewport = boundingBox;
     AABB2       screenViewport = m_owner->m_controller->m_screenViewport;
     float       multiplier     = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
-    // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", (int)m_owner->m_health), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier, Vec2(0.29f, 0.5f));
+    g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", (int)m_owner->m_health), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier, Vec2(0.29f, 0.5f));
     // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", PlayerSaveSubsystem::GetPlayerSaveData(player->m_index)->m_numOfKilled), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier,
-    //                                    Vec2(0.05f, 0.5f));
+                                       // Vec2(0.05f, 0.5f));
     // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", PlayerSaveSubsystem::GetPlayerSaveData(player->m_index)->m_numOfDeaths), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier,
-    //                                    Vec2(0.95f, 0.5f));
-    // g_theRenderer->BindTexture(&g_testFont->GetTexture());
-    // g_theRenderer->DrawVertexArray(vertexes);
+                                       // Vec2(0.95f, 0.5f));
+    g_theRenderer->BindTexture(&g_testFont->GetTexture());
+    g_theRenderer->DrawVertexArray(vertexes);
     // g_theRenderer->BindTexture(nullptr);
 }
 
