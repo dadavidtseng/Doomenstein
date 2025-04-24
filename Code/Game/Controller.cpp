@@ -63,7 +63,7 @@ AABB2 Controller::SetViewport(AABB2 viewPort)
 }
 
 
-int Controller::GetControllerIndex()
+int Controller::GetControllerIndex() const
 {
     return m_index;
 }

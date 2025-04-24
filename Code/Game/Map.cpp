@@ -54,17 +54,18 @@ Map::Map(Game*                owner,
     {
         SpawnActor(spawnInfo);
     }
+    // m_game->SpawnPlayerController();
 
-    // for (PlayerController* controller : g_theGame->m_localPlayerControllerList)
-    // {
-    //     m_game->SpawnPlayerController();
-    //
-    //     Actor* playerActor = SpawnPlayer(controller);
-    //     controller->Possess(playerActor->m_handle);
-    // }
-    m_game->SpawnPlayerController();
-    Actor const* playerActor = SpawnPlayer(m_game->GetPlayerController());
-    m_game->GetPlayerController()->Possess(playerActor->m_handle);
+    g_theGame->CreateLocalPlayer(0, eDeviceType::KEYBOARD_AND_MOUSE);
+    // g_theGame->CreateLocalPlayer(1, eDeviceType::KEYBOARD_AND_MOUSE);
+
+    for (PlayerController* controller : g_theGame->m_localPlayerControllerList)
+    {
+        Actor* playerActor = SpawnPlayer(controller);
+        controller->Possess(playerActor->m_handle);
+    }
+    // Actor const* playerActor = SpawnPlayer(m_game->GetPlayerController());
+    // m_game->GetPlayerController()->Possess(playerActor->m_handle);
 }
 
 //----------------------------------------------------------------------------------------------------

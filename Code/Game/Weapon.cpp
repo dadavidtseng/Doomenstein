@@ -43,6 +43,8 @@ Weapon::Weapon(Actor*                  owner,
         IntVec2  baseDimension = baseTexture->GetDimensions();
         float    multiplier    = g_theGame->m_screenSpace.m_maxs.x / (float)baseDimension.x;
         m_hudBaseBound         = AABB2(Vec2(0.0f, 0.0f), Vec2(g_theGame->m_screenSpace.m_maxs.x, (float)baseDimension.y * multiplier));
+
+
     }
 }
 
@@ -56,6 +58,13 @@ void Weapon::Update(float const deltaSeconds)
     // DebuggerPrintf("(%f)Weapon::Update\n", m_currentPlayingAnimation.Get);
 
     UpdateAnimation(deltaSeconds);
+
+    if (m_owner->m_controller!=nullptr&&
+           m_owner->m_controller->GetControllerIndex() == 1)
+    {
+        m_hudBaseBound.m_mins=Vec2(0.f,400.f);
+        m_hudBaseBound.m_maxs=Vec2(1600.f,517.f);
+    }
 }
 
 void Weapon::UpdateAnimation(float const deltaSeconds)

@@ -31,7 +31,7 @@ public:
     AABB2 SetViewport(AABB2 viewPort);
 
     /// Getter
-    int GetControllerIndex();
+    int GetControllerIndex() const;
 
     // The reference to controller's actor is by actor handle.
     ActorHandle m_actorHandle;           // Handle of our currently possessed actor or INVALID if no actor is possessed.

@@ -93,9 +93,9 @@ void Game::Render() const
 {
     //-Start-of-Game-Camera---------------------------------------------------------------------------
 
-    if (m_playerController != nullptr)
-    {
-        g_theRenderer->BeginCamera(*m_playerController->m_worldCamera);
+    // if (m_playerController != nullptr)
+    // {
+        // g_theRenderer->BeginCamera(*m_playerController->m_worldCamera);
 
         if (m_currentGameState == eGameState::INGAME)
         {
@@ -108,11 +108,11 @@ void Game::Render() const
                     m_currentMap->Render(player);
                     g_theRenderer->EndCamera(*player->m_worldCamera);
                 }
-                m_currentMap->Render(m_playerController);
+                // m_currentMap->Render(m_playerController);
             }
-        }
+        // }
 
-        g_theRenderer->EndCamera(*m_playerController->m_worldCamera);
+        // g_theRenderer->EndCamera(*m_playerController->m_worldCamera);
     }
 
     //-End-of-Game-Camera-----------------------------------------------------------------------------
@@ -186,6 +186,14 @@ void Game::UpdateFromKeyBoard()
             App::RequestQuit();
         }
 
+        XboxController controller = g_theInput->GetController(0);
+
+
+        if (g_theInput->WasKeyJustPressed(KEYCODE_I)&&controller.IsConnected())
+        {
+            CreateLocalPlayer(1,eDeviceType::KEYBOARD_AND_MOUSE);
+        }
+
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
         {
             ChangeState(m_currentGameState = eGameState::INGAME);
@@ -239,6 +247,8 @@ void Game::UpdateFromKeyBoard()
         {
             DebugAddMessage(Stringf("PlayerController Position: (%.2f, %.2f, %.2f)", m_playerController->m_position.x, m_playerController->m_position.y, m_playerController->m_position.z), 0.f);
         }
+
+
     }
 }
 
@@ -313,27 +323,27 @@ void Game::UpdateFromController()
 //----------------------------------------------------------------------------------------------------
 void Game::UpdatePlayerController(float const deltaSeconds) const
 {
-    if (m_playerController != nullptr &&
-        m_currentGameState == eGameState::INGAME)
-    {
-        float systemDeltaSeconds = (float)Clock::GetSystemClock().GetDeltaSeconds();
-        m_playerController->Update(systemDeltaSeconds);
-    }
+    // if (m_playerController != nullptr &&
+    //     m_currentGameState == eGameState::INGAME)
+    // {
+    //     float systemDeltaSeconds = (float)Clock::GetSystemClock().GetDeltaSeconds();
+    //     m_playerController->Update(systemDeltaSeconds);
+    // }
 
     DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / deltaSeconds, m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
 
     /// PlayerController
-    // if (m_currentGameState == eGameState::INGAME)
-    // {
-    //     for (PlayerController* controller : m_localPlayerControllerList)
-    //     {
-    //         controller->Update((float)Clock::GetSystemClock().GetDeltaSeconds());
-    //         DebugAddMessage(Stringf("PlayerController position: %.2f, %.2f, %.2f", controller->m_position.x, controller->m_position.y, controller->m_position.z), 0);
-    //         DebugAddMessage(Stringf("PlayerController orientation: %.2f, %.2f, %.2f", controller->m_orientation.m_yawDegrees, controller->m_orientation.m_pitchDegrees,
-    //                                 controller->m_orientation.m_rollDegrees),
-    //                         0);
-    //     }
-    // }
+    if (m_currentGameState == eGameState::INGAME)
+    {
+        for (PlayerController* controller : m_localPlayerControllerList)
+        {
+            controller->Update((float)Clock::GetSystemClock().GetDeltaSeconds());
+            DebugAddMessage(Stringf("PlayerController position: %.2f, %.2f, %.2f", controller->m_position.x, controller->m_position.y, controller->m_position.z), 0);
+            DebugAddMessage(Stringf("PlayerController orientation: %.2f, %.2f, %.2f", controller->m_orientation.m_yawDegrees, controller->m_orientation.m_pitchDegrees,
+                                    controller->m_orientation.m_rollDegrees),
+                            0);
+        }
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -354,22 +364,43 @@ void Game::RenderAttractMode() const
 //----------------------------------------------------------------------------------------------------
 void Game::RenderInGame() const
 {
-    if (m_playerController->m_isCameraMode)
+    for (PlayerController* controller : m_localPlayerControllerList)
     {
-        DebugAddScreenText(Stringf("(F1)Control Mode:Player Camera"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
+        if (controller != nullptr&&controller->m_isCameraMode)
+        {
+            DebugAddScreenText(Stringf("(F1)Control Mode:Player Camera"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
+        }
+        else
+        {
+            DebugAddScreenText(Stringf("(F1)Control Mode:Actor"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
+        }
     }
-    else
-    {
-        DebugAddScreenText(Stringf("(F1)Control Mode:Actor"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
-    }
+    // if (m_playerController->m_isCameraMode)
+    // {
+    //     DebugAddScreenText(Stringf("(F1)Control Mode:Player Camera"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
+    // }
+    // else
+    // {
+    //     DebugAddScreenText(Stringf("(F1)Control Mode:Actor"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
+    // }
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::RenderPlayerController() const
 {
-    if (m_playerController == nullptr) return;
-    // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
-    m_playerController->Render();
+    for (PlayerController* controller : m_localPlayerControllerList)
+    {
+        if (controller!=nullptr)
+        {
+            controller->Render();
+        }
+    }
+
+    // if (m_playerController == nullptr) return;
+    // // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
+    // m_playerController->Render();
+
+
 }
 
 PlayerController* Game::CreateLocalPlayer(int id, eDeviceType deviceType)
@@ -434,7 +465,11 @@ bool Game::GetIsSingleMode() const
 //----------------------------------------------------------------------------------------------------
 void Game::SpawnPlayerController()
 {
-    m_playerController = new PlayerController(m_currentMap);
+    // m_localPlayerControllerList.push_back(new PlayerController(m_currentMap));
+    // m_localPlayerControllerList[0]->SetControllerIndex(0);
+    // m_localPlayerControllerList.push_back(new PlayerController(m_currentMap));
+    // m_localPlayerControllerList[1]->SetControllerIndex(1);
+    // m_playerController = new PlayerController(m_currentMap);
 }
 
 //----------------------------------------------------------------------------------------------------

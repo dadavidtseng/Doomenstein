@@ -40,6 +40,11 @@ public:
     eGameState        GetGameState() const;
     void              ChangeState(eGameState nextState);
     void              SpawnPlayerController();
+    PlayerController* CreateLocalPlayer(int id, eDeviceType deviceType);
+    void              RemoveLocalPlayer(int id); // Remove local player by its unique id and automatically shrink the controller container.
+    PlayerController* GetLocalPlayer(int id); // Return the PlayerController with specific controller id.
+    PlayerController* GetControllerByDeviceType(eDeviceType deviceType); // Return the first found controller that has the specific device type.
+    bool              GetIsSingleMode() const;
     Clock*            m_gameClock = nullptr;
     AABB2             m_screenSpace;
     AABB2             m_worldSpace;
@@ -52,11 +57,7 @@ private:
     void RenderAttractMode() const;
     void RenderInGame() const;
     void RenderPlayerController() const;
-    PlayerController* CreateLocalPlayer(int id, eDeviceType deviceType);
-    void              RemoveLocalPlayer(int id); // Remove local player by its unique id and automatically shrink the controller container.
-    PlayerController* GetLocalPlayer(int id); // Return the PlayerController with specific controller id.
-    PlayerController* GetControllerByDeviceType(eDeviceType deviceType); // Return the first found controller that has the specific device type.
-    bool              GetIsSingleMode() const;
+
 
     void InitializeMaps();
 
