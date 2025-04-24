@@ -74,7 +74,7 @@ void AIController::Update(float const deltaSeconds)
         if (distanceToTarget < possessedActor->m_currentWeapon->m_definition->m_meleeRange + targetActor->m_radius)
         {
             possessedActor->m_currentWeapon->Fire();
-            possessedActor->PlayAnimationByName("Attack",true);
+            possessedActor->PlayAnimationByName("Attack", true);
         }
     }
 }

@@ -5,6 +5,9 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Controller.hpp"
 
+#include "Game.hpp"
+#include "GameCommon.hpp"
+#include "Engine/Renderer/Camera.hpp"
 #include "Game/Actor.hpp"
 #include "Game/Map.hpp"
 
@@ -43,4 +46,24 @@ void Controller::Possess(ActorHandle const& actorHandle)
 Actor* Controller::GetActor()
 {
     return m_map->GetActorByHandle(m_actorHandle);
+}
+
+void Controller::SetControllerIndex(int index)
+{
+    m_index = index;
+}
+
+AABB2 Controller::SetViewport(AABB2 viewPort)
+{
+    m_viewport = viewPort;
+    m_worldCamera->SetNormalizedViewport(viewPort);
+    m_viewCamera->SetNormalizedViewport(viewPort);
+    m_screenViewport = m_viewCamera->GetViewPortUnnormalized(Vec2(g_theGame->m_screenSpace.GetDimensions().x, g_theGame->m_screenSpace.GetDimensions().y));
+    return viewPort;
+}
+
+
+int Controller::GetControllerIndex()
+{
+    return m_index;
 }

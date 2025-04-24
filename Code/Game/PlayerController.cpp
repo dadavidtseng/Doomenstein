@@ -12,6 +12,7 @@
 #include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Camera.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
+#include "Engine/Renderer/Renderer.hpp"
 #include "Game/Actor.hpp"
 #include "Game/ActorDefinition.hpp"
 #include "Game/Game.hpp"
@@ -22,7 +23,13 @@
 PlayerController::PlayerController(Map* owner)
     : Controller(owner)
 {
-    m_worldCamera = new Camera();
+    // m_worldCamera = new Camera();
+    m_worldCamera         = new Camera();
+    m_worldCamera->m_mode = Camera::eMode_Perspective;
+    m_worldCamera->SetOrthoGraphicView(Vec2(-1, -1), Vec2(1, 1));
+    m_viewCamera         = new Camera();
+    m_viewCamera->m_mode = Camera::eMode_Orthographic;
+    m_viewCamera->SetOrthoGraphicView(Vec2::ZERO, g_theGame->m_screenSpace.m_maxs); // TODO: use the normalized viewport
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -165,17 +172,43 @@ void PlayerController::Update(float deltaSeconds)
 //----------------------------------------------------------------------------------------------------
 void PlayerController::Render() const
 {
-    Actor const* possessedActor = m_map->GetActorByHandle(m_actorHandle);
-    if (possessedActor == nullptr) return;
-    String const possessedActorName   = possessedActor->m_definition->m_name;
-    int const    possessedActorHealth = possessedActor->m_health;
+    // Actor const* possessedActor = m_map->GetActorByHandle(m_actorHandle);
+    // if (possessedActor == nullptr) return;
+    // String const possessedActorName   = possessedActor->m_definition->m_name;
+    // int const    possessedActorHealth = possessedActor->m_health;
+    //
+    // DebugAddScreenText(Stringf("Name:%s/Health:%d", possessedActorName.c_str(), possessedActorHealth), Vec2(0.f, 20.f), 20.f, Vec2::ZERO, 0.f);
+    //
+    // if (possessedActor->m_currentWeapon)
+    // {
+    //     possessedActor->m_currentWeapon->Render();
+    // }
 
-    DebugAddScreenText(Stringf("Name:%s/Health:%d", possessedActorName.c_str(), possessedActorHealth), Vec2(0.f, 20.f), 20.f, Vec2::ZERO, 0.f);
-
-    if (possessedActor->m_currentWeapon)
+    g_theRenderer->BeginCamera(*m_viewCamera);
+    if (g_theGame->GetGameState() != eGameState::INGAME)
+        return;
+    if (!m_actorHandle.IsValid())
+        return;
+    if (m_isCameraMode)
+        return;
+    Actor* possessActor = m_map->GetActorByHandle(m_actorHandle);
+    if (possessActor->m_definition->m_name == "Marine")
     {
-        possessedActor->m_currentWeapon->Render();
+        if (possessActor->m_currentWeapon)
+            possessActor->m_currentWeapon->Render();
     }
+    g_theRenderer->EndCamera(*m_viewCamera);
+}
+
+eDeviceType PlayerController::SetInputDeviceType(eDeviceType newDeviceType)
+{
+    m_deviceType = newDeviceType;
+    return newDeviceType;
+}
+
+eDeviceType PlayerController::GetInputDeviceType() const
+{
+    return m_deviceType;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -223,6 +256,7 @@ void PlayerController::UpdateWorldCamera()
         // if (possessActor && !possessActor->m_isDead)
         if (possessedActor != nullptr)
         {
+            // m_worldCamera->SetOrthoGraphicView(Vec2(-1, -1), Vec2(1, 1));
             m_worldCamera->SetPerspectiveGraphicView(2.0f, possessedActor->m_definition->m_cameraFOV, 0.1f, 100.f);
             // Set the world camera to use the possessed actor's eye height and FOV.
             m_position = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, possessedActor->m_definition->m_eyeHeight);

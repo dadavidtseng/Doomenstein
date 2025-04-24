@@ -6,8 +6,6 @@
 #pragma once
 
 //----------------------------------------------------------------------------------------------------
-struct Rgba8;
-struct Vec2;
 class App;
 class AudioSystem;
 class BitmapFont;
@@ -22,12 +20,6 @@ extern BitmapFont*            g_theBitmapFont;
 extern Game*                  g_theGame;
 extern Renderer*              g_theRenderer;
 extern RandomNumberGenerator* g_theRNG;
-
-//-----------------------------------------------------------------------------------------------
-// initial settings
-//
-constexpr float SCREEN_SIZE_X = 1600.f;
-constexpr float SCREEN_SIZE_Y = 800.f;
 
 //----------------------------------------------------------------------------------------------------
 template <typename T>

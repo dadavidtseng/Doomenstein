@@ -62,10 +62,10 @@ void App::Startup()
     // Initialize devConsoleCamera
     m_devConsoleCamera = new Camera();
 
-    Vec2 const bottomLeft     = Vec2::ZERO;
-    float const screenSizeX = g_gameConfigBlackboard.GetValue("screenSizeX",-1.f);
-    float const screenSizeY = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
-    Vec2 const screenTopRight = Vec2(screenSizeX, screenSizeY);
+    Vec2 const  bottomLeft     = Vec2::ZERO;
+    float const screenSizeX    = g_gameConfigBlackboard.GetValue("screenSizeX", -1.f);
+    float const screenSizeY    = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
+    Vec2 const  screenTopRight = Vec2(screenSizeX, screenSizeY);
 
     m_devConsoleCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
 

@@ -119,7 +119,10 @@ void Actor::Render(PlayerController const* toPlayer) const
     // if (m_definition->m_billboardType == eBillboardType::WORLD_UP_FACING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_FACING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
     // if (m_definition->m_billboardType == eBillboardType::FULL_OPPOSING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::FULL_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
     // if (m_definition->m_billboardType == eBillboardType::WORLD_UP_OPPOSING)localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
-    if (m_definition->m_billboardType == eBillboardType::NONE) localToWorldMat = GetModelToWorldTransform();
+    if (m_definition->m_billboardType == eBillboardType::NONE)
+    {
+        localToWorldMat = GetModelToWorldTransform();
+    }
     else
     {
         if (m_definition->m_billboardType == eBillboardType::WORLD_UP_FACING)

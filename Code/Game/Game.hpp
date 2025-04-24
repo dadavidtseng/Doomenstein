@@ -9,6 +9,7 @@
 
 #include "Engine/Math/AABB2.hpp"
 
+enum class eDeviceType : int8_t;
 //----------------------------------------------------------------------------------------------------
 class Map;
 class Camera;
@@ -43,7 +44,7 @@ public:
     AABB2             m_screenSpace;
     AABB2             m_worldSpace;
     Map*              m_currentMap = nullptr;
-
+    std::vector<PlayerController*> m_localPlayerControllerList;
 private:
     void UpdateFromKeyBoard();
     void UpdateFromController();
@@ -51,6 +52,11 @@ private:
     void RenderAttractMode() const;
     void RenderInGame() const;
     void RenderPlayerController() const;
+    PlayerController* CreateLocalPlayer(int id, eDeviceType deviceType);
+    void              RemoveLocalPlayer(int id); // Remove local player by its unique id and automatically shrink the controller container.
+    PlayerController* GetLocalPlayer(int id); // Return the PlayerController with specific controller id.
+    PlayerController* GetControllerByDeviceType(eDeviceType deviceType); // Return the first found controller that has the specific device type.
+    bool              GetIsSingleMode() const;
 
     void InitializeMaps();
 
@@ -58,5 +64,5 @@ private:
     PlayerController*              m_playerController = nullptr;
     eGameState                     m_currentGameState = eGameState::ATTRACT;
     std::vector<Map*>              m_maps;
-    std::vector<PlayerController*> m_localPlayerControllerList;
+
 };

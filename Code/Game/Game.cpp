@@ -29,16 +29,16 @@ Game::Game()
 
     m_screenCamera = new Camera();
 
-    Vec2 const bottomLeft     = Vec2::ZERO;
-    float const screenSizeX = g_gameConfigBlackboard.GetValue("screenSizeX",-1.f);
-    float const screenSizeY = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
-    Vec2 const screenTopRight = Vec2(screenSizeX, screenSizeY);
+    Vec2 const  bottomLeft     = Vec2::ZERO;
+    float const screenSizeX    = g_gameConfigBlackboard.GetValue("screenSizeX", -1.f);
+    float const screenSizeY    = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
+    Vec2 const  screenTopRight = Vec2(screenSizeX, screenSizeY);
 
     /// Spaces
     m_screenSpace.m_mins = Vec2::ZERO;
     m_screenSpace.m_maxs = Vec2(g_gameConfigBlackboard.GetValue("screenSizeX", 1600.f), g_gameConfigBlackboard.GetValue("screenSizeY", 800.f));
-    // m_worldSpace.m_mins  = Vec2::ZERO;
-    // m_worldSpace.m_maxs  = Vec2(g_gameConfigBlackboard.GetValue("worldSizeX", 200.f), g_gameConfigBlackboard.GetValue("worldSizeY", 100.f));
+    m_worldSpace.m_mins  = Vec2::ZERO;
+    m_worldSpace.m_maxs  = Vec2(g_gameConfigBlackboard.GetValue("worldSizeX", 200.f), g_gameConfigBlackboard.GetValue("worldSizeY", 100.f));
 
     m_screenCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
 
@@ -99,9 +99,15 @@ void Game::Render() const
 
         if (m_currentGameState == eGameState::INGAME)
         {
-
             if (m_currentMap != nullptr)
             {
+                for (PlayerController* player : m_localPlayerControllerList)
+                {
+                    player->Render();
+                    g_theRenderer->BeginCamera(*player->m_worldCamera);
+                    m_currentMap->Render(player);
+                    g_theRenderer->EndCamera(*player->m_worldCamera);
+                }
                 m_currentMap->Render(m_playerController);
             }
         }
@@ -315,6 +321,19 @@ void Game::UpdatePlayerController(float const deltaSeconds) const
     }
 
     DebugAddScreenText(Stringf("Time: %.2f\nFPS: %.2f\nScale: %.1f", m_gameClock->GetTotalSeconds(), 1.f / deltaSeconds, m_gameClock->GetTimeScale()), m_screenCamera->GetOrthographicTopRight() - Vec2(250.f, 60.f), 20.f, Vec2::ZERO, 0.f, Rgba8::WHITE, Rgba8::WHITE);
+
+    /// PlayerController
+    // if (m_currentGameState == eGameState::INGAME)
+    // {
+    //     for (PlayerController* controller : m_localPlayerControllerList)
+    //     {
+    //         controller->Update((float)Clock::GetSystemClock().GetDeltaSeconds());
+    //         DebugAddMessage(Stringf("PlayerController position: %.2f, %.2f, %.2f", controller->m_position.x, controller->m_position.y, controller->m_position.z), 0);
+    //         DebugAddMessage(Stringf("PlayerController orientation: %.2f, %.2f, %.2f", controller->m_orientation.m_yawDegrees, controller->m_orientation.m_pitchDegrees,
+    //                                 controller->m_orientation.m_rollDegrees),
+    //                         0);
+    //     }
+    // }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -353,6 +372,65 @@ void Game::RenderPlayerController() const
     m_playerController->Render();
 }
 
+PlayerController* Game::CreateLocalPlayer(int id, eDeviceType deviceType)
+{
+    PlayerController* newPlayer = new PlayerController(nullptr);
+    newPlayer->SetInputDeviceType(deviceType);
+    for (PlayerController* m_local_player_controller : m_localPlayerControllerList)
+    {
+        if (m_local_player_controller && m_local_player_controller->GetControllerIndex() == id)
+        {
+            printf("Game::CreateLocalPlayer      You create the Player controller with same ID: %d\n", id);
+            return nullptr;
+        }
+    }
+    newPlayer->SetControllerIndex(id);
+    m_localPlayerControllerList.push_back(newPlayer);
+    printf("Game::CreateLocalPlayer     Create Local Player with id: %d\n", id);
+    return newPlayer;
+}
+
+void Game::RemoveLocalPlayer(int id)
+{
+    auto it = std::remove_if(m_localPlayerControllerList.begin(), m_localPlayerControllerList.end(),
+                             [id](PlayerController* controller) {
+                                 if (controller && controller->GetControllerIndex() == id)
+                                 {
+                                     printf("Game::RemoveLocalPlayer     Remove Local Player with id: %d\n", id);
+                                     delete controller;
+                                     return true;
+                                 }
+                                 return false;
+                             });
+    // Another solution rather tha use remove_if
+    // If you need to ensure that unused memory is freed, you can use the swap technique.
+    m_localPlayerControllerList.erase(it, m_localPlayerControllerList.end());
+    m_localPlayerControllerList.shrink_to_fit();
+}
+
+PlayerController* Game::GetLocalPlayer(int id)
+{
+    for (PlayerController* m_local_player_controller : m_localPlayerControllerList)
+    {
+        if (m_local_player_controller && m_local_player_controller->GetControllerIndex() == id) return m_local_player_controller;
+    }
+    return nullptr;
+}
+
+PlayerController* Game::GetControllerByDeviceType(eDeviceType deviceType)
+{
+    for (PlayerController* m_local_player_controller : m_localPlayerControllerList)
+    {
+        if (m_local_player_controller && m_local_player_controller->GetInputDeviceType() == deviceType) return m_local_player_controller;
+    }
+    return nullptr;
+}
+
+bool Game::GetIsSingleMode() const
+{
+    return m_localPlayerControllerList.size() == 1;
+}
+
 //----------------------------------------------------------------------------------------------------
 void Game::SpawnPlayerController()
 {
@@ -381,7 +459,7 @@ void Game::InitializeMaps()
 {
     MapDefinition::InitializeMapDefs("Data/Definitions/MapDefinitions.xml");
     TileDefinition::InitializeTileDefs("Data/Definitions/TileDefinitions.xml");
-     ActorDefinition::InitializeActorDefs("Data/Definitions/ProjectileActorDefinitions.xml");
+    ActorDefinition::InitializeActorDefs("Data/Definitions/ProjectileActorDefinitions.xml");
     WeaponDefinition::InitializeWeaponDefs("Data/Definitions/WeaponDefinitions.xml");
     ActorDefinition::InitializeActorDefs("Data/Definitions/ActorDefinitions.xml");
 
