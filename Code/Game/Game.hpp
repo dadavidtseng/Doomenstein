@@ -36,7 +36,7 @@ public:
     void              Render() const;
     bool              IsAttractMode() const;
     Map*              GetCurrentMap() const;
-    PlayerController* GetPlayerController() const;
+    // PlayerController* GetPlayerController() const;
     eGameState        GetGameState() const;
     void              ChangeState(eGameState nextState);
     void              SpawnPlayerController();
@@ -62,7 +62,7 @@ private:
     void InitializeMaps();
 
     Camera*                        m_screenCamera     = nullptr;
-    PlayerController*              m_playerController = nullptr;
+    // PlayerController*              m_playerController = nullptr;
     eGameState                     m_currentGameState = eGameState::ATTRACT;
     std::vector<Map*>              m_maps;
 

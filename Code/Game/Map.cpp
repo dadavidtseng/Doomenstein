@@ -288,12 +288,12 @@ void Map::Update(float const deltaSeconds)
     CollideActors();
     CollideActorsWithMap();
     DeleteDestroyedActor();
-    if (!m_game->GetPlayerController()->GetActor())
-    {
-        Actor const* playerActor = SpawnPlayer(m_game->GetPlayerController());
-
-        m_game->GetPlayerController()->Possess(playerActor->m_handle);
-    }
+    // if (!m_game->GetPlayerController()->GetActor())
+    // {
+    //     Actor const* playerActor = SpawnPlayer(m_game->GetPlayerController());
+    //
+    //     m_game->GetPlayerController()->Possess(playerActor->m_handle);
+    // }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -962,33 +962,33 @@ Actor const* Map::GetClosestVisibleEnemy(Actor const* owner) const
 // Have the player controller possess the next actor in the list that can be possessed.
 void Map::DebugPossessNext() const
 {
-    PlayerController* playerController = m_game->GetPlayerController();
-
-    if (playerController == nullptr) return;
-
-    Actor const* playerControlledActor = playerController->GetActor();
-    unsigned int startIndex            = 0;
-
-    if (playerControlledActor != nullptr)
-    {
-        startIndex = playerControlledActor->m_handle.GetIndex() + 1;
-    }
-
-    unsigned int const actorCount = static_cast<unsigned int>(m_actors.size());
-
-    if (actorCount == 0) return;
-
-    for (unsigned int i = 0; i < actorCount; i++)
-    {
-        unsigned int const desiredIndex   = (startIndex + i) % actorCount;
-        Actor const*       potentialActor = m_actors[desiredIndex];
-
-        if (potentialActor &&
-            potentialActor->m_handle.IsValid() &&
-            potentialActor->m_definition->m_canBePossessed)
-        {
-            playerController->Possess(potentialActor->m_handle);
-            return;
-        }
-    }
+    // PlayerController* playerController = m_game->GetPlayerController();
+    //
+    // if (playerController == nullptr) return;
+    //
+    // Actor const* playerControlledActor = playerController->GetActor();
+    // unsigned int startIndex            = 0;
+    //
+    // if (playerControlledActor != nullptr)
+    // {
+    //     startIndex = playerControlledActor->m_handle.GetIndex() + 1;
+    // }
+    //
+    // unsigned int const actorCount = static_cast<unsigned int>(m_actors.size());
+    //
+    // if (actorCount == 0) return;
+    //
+    // for (unsigned int i = 0; i < actorCount; i++)
+    // {
+    //     unsigned int const desiredIndex   = (startIndex + i) % actorCount;
+    //     Actor const*       potentialActor = m_actors[desiredIndex];
+    //
+    //     if (potentialActor &&
+    //         potentialActor->m_handle.IsValid() &&
+    //         potentialActor->m_definition->m_canBePossessed)
+    //     {
+    //         playerController->Possess(potentialActor->m_handle);
+    //         return;
+    //     }
+    // }
 }

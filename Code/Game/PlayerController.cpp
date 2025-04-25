@@ -31,6 +31,9 @@ PlayerController::PlayerController(Map* owner)
     m_viewCamera->m_mode = Camera::eMode_Orthographic;
     m_viewCamera->SetOrthoGraphicView(Vec2::ZERO, g_theGame->m_screenSpace.m_maxs); // TODO: use the normalized viewport
     // m_viewCamera->SetOrthoGraphicView(Vec2(0.f, 400.f), Vec2(1600.f, 800.f));
+    m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 0.5f), Vec2::ONE);
+    m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 400.f), Vec2(1600.f,800.f));
+    m_viewCamera->m_viewPort = AABB2(Vec2(0.f, 400.f), Vec2(1600.f,800.f));
 
     // m_viewCamera->SetOrthoGraphicView(Vec2(-800.f, -400.f), g_theGame->m_screenSpace.m_maxs); // TODO: use the normalized viewport
 }
@@ -263,7 +266,7 @@ void PlayerController::UpdateWorldCamera()
         {
             // m_worldCamera->SetOrthoGraphicView(Vec2(-1, -1), Vec2(1, 1));
             // m_worldCamera->SetPerspectiveGraphicView(2.0f, possessedActor->m_definition->m_cameraFOV, 0.1f, 100.f);
-            m_worldCamera->SetPerspectiveGraphicView(2.0f, possessedActor->m_definition->m_cameraFOV, 0.1f, 100.f);
+            m_worldCamera->SetPerspectiveGraphicView(4.0f, possessedActor->m_definition->m_cameraFOV, 0.1f, 100.f);
             // Set the world camera to use the possessed actor's eye height and FOV.
             m_position = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, possessedActor->m_definition->m_eyeHeight);
             // m_position += Vec3::X_BASIS;
@@ -284,10 +287,12 @@ void PlayerController::UpdateWorldCamera()
         m_position          = Vec3(possessedActor->m_position.x, possessedActor->m_position.y, interpolate);
     }
 
-    m_worldCamera->SetPositionAndOrientation(m_position, m_orientation);
-    Mat44 c2r;
-    c2r.SetIJK3D(Vec3::Z_BASIS, -Vec3::X_BASIS, Vec3::Y_BASIS);
-    m_worldCamera->SetCameraToRenderTransform(c2r);
+    m_viewCamera->SetOrthoGraphicView(g_theGame->m_screenSpace.m_mins, g_theGame->m_screenSpace.m_maxs);
+    m_worldCamera->SetPosition(m_position);
+    m_worldCamera->SetOrientation(m_orientation);
+    Mat44 ndcMatrix;
+    ndcMatrix.SetIJK3D(Vec3(0, 0, 1), Vec3(-1, 0, 0), Vec3(0, 1, 0));
+    m_worldCamera->SetCameraToRenderTransform(ndcMatrix);
 }
 
 Mat44 PlayerController::GetModelToWorldTransform() const

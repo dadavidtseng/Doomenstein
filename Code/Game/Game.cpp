@@ -65,7 +65,7 @@ Game::~Game()
 {
     SafeDeletePointer(m_currentMap);
     SafeDeletePointer(m_gameClock);
-    SafeDeletePointer(m_playerController);
+    // SafeDeletePointer(m_playerController);
     SafeDeletePointer(m_screenCamera);
 }
 
@@ -81,8 +81,13 @@ void Game::Update()
     UpdateFromController();
     UpdatePlayerController(gameDeltaSeconds);
 
-    if (m_currentMap != nullptr &&
-        m_playerController != nullptr)
+    // if (m_currentMap != nullptr &&
+    //     m_playerController != nullptr)
+    // {
+    //     m_currentMap->Update(gameDeltaSeconds);
+    // }
+
+    if (m_currentMap != nullptr)
     {
         m_currentMap->Update(gameDeltaSeconds);
     }
@@ -95,21 +100,21 @@ void Game::Render() const
 
     // if (m_playerController != nullptr)
     // {
-        // g_theRenderer->BeginCamera(*m_playerController->m_worldCamera);
+    // g_theRenderer->BeginCamera(*m_playerController->m_worldCamera);
 
-        if (m_currentGameState == eGameState::INGAME)
+    if (m_currentGameState == eGameState::INGAME)
+    {
+        if (m_currentMap != nullptr)
         {
-            if (m_currentMap != nullptr)
+            for (PlayerController* player : m_localPlayerControllerList)
             {
-                for (PlayerController* player : m_localPlayerControllerList)
-                {
-                    player->Render();
-                    g_theRenderer->BeginCamera(*player->m_worldCamera);
-                    m_currentMap->Render(player);
-                    g_theRenderer->EndCamera(*player->m_worldCamera);
-                }
-                // m_currentMap->Render(m_playerController);
+                player->Render();
+                g_theRenderer->BeginCamera(*player->m_worldCamera);
+                m_currentMap->Render(player);
+                g_theRenderer->EndCamera(*player->m_worldCamera);
             }
+            // m_currentMap->Render(m_playerController);
+        }
         // }
 
         // g_theRenderer->EndCamera(*m_playerController->m_worldCamera);
@@ -120,10 +125,10 @@ void Game::Render() const
 
     if (m_currentGameState == eGameState::INGAME)
     {
-        if (m_playerController != nullptr)
-        {
-            DebugRenderWorld(*m_playerController->m_worldCamera);
-        }
+        // if (m_playerController != nullptr)
+        // {
+        //     DebugRenderWorld(*m_playerController->m_worldCamera);
+        // }
     }
 
     //------------------------------------------------------------------------------------------------
@@ -139,7 +144,7 @@ void Game::Render() const
     if (m_currentGameState == eGameState::INGAME)
     {
         RenderInGame();
-        RenderPlayerController();
+        // RenderPlayerController();
     }
 
     g_theRenderer->EndCamera(*m_screenCamera);
@@ -169,12 +174,12 @@ Map* Game::GetCurrentMap() const
     return m_currentMap;
 }
 
-PlayerController* Game::GetPlayerController() const
-{
-    if (m_playerController == nullptr) return nullptr;
-
-    return m_playerController;
-}
+// PlayerController* Game::GetPlayerController() const
+// {
+//     if (m_playerController == nullptr) return nullptr;
+//
+//     return m_playerController;
+// }
 
 //----------------------------------------------------------------------------------------------------
 void Game::UpdateFromKeyBoard()
@@ -189,9 +194,9 @@ void Game::UpdateFromKeyBoard()
         XboxController controller = g_theInput->GetController(0);
 
 
-        if (g_theInput->WasKeyJustPressed(KEYCODE_I)&&controller.IsConnected())
+        if (g_theInput->WasKeyJustPressed(KEYCODE_I) && controller.IsConnected())
         {
-            CreateLocalPlayer(1,eDeviceType::KEYBOARD_AND_MOUSE);
+            CreateLocalPlayer(1, eDeviceType::KEYBOARD_AND_MOUSE);
         }
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
@@ -216,11 +221,11 @@ void Game::UpdateFromKeyBoard()
 
             m_maps.clear();
 
-            if (m_playerController != nullptr)
-            {
-                delete m_playerController;
-                m_playerController = nullptr;
-            }
+            // if (m_playerController != nullptr)
+            // {
+            //     delete m_playerController;
+            //     m_playerController = nullptr;
+            // }
         }
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_P))
@@ -243,12 +248,10 @@ void Game::UpdateFromKeyBoard()
             m_gameClock->SetTimeScale(1.f);
         }
 
-        if (m_playerController != nullptr)
-        {
-            DebugAddMessage(Stringf("PlayerController Position: (%.2f, %.2f, %.2f)", m_playerController->m_position.x, m_playerController->m_position.y, m_playerController->m_position.z), 0.f);
-        }
-
-
+        // if (m_playerController != nullptr)
+        // {
+        //     DebugAddMessage(Stringf("PlayerController Position: (%.2f, %.2f, %.2f)", m_playerController->m_position.x, m_playerController->m_position.y, m_playerController->m_position.z), 0.f);
+        // }
     }
 }
 
@@ -286,11 +289,11 @@ void Game::UpdateFromController()
 
             m_maps.clear();
 
-            if (m_playerController != nullptr)
-            {
-                delete m_playerController;
-                m_playerController = nullptr;
-            }
+            // if (m_playerController != nullptr)
+            // {
+            //     delete m_playerController;
+            //     m_playerController = nullptr;
+            // }
         }
 
         if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
@@ -366,7 +369,7 @@ void Game::RenderInGame() const
 {
     for (PlayerController* controller : m_localPlayerControllerList)
     {
-        if (controller != nullptr&&controller->m_isCameraMode)
+        if (controller != nullptr && controller->m_isCameraMode)
         {
             DebugAddScreenText(Stringf("(F1)Control Mode:Player Camera"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
         }
@@ -390,7 +393,7 @@ void Game::RenderPlayerController() const
 {
     for (PlayerController* controller : m_localPlayerControllerList)
     {
-        if (controller!=nullptr)
+        if (controller != nullptr)
         {
             controller->Render();
         }
@@ -399,8 +402,6 @@ void Game::RenderPlayerController() const
     // if (m_playerController == nullptr) return;
     // // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
     // m_playerController->Render();
-
-
 }
 
 PlayerController* Game::CreateLocalPlayer(int id, eDeviceType deviceType)

@@ -127,21 +127,21 @@ void Actor::Render(PlayerController const* toPlayer) const
     {
         if (m_definition->m_billboardType == eBillboardType::WORLD_UP_FACING)
         {
-            Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
-            cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
-            localToWorldMat = Mat44::MakeTranslation3D(m_position);
+            // Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
+            // cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+            // localToWorldMat = Mat44::MakeTranslation3D(m_position);
             localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_FACING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
         }
         else if (m_definition->m_billboardType == eBillboardType::FULL_OPPOSING)
         {
-            Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
-            cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+            // Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
+            // cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
             localToWorldMat.Append(GetBillboardMatrix(eBillboardType::FULL_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position));
         }
         else if (m_definition->m_billboardType == eBillboardType::WORLD_UP_OPPOSING)
         {
-            Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
-            cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
+            // Mat44 cameraTransform = Mat44::MakeTranslation3D(toPlayer->m_position);
+            // cameraTransform.Append(toPlayer->m_orientation.GetAsMatrix_IFwd_JLeft_KUp());
             localToWorldMat.Append(GetBillboardMatrix(eBillboardType::WORLD_UP_OPPOSING, toPlayer->m_worldCamera->GetCameraToWorldTransform(), m_position + eyeHeight));
         }
         else
