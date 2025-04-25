@@ -44,7 +44,7 @@ Weapon::Weapon(Actor*                  owner,
         float    multiplier    = g_theGame->m_screenSpace.m_maxs.x / (float)baseDimension.x;
         m_hudBaseBound         = AABB2(Vec2(0.0f, 0.0f), Vec2(g_theGame->m_screenSpace.m_maxs.x, (float)baseDimension.y * multiplier));
 
-
+  
     }
 }
 
@@ -59,12 +59,17 @@ void Weapon::Update(float const deltaSeconds)
 
     UpdateAnimation(deltaSeconds);
 
-    if (m_owner->m_controller!=nullptr&&
-           m_owner->m_controller->GetControllerIndex() == 1)
-    {
-        m_hudBaseBound.m_mins=Vec2(0.f,400.f);
-        m_hudBaseBound.m_maxs=Vec2(1600.f,517.f);
-    }
+    // if (m_owner->m_controller!=nullptr&&
+    //        m_owner->m_controller->GetControllerIndex() == 0)
+    // {
+    //     m_hudBaseBound         = AABB2(Vec2(0.0f, 0.0f), Vec2(1600.f, 400.f));
+    // }
+    //
+    // if (m_owner->m_controller!=nullptr&&
+    //        m_owner->m_controller->GetControllerIndex() == 1)
+    // {
+    //     m_hudBaseBound         = AABB2(Vec2(0.0f, 400.0f), Vec2(1600.f, 800.f));
+    // }
 }
 
 void Weapon::UpdateAnimation(float const deltaSeconds)

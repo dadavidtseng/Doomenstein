@@ -9,6 +9,9 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AAIController_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AAI_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AAI_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AAnimation_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AAnimationGroup_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AAnimation_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AApp_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AApp_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AController_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
@@ -18,6 +21,8 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AGameCommon_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AGame_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AGameCommon_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AHUD_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AHUD_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AMain_005FWindows_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AMapDefinition_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003AMapDefinition_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
@@ -27,6 +32,8 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003APlayerController_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003APlayer_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003APlayer_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003ASound_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003ASound_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003ATileDefinition_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003ATileDefinition_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=1C6046C0_002DACFA_002D4AB7_002DB8D2_002D670AD463B3EF_002Ff_003ATile_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
@@ -71,6 +78,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ACore_002Ff_003AImage_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ACore_002Ff_003AStringUtils_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ACore_002Ff_003AStringUtils_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ACore_002Ff_003ATimer_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ACore_002Ff_003AVertexUtils_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ACore_002Ff_003AVertexUtils_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ACore_002Ff_003AVertex_005FPCU_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
@@ -86,12 +94,17 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AEulerAngles_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AFloatRange_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AFloatRange_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AMat44_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AMathUtils_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AMathUtils_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003ARaycastUtils_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003ARaycastUtils_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AVec2_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AVec2_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AVec3_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003AMath_002Ff_003AVec3_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ACamera_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ACamera_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ADebugRenderSystem_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ADebugRenderSystem_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ADefaultShader_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
@@ -101,6 +114,8 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ARenderer_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003AShader_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003AShader_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ASpriteAnimDefinition_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ASpriteAnimDefinition_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ATexture_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003ATexture_002Ehpp/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=D80656F3_002DB024_002D489F_002DB7B3_002D8BF35B25C423_002Fd_003ARenderer_002Ff_003AVertexBuffer_002Ecpp/@EntryIndexedValue">ForceIncluded</s:String>

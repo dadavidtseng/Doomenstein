@@ -31,9 +31,10 @@ PlayerController::PlayerController(Map* owner)
     m_viewCamera->m_mode = Camera::eMode_Orthographic;
     m_viewCamera->SetOrthoGraphicView(Vec2::ZERO, g_theGame->m_screenSpace.m_maxs); // TODO: use the normalized viewport
     // m_viewCamera->SetOrthoGraphicView(Vec2(0.f, 400.f), Vec2(1600.f, 800.f));
-    m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 0.5f), Vec2::ONE);
-    m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 400.f), Vec2(1600.f,800.f));
-    m_viewCamera->m_viewPort = AABB2(Vec2(0.f, 400.f), Vec2(1600.f,800.f));
+    // m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 0.5f), Vec2::ONE);
+    // m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 800.f), Vec2(1600.f,0.f));
+    // m_viewCamera->m_viewPort = AABB2(Vec2(0.f, 0.f), Vec2(1600.f,400.f));
+
 
     // m_viewCamera->SetOrthoGraphicView(Vec2(-800.f, -400.f), g_theGame->m_screenSpace.m_maxs); // TODO: use the normalized viewport
 }
@@ -191,7 +192,17 @@ void PlayerController::Render() const
     // {
     //     possessedActor->m_currentWeapon->Render();
     // }
+    if (m_index == 0)
+    {
+        m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 0.f), Vec2(1600.f,400.f));
+        m_viewCamera->m_viewPort = AABB2(Vec2(0.f, 0.f), Vec2(1600.f,400.f));
+    }
 
+    if (m_index == 1)
+    {
+        m_worldCamera->m_viewPort = AABB2(Vec2(0.f, 400.f), Vec2(1600.f,800.f));
+        m_viewCamera->m_viewPort = AABB2(Vec2(0.f, 400.f), Vec2(1600.f,800.f));
+    }
     g_theRenderer->BeginCamera(*m_viewCamera);
     if (g_theGame->GetGameState() != eGameState::INGAME)
         return;

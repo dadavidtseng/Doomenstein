@@ -110,6 +110,7 @@ void Game::Render() const
             {
                 player->Render();
                 g_theRenderer->BeginCamera(*player->m_worldCamera);
+                DebuggerPrintf("%d, %f, %f\n",player->m_index,player->m_worldCamera->m_viewPort.m_mins.x, player->m_worldCamera->m_viewPort.m_mins.y);
                 m_currentMap->Render(player);
                 g_theRenderer->EndCamera(*player->m_worldCamera);
             }
