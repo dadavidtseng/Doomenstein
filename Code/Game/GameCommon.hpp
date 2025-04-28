@@ -28,3 +28,5 @@ void SafeDeletePointer(T*& pointer)
     delete pointer;
     pointer = nullptr;
 }
+
+void PlaySoundClicked(char const* keyName);

@@ -46,7 +46,7 @@ Actor::Actor(SpawnInfo const& spawnInfo)
 
     for (String const& weapon : m_definition->m_inventory)
     {
-        if (WeaponDefinition const* weaponDef = WeaponDefinition::GetDefByName(weapon))
+        if (WeaponDefinition * weaponDef = WeaponDefinition::GetDefByName(weapon))
         {
             m_weapons.push_back(new Weapon(this, weaponDef));
         }

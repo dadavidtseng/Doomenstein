@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Game.hpp"
 
+#include "Sound.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -58,7 +59,7 @@ Game::Game()
     transform.SetIJKT3D(-Vec3::X_BASIS, Vec3::Z_BASIS, Vec3::Y_BASIS, Vec3(0.f, -0.25f, 0.25f));
     DebugAddWorldText("Z-Up", transform, 0.25f, Vec2(1.f, 0.f), -1.f, Rgba8::BLUE);
 
-    // InitializeMaps();
+    // SoundID mainMenuSoundID = g_theAudio->CreateOrGetSound(g_gameConfigBlackboard.GetValue("Game.Common.Audio.MainMenu", ""));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -184,6 +185,7 @@ void Game::UpdateFromKeyBoard()
         {
             CreateLocalPlayer(0, eDeviceType::KEYBOARD_AND_MOUSE);
             ChangeState(eGameState::LOBBY);
+            PlaySoundClicked("Game.Common.Audio.ButtonClicked");
             return;
         }
     }
@@ -208,6 +210,10 @@ void Game::UpdateFromKeyBoard()
                 }
 
                 ChangeState(eGameState::INGAME);
+                SoundID         mainMenuSoundID    = g_theAudio->CreateOrGetSound(g_gameConfigBlackboard.GetValue("Game.Common.Audio.MainMenu", ""), AudioSystemSoundDimension::Sound2D);
+                SoundPlaybackID mainMenuPlaybackID = g_theAudio->StartSound(mainMenuSoundID, false, 0.25f);
+                g_theAudio->SetNumListeners(static_cast<int>(m_localPlayerControllerList.size()));
+
                 InitializeMaps();
             }
 
@@ -236,6 +242,7 @@ void Game::UpdateFromKeyBoard()
 
     if (m_currentGameState == eGameState::INGAME)
     {
+
         if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
         {
             ChangeState(eGameState::ATTRACT);
@@ -407,6 +414,18 @@ void Game::UpdatePlayerController(float const deltaSeconds) const
                                     controller->m_orientation.m_rollDegrees),
                             0);
         }
+        UpdateListeners(Clock::GetSystemClock().GetDeltaSeconds());
+    }
+}
+
+void Game::UpdateListeners(float const deltaSeconds) const
+{
+    UNUSED(deltaSeconds)
+    for (PlayerController const* controller : m_localPlayerControllerList)
+    {
+        Vec3 forward, left, up;
+        controller->m_orientation.GetAsVectors_IFwd_JLeft_KUp(forward, left, up);
+        g_theAudio->UpdateListener(controller->m_index - 1, controller->m_position, forward, up); // Index is an adjustment
     }
 }
 

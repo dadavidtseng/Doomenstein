@@ -54,7 +54,7 @@ bool WeaponDefinition::LoadFromXmlElement(XmlElement const* element)
         m_hud = new HUD(*hudElement);
     }
 
-    XmlElement const* soundElement = element->FirstChildElement("HUD");
+    XmlElement const* soundElement = element->FirstChildElement("Sounds");
 
     if (soundElement != nullptr)
     {
@@ -114,9 +114,9 @@ void WeaponDefinition::InitializeWeaponDefs(char const* path)
 }
 
 //----------------------------------------------------------------------------------------------------
-WeaponDefinition const* WeaponDefinition::GetDefByName(String const& name)
+WeaponDefinition * WeaponDefinition::GetDefByName(String const& name)
 {
-    for (WeaponDefinition const* tileDef : s_weaponDefinitions)
+    for (WeaponDefinition * tileDef : s_weaponDefinitions)
     {
         if (tileDef->m_name == name)
         {
@@ -124,5 +124,16 @@ WeaponDefinition const* WeaponDefinition::GetDefByName(String const& name)
         }
     }
 
+    return nullptr;
+}
+
+//----------------------------------------------------------------------------------------------------
+Sound* WeaponDefinition::GetSoundByName( String const& soundName)
+{
+    for (Sound& sound : m_sounds)
+    {
+        if (sound.m_name == soundName)
+            return &sound;
+    }
     return nullptr;
 }

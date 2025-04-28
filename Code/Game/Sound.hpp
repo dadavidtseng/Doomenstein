@@ -17,6 +17,7 @@ class Sound
 {
 public:
     explicit Sound(XmlElement const& soundElement);
+    SoundID  GetSoundID() const;
 
     String  m_name     = "DEFAULT";
     String  m_filePath = "DEFAULT";

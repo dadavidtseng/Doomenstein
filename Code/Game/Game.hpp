@@ -52,6 +52,7 @@ private:
     void UpdateFromKeyBoard();
     void UpdateFromController();
     void UpdatePlayerController(float deltaSeconds) const;
+    void UpdateListeners(float deltaSeconds) const;
     void RenderAttractMode() const;
     void RenderLobby() const;
     void RenderInGame() const;

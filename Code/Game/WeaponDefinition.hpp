@@ -20,7 +20,8 @@ struct WeaponDefinition
     bool LoadFromXmlElement(XmlElement const* element);
 
     static void                           InitializeWeaponDefs(char const* path);
-    static WeaponDefinition const*        GetDefByName(String const& name);
+    static WeaponDefinition *        GetDefByName(String const& name);
+    Sound*                                GetSoundByName(String const& soundName);
     static std::vector<WeaponDefinition*> s_weaponDefinitions;
 
     String     m_name;

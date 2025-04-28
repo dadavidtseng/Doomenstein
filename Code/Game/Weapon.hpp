@@ -19,7 +19,7 @@ struct WeaponDefinition;
 class Weapon
 {
 public:
-    explicit Weapon(Actor* owner, WeaponDefinition const* weaponDef);
+    explicit Weapon(Actor* owner, WeaponDefinition * weaponDef);
     ~Weapon();
     void Update(float deltaSeconds) ;
     void UpdateAnimation(float deltaSeconds) ;
@@ -34,7 +34,7 @@ public:
     Animation*  PlayAnimationByName(String animationName, bool force = false);
 
     Actor*                  m_owner      = nullptr;
-    WeaponDefinition const* m_definition = nullptr;     // Reference to our weapon definition.
+    WeaponDefinition * m_definition = nullptr;     // Reference to our weapon definition.
     // Timer*                  m_timer      = nullptr;
     float                   m_lastFireTime = 0.f;
 

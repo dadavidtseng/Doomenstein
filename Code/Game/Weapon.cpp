@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/Weapon.hpp"
 
+#include "Sound.hpp"
 #include "Engine/Core/Clock.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------------------------------
 Weapon::Weapon(Actor*                  owner,
-               WeaponDefinition const* weaponDef)
+               WeaponDefinition * weaponDef)
     : m_owner(owner),
       m_definition(weaponDef)
 {
@@ -196,6 +197,8 @@ void Weapon::Fire()
     if (m_timeSinceLastFire > m_definition->m_refireTime)
     {
         // m_owner->m_controller->m_state = "Attack";
+        SoundID weaponFireSound        = m_definition->GetSoundByName("Fire")->GetSoundID();
+        g_theAudio->StartSoundAt(weaponFireSound, m_owner->m_position);
         if (m_definition->m_hud)
         {
             PlayAnimationByName("Attack");
