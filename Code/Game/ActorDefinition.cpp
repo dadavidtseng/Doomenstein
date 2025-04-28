@@ -5,6 +5,7 @@
 //----------------------------------------------------------------------------------------------------
 #include "Game/ActorDefinition.hpp"
 
+#include "Sound.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Renderer/Renderer.hpp"
@@ -108,6 +109,22 @@ bool ActorDefinition::LoadFromXmlElement(XmlElement const* element)
                 m_animationGroup.push_back(animationGroup);
                 visualChildElement = visualChildElement->NextSiblingElement();
             }
+        }
+    }
+
+    XmlElement const* soundsElement = element->FirstChildElement("Sounds");
+
+    if (soundsElement != nullptr)
+    {
+        XmlElement const* soundElement = soundsElement->FirstChildElement("Sound");
+
+        while (soundElement != nullptr)
+        {
+            Sound sound = Sound(*soundElement);
+
+            m_sounds.push_back(sound);
+
+            soundElement = soundElement->NextSiblingElement("Sound");
         }
     }
 

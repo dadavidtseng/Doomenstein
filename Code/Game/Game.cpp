@@ -9,6 +9,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 #include "Engine/Input/InputSystem.hpp"
+#include "Engine/Renderer/BitmapFont.hpp"
 #include "Engine/Renderer/DebugRenderSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 #include "Game/Actor.hpp"
@@ -24,9 +25,6 @@
 //----------------------------------------------------------------------------------------------------
 Game::Game()
 {
-    // SpawnPlayer();
-    // m_playerController = new PlayerController(m_currentMap);
-
     m_screenCamera = new Camera();
 
     Vec2 const  bottomLeft     = Vec2::ZERO;
@@ -34,13 +32,16 @@ Game::Game()
     float const screenSizeY    = g_gameConfigBlackboard.GetValue("screenSizeY", -1.f);
     Vec2 const  screenTopRight = Vec2(screenSizeX, screenSizeY);
 
-    /// Spaces
     m_screenSpace.m_mins = Vec2::ZERO;
     m_screenSpace.m_maxs = Vec2(g_gameConfigBlackboard.GetValue("screenSizeX", 1600.f), g_gameConfigBlackboard.GetValue("screenSizeY", 800.f));
-    m_worldSpace.m_mins  = Vec2::ZERO;
-    m_worldSpace.m_maxs  = Vec2(g_gameConfigBlackboard.GetValue("worldSizeX", 200.f), g_gameConfigBlackboard.GetValue("worldSizeY", 100.f));
+    // m_screenSpace.m_maxs = Vec2(1600.f,400.f);
+    m_worldSpace.m_mins = Vec2::ZERO;
+    m_worldSpace.m_maxs = Vec2(g_gameConfigBlackboard.GetValue("worldSizeX", 200.f), g_gameConfigBlackboard.GetValue("worldSizeY", 100.f));
 
     m_screenCamera->SetOrthoGraphicView(bottomLeft, screenTopRight);
+    // m_screenCamera->SetOrthoGraphicView(Vec2(0.f,0.f),Vec2(1600.f, 400.f));
+
+    m_screenCamera->SetNormalizedViewport(AABB2(Vec2(0.f, 0.f), Vec2(1.f, 1.f)));
 
     m_gameClock = new Clock(Clock::GetSystemClock());
 
@@ -97,28 +98,34 @@ void Game::Update()
 void Game::Render() const
 {
     //-Start-of-Game-Camera---------------------------------------------------------------------------
-
-    // if (m_playerController != nullptr)
-    // {
-    // g_theRenderer->BeginCamera(*m_playerController->m_worldCamera);
-
     if (m_currentGameState == eGameState::INGAME)
     {
         if (m_currentMap != nullptr)
         {
-            for (PlayerController* player : m_localPlayerControllerList)
+            if (m_localPlayerControllerList.size() == 1)
             {
-                player->Render();
-                g_theRenderer->BeginCamera(*player->m_worldCamera);
-                DebuggerPrintf("%d, %f, %f\n",player->m_index,player->m_worldCamera->m_viewPort.m_mins.x, player->m_worldCamera->m_viewPort.m_mins.y);
-                m_currentMap->Render(player);
-                g_theRenderer->EndCamera(*player->m_worldCamera);
+                m_localPlayerControllerList[0]->SetViewport(AABB2(Vec2::ZERO, Vec2::ONE));
+                m_localPlayerControllerList[0]->Render();
+                g_theRenderer->BeginCamera(*m_localPlayerControllerList[0]->m_worldCamera);
+                m_currentMap->Render(m_localPlayerControllerList[0]);
+                g_theRenderer->EndCamera(*m_localPlayerControllerList[0]->m_worldCamera);
             }
-            // m_currentMap->Render(m_playerController);
-        }
-        // }
 
-        // g_theRenderer->EndCamera(*m_playerController->m_worldCamera);
+            if (m_localPlayerControllerList.size() == 2)
+            {
+                m_localPlayerControllerList[0]->SetViewport(AABB2(Vec2(0.f,0.f), Vec2(1.f,0.5f)));
+                m_localPlayerControllerList[0]->Render();
+                g_theRenderer->BeginCamera(*m_localPlayerControllerList[0]->m_worldCamera);
+                m_currentMap->Render(m_localPlayerControllerList[0]);
+                g_theRenderer->EndCamera(*m_localPlayerControllerList[0]->m_worldCamera);
+
+                m_localPlayerControllerList[1]->SetViewport(AABB2(Vec2(0.f,0.5f), Vec2(1.f,1.f)));
+                m_localPlayerControllerList[1]->Render();
+                g_theRenderer->BeginCamera(*m_localPlayerControllerList[1]->m_worldCamera);
+                m_currentMap->Render(m_localPlayerControllerList[1]);
+                g_theRenderer->EndCamera(*m_localPlayerControllerList[1]->m_worldCamera);
+            }
+        }
     }
 
     //-End-of-Game-Camera-----------------------------------------------------------------------------
@@ -142,6 +149,11 @@ void Game::Render() const
         RenderAttractMode();
     }
 
+    if (m_currentGameState == eGameState::LOBBY)
+    {
+        RenderLobby();
+    }
+
     if (m_currentGameState == eGameState::INGAME)
     {
         RenderInGame();
@@ -159,30 +171,6 @@ void Game::Render() const
 }
 
 //----------------------------------------------------------------------------------------------------
-bool Game::IsAttractMode() const
-{
-    return m_currentGameState == eGameState::ATTRACT;
-}
-
-//----------------------------------------------------------------------------------------------------
-Map* Game::GetCurrentMap() const
-{
-    if (m_currentMap == nullptr)
-    {
-        ERROR_AND_DIE("(Game::GetCurrentMap) m_currentMap is nullptr")
-    }
-
-    return m_currentMap;
-}
-
-// PlayerController* Game::GetPlayerController() const
-// {
-//     if (m_playerController == nullptr) return nullptr;
-//
-//     return m_playerController;
-// }
-
-//----------------------------------------------------------------------------------------------------
 void Game::UpdateFromKeyBoard()
 {
     if (m_currentGameState == eGameState::ATTRACT)
@@ -192,19 +180,57 @@ void Game::UpdateFromKeyBoard()
             App::RequestQuit();
         }
 
-        XboxController controller = g_theInput->GetController(0);
-
-
-        if (g_theInput->WasKeyJustPressed(KEYCODE_I) && controller.IsConnected())
-        {
-            CreateLocalPlayer(1, eDeviceType::KEYBOARD_AND_MOUSE);
-        }
-
         if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
         {
-            ChangeState(m_currentGameState = eGameState::INGAME);
-            // SpawnPlayerController();
-            InitializeMaps();
+            CreateLocalPlayer(0, eDeviceType::KEYBOARD_AND_MOUSE);
+            ChangeState(eGameState::LOBBY);
+            return;
+        }
+    }
+
+    if (m_currentGameState == eGameState::LOBBY)
+    {
+        if (g_theInput->WasKeyJustPressed(KEYCODE_SPACE))
+        {
+            if (m_localPlayerControllerList.size() == 1)
+            {
+                if (GetControllerByDeviceType(eDeviceType::KEYBOARD_AND_MOUSE) == nullptr)
+                {
+                    if (m_localPlayerControllerList[0]->m_index == 0)
+                    {
+                        CreateLocalPlayer(1, eDeviceType::KEYBOARD_AND_MOUSE);
+                    }
+                    if (m_localPlayerControllerList[0]->m_index == 1)
+                    {
+                        CreateLocalPlayer(0, eDeviceType::KEYBOARD_AND_MOUSE);
+                    }
+                    return;
+                }
+
+                ChangeState(eGameState::INGAME);
+                InitializeMaps();
+            }
+
+            if (m_localPlayerControllerList.size() == 2)
+            {
+                ChangeState(eGameState::INGAME);
+                InitializeMaps();
+            }
+        }
+
+        if (g_theInput->WasKeyJustPressed(KEYCODE_ESC))
+        {
+            PlayerController const* localPlayerController = GetControllerByDeviceType(eDeviceType::KEYBOARD_AND_MOUSE);
+
+            if (localPlayerController != nullptr)
+            {
+                RemoveLocalPlayer(localPlayerController->m_index);
+
+                if (m_localPlayerControllerList.empty())
+                {
+                    ChangeState(eGameState::ATTRACT);
+                }
+            }
         }
     }
 
@@ -221,12 +247,7 @@ void Game::UpdateFromKeyBoard()
             }
 
             m_maps.clear();
-
-            // if (m_playerController != nullptr)
-            // {
-            //     delete m_playerController;
-            //     m_playerController = nullptr;
-            // }
+            m_localPlayerControllerList.clear();
         }
 
         if (g_theInput->WasKeyJustPressed(KEYCODE_P))
@@ -248,11 +269,6 @@ void Game::UpdateFromKeyBoard()
         {
             m_gameClock->SetTimeScale(1.f);
         }
-
-        // if (m_playerController != nullptr)
-        // {
-        //     DebugAddMessage(Stringf("PlayerController Position: (%.2f, %.2f, %.2f)", m_playerController->m_position.x, m_playerController->m_position.y, m_playerController->m_position.z), 0.f);
-        // }
     }
 }
 
@@ -260,6 +276,8 @@ void Game::UpdateFromKeyBoard()
 void Game::UpdateFromController()
 {
     XboxController const& controller = g_theInput->GetController(0);
+
+    if (!controller.IsConnected()) return;
 
     if (m_currentGameState == eGameState::ATTRACT)
     {
@@ -270,9 +288,56 @@ void Game::UpdateFromController()
 
         if (controller.WasButtonJustPressed(XBOX_BUTTON_START))
         {
-            m_currentGameState = eGameState::INGAME;
-            // SpawnPlayerController();
-            InitializeMaps();
+            CreateLocalPlayer(0, eDeviceType::CONTROLLER);
+            ChangeState(eGameState::LOBBY);
+            return;
+        }
+    }
+
+    if (m_currentGameState == eGameState::LOBBY)
+    {
+        if (controller.WasButtonJustPressed(XBOX_BUTTON_START))
+        {
+            if (m_localPlayerControllerList.size() == 1)
+            {
+                if (GetControllerByDeviceType(eDeviceType::CONTROLLER) == nullptr)
+                {
+                    if (m_localPlayerControllerList[0]->m_index == 0)
+                    {
+                        CreateLocalPlayer(1, eDeviceType::CONTROLLER);
+                    }
+                    if (m_localPlayerControllerList[0]->m_index == 1)
+                    {
+                        CreateLocalPlayer(0, eDeviceType::CONTROLLER);
+                    }
+
+                    return;
+                }
+
+                ChangeState(eGameState::INGAME);
+                InitializeMaps();
+            }
+
+            if (m_localPlayerControllerList.size() == 2)
+            {
+                ChangeState(eGameState::INGAME);
+                InitializeMaps();
+            }
+        }
+
+        if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
+        {
+            PlayerController* localPlayerController = GetControllerByDeviceType(eDeviceType::CONTROLLER);
+
+            if (localPlayerController != nullptr)
+            {
+                RemoveLocalPlayer(localPlayerController->m_index);
+
+                if (m_localPlayerControllerList.empty())
+                {
+                    ChangeState(eGameState::ATTRACT);
+                }
+            }
         }
     }
 
@@ -289,12 +354,7 @@ void Game::UpdateFromController()
             }
 
             m_maps.clear();
-
-            // if (m_playerController != nullptr)
-            // {
-            //     delete m_playerController;
-            //     m_playerController = nullptr;
-            // }
+            m_localPlayerControllerList.clear();
         }
 
         if (controller.WasButtonJustPressed(XBOX_BUTTON_BACK))
@@ -354,7 +414,8 @@ void Game::UpdatePlayerController(float const deltaSeconds) const
 void Game::RenderAttractMode() const
 {
     VertexList_PCU verts;
-    AddVertsForDisc2D(verts, Vec2(800.f, 400.f), 300.f, 10.f, Rgba8::YELLOW);
+    AddVertsForAABB2D(verts, m_screenSpace.m_mins, m_screenSpace.m_maxs, Rgba8::BLACK);
+    AddVertsForDisc2D(verts, m_screenSpace.GetCenter(), 150.f, 10.f, Rgba8::YELLOW);
 
     g_theRenderer->SetModelConstants();
     g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
@@ -363,12 +424,97 @@ void Game::RenderAttractMode() const
     g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
     g_theRenderer->BindTexture(nullptr);
     g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());
+
+    VertexList_PCU  textVerts;
+    float constexpr textHeight = 20.f;
+    AABB2 const     textBounds = AABB2(m_screenSpace.m_mins, Vec2(m_screenSpace.m_maxs.x, textHeight * 3.f));
+    g_theBitmapFont->AddVertsForTextInBox2D(textVerts, "Press SPACE to join with mouse and keyboard\nPress START to join with controller\nPress ESCAPE or BACK to exit", textBounds, textHeight * 3.f, Rgba8::WHITE, 1.f, Vec2::HALF);
+    g_theRenderer->SetModelConstants();
+    g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+    g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+    g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+    g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+    g_theRenderer->BindTexture(&g_theBitmapFont->GetTexture());
+    g_theRenderer->DrawVertexArray(static_cast<int>(textVerts.size()), textVerts.data());
+}
+
+void Game::RenderLobby() const
+{
+    VertexList_PCU verts;
+
+    if (m_localPlayerControllerList.size() == 1)
+    {
+        m_localPlayerControllerList[0]->SetViewport(AABB2(Vec2::ZERO, Vec2::ONE));
+
+        AddVertsForAABB2D(verts, m_screenSpace.m_mins, m_screenSpace.m_maxs, Rgba8::BLACK);
+        AddVertsForDisc2D(verts, m_screenSpace.GetCenter(), 150.f, 10.f, Rgba8::GREEN);
+
+        g_theRenderer->SetModelConstants();
+        g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+        g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+        g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+        g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+        g_theRenderer->BindTexture(nullptr);
+        g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());
+
+        VertexList_PCU  textVerts;
+        float constexpr textHeight = 20.f;
+        AABB2 const     textBounds = AABB2(m_screenSpace.m_mins, Vec2(m_screenSpace.m_maxs.x, textHeight * 5.f));
+        String const    text       = m_localPlayerControllerList[0]->m_deviceType == eDeviceType::KEYBOARD_AND_MOUSE
+                                ? "Keyboard and Mouse\nPress SPACE to start game\nPress ESCAPE to leave game\nPress START to join player"
+                                : "Controller\nPress START to start game\nPress BACK to leave game\nPress SPACE to join player";
+
+        g_theBitmapFont->AddVertsForTextInBox2D(textVerts, "Player 01\n" + text, textBounds, textHeight * 5.f, Rgba8::WHITE, 1.f, Vec2::HALF);
+        g_theRenderer->SetModelConstants();
+        g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+        g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+        g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+        g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+        g_theRenderer->BindTexture(&g_theBitmapFont->GetTexture());
+        g_theRenderer->DrawVertexArray(static_cast<int>(textVerts.size()), textVerts.data());
+    }
+    else if (m_localPlayerControllerList.size() == 2)
+    {
+        m_localPlayerControllerList[0]->SetViewport(AABB2(Vec2(0.f, 0.5f), Vec2(1.f, 1.f)));
+        m_localPlayerControllerList[1]->SetViewport(AABB2(Vec2(0.f, 0.f), Vec2(1.f, 0.5f)));
+
+        AABB2 const playerController1 = AABB2(Vec2(m_screenSpace.m_mins.x, (float)m_screenSpace.m_mins.y + m_screenSpace.m_maxs.y * 0.5f), m_screenSpace.m_maxs);
+        AddVertsForAABB2D(verts, playerController1.m_mins, playerController1.m_maxs, Rgba8::BLACK);
+        AddVertsForDisc2D(verts, playerController1.GetCenter(), 150.f, 10.f, Rgba8::GREEN);
+        AABB2 const playerController2 = AABB2(m_screenSpace.m_mins, Vec2(m_screenSpace.m_maxs.x, m_screenSpace.m_maxs.y * 0.5f));
+        AddVertsForAABB2D(verts, playerController2.m_mins, playerController2.m_maxs, Rgba8::GREY);
+        AddVertsForDisc2D(verts, playerController2.GetCenter(), 150.f, 10.f, Rgba8::RED);
+
+        g_theRenderer->SetModelConstants();
+        g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+        g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+        g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+        g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+        g_theRenderer->BindTexture(nullptr);
+        g_theRenderer->DrawVertexArray(static_cast<int>(verts.size()), verts.data());
+
+        VertexList_PCU  textVerts;
+        float constexpr textHeight                  = 20.f;
+        AABB2 const     playerControllerTextBounds1 = AABB2(playerController1.m_mins, Vec2(playerController1.m_maxs.x, playerController2.m_maxs.y + textHeight * 4.f));
+        AABB2 const     playerControllerTextBounds2 = AABB2(playerController2.m_mins, Vec2(playerController2.m_maxs.x, textHeight * 4.f));
+        String const    text1                       = m_localPlayerControllerList[0]->m_deviceType == eDeviceType::KEYBOARD_AND_MOUSE ? "Keyboard and Mouse\nPress SPACE to start game\nPress ESCAPE to leave game" : "Controller\nPress START to start game\nPress BACK to leave game";
+        String const    text2                       = m_localPlayerControllerList[1]->m_deviceType == eDeviceType::KEYBOARD_AND_MOUSE ? "Keyboard and Mouse\nPress SPACE to start game\nPress ESCAPE to leave game" : "Controller\nPress START to start game\nPress BACK to leave game";
+        g_theBitmapFont->AddVertsForTextInBox2D(textVerts, "Player 01\n" + text1, playerControllerTextBounds1, textHeight * 4.f, Rgba8::WHITE, 1.f, Vec2::HALF);
+        g_theBitmapFont->AddVertsForTextInBox2D(textVerts, "Player 02\n" + text2, playerControllerTextBounds2, textHeight * 4.f, Rgba8::WHITE, 1.f, Vec2::HALF);
+        g_theRenderer->SetModelConstants();
+        g_theRenderer->SetBlendMode(eBlendMode::ALPHA);
+        g_theRenderer->SetRasterizerMode(eRasterizerMode::SOLID_CULL_NONE);
+        g_theRenderer->SetSamplerMode(eSamplerMode::POINT_CLAMP);
+        g_theRenderer->SetDepthMode(eDepthMode::DISABLED);
+        g_theRenderer->BindTexture(&g_theBitmapFont->GetTexture());
+        g_theRenderer->DrawVertexArray(static_cast<int>(textVerts.size()), textVerts.data());
+    }
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::RenderInGame() const
 {
-    for (PlayerController* controller : m_localPlayerControllerList)
+    for (PlayerController const* controller : m_localPlayerControllerList)
     {
         if (controller != nullptr && controller->m_isCameraMode)
         {
@@ -379,99 +525,92 @@ void Game::RenderInGame() const
             DebugAddScreenText(Stringf("(F1)Control Mode:Actor"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
         }
     }
-    // if (m_playerController->m_isCameraMode)
-    // {
-    //     DebugAddScreenText(Stringf("(F1)Control Mode:Player Camera"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
-    // }
-    // else
-    // {
-    //     DebugAddScreenText(Stringf("(F1)Control Mode:Actor"), Vec2::ZERO, 20.f, Vec2::ZERO, 0.f);
-    // }
 }
 
 //----------------------------------------------------------------------------------------------------
 void Game::RenderPlayerController() const
 {
-    for (PlayerController* controller : m_localPlayerControllerList)
+    for (PlayerController const* controller : m_localPlayerControllerList)
     {
         if (controller != nullptr)
         {
             controller->Render();
         }
     }
-
-    // if (m_playerController == nullptr) return;
-    // // g_theRenderer->SetModelConstants(m_player->GetModelToWorldTransform());
-    // m_playerController->Render();
 }
 
-PlayerController* Game::CreateLocalPlayer(int id, eDeviceType deviceType)
+//----------------------------------------------------------------------------------------------------
+PlayerController* Game::CreateLocalPlayer(int const         id,
+                                          eDeviceType const deviceType)
 {
     PlayerController* newPlayer = new PlayerController(nullptr);
     newPlayer->SetInputDeviceType(deviceType);
-    for (PlayerController* m_local_player_controller : m_localPlayerControllerList)
+
+    for (PlayerController const* controller : m_localPlayerControllerList)
     {
-        if (m_local_player_controller && m_local_player_controller->GetControllerIndex() == id)
+        if (controller && controller->GetControllerIndex() == id)
         {
-            printf("Game::CreateLocalPlayer      You create the Player controller with same ID: %d\n", id);
             return nullptr;
         }
     }
+
     newPlayer->SetControllerIndex(id);
     m_localPlayerControllerList.push_back(newPlayer);
-    printf("Game::CreateLocalPlayer     Create Local Player with id: %d\n", id);
+
     return newPlayer;
 }
 
+//----------------------------------------------------------------------------------------------------
 void Game::RemoveLocalPlayer(int id)
 {
-    auto it = std::remove_if(m_localPlayerControllerList.begin(), m_localPlayerControllerList.end(),
-                             [id](PlayerController* controller) {
-                                 if (controller && controller->GetControllerIndex() == id)
-                                 {
-                                     printf("Game::RemoveLocalPlayer     Remove Local Player with id: %d\n", id);
-                                     delete controller;
-                                     return true;
-                                 }
-                                 return false;
-                             });
+    std::vector<PlayerController*>::iterator const it = std::remove_if(m_localPlayerControllerList.begin(), m_localPlayerControllerList.end(),
+                                                                       [id](PlayerController const* controller) {
+                                                                           if (controller && controller->GetControllerIndex() == id)
+                                                                           {
+                                                                               printf("Game::RemoveLocalPlayer     Remove Local Player with id: %d\n", id);
+                                                                               delete controller;
+                                                                               return true;
+                                                                           }
+                                                                           return false;
+                                                                       });
     // Another solution rather tha use remove_if
     // If you need to ensure that unused memory is freed, you can use the swap technique.
     m_localPlayerControllerList.erase(it, m_localPlayerControllerList.end());
     m_localPlayerControllerList.shrink_to_fit();
 }
 
-PlayerController* Game::GetLocalPlayer(int id)
+//----------------------------------------------------------------------------------------------------
+PlayerController* Game::GetLocalPlayer(int const id) const
 {
-    for (PlayerController* m_local_player_controller : m_localPlayerControllerList)
+    for (PlayerController* m_localPlayerController : m_localPlayerControllerList)
     {
-        if (m_local_player_controller && m_local_player_controller->GetControllerIndex() == id) return m_local_player_controller;
-    }
-    return nullptr;
-}
+        if (m_localPlayerController &&
+            m_localPlayerController->GetControllerIndex() == id)
 
-PlayerController* Game::GetControllerByDeviceType(eDeviceType deviceType)
-{
-    for (PlayerController* m_local_player_controller : m_localPlayerControllerList)
-    {
-        if (m_local_player_controller && m_local_player_controller->GetInputDeviceType() == deviceType) return m_local_player_controller;
+            return m_localPlayerController;
     }
-    return nullptr;
-}
 
-bool Game::GetIsSingleMode() const
-{
-    return m_localPlayerControllerList.size() == 1;
+    return nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------
-void Game::SpawnPlayerController()
+PlayerController* Game::GetControllerByDeviceType(eDeviceType const deviceType) const
 {
-    // m_localPlayerControllerList.push_back(new PlayerController(m_currentMap));
-    // m_localPlayerControllerList[0]->SetControllerIndex(0);
-    // m_localPlayerControllerList.push_back(new PlayerController(m_currentMap));
-    // m_localPlayerControllerList[1]->SetControllerIndex(1);
-    // m_playerController = new PlayerController(m_currentMap);
+    for (PlayerController* m_localPlayerController : m_localPlayerControllerList)
+    {
+        if (m_localPlayerController &&
+            m_localPlayerController->GetInputDeviceType() == deviceType)
+
+            return m_localPlayerController;
+    }
+
+    return nullptr;
+}
+
+//----------------------------------------------------------------------------------------------------
+bool Game::GetIsSingleMode() const
+{
+    return m_localPlayerControllerList.size() == 1;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -485,7 +624,7 @@ void Game::ChangeState(eGameState const nextState)
     m_currentGameState = nextState;
 }
 
-//----------------------------------------------------------------------------------------------------
+//---------------------------------------- ------------------------------------------------------------
 eGameState Game::GetGameState() const
 {
     return m_currentGameState;

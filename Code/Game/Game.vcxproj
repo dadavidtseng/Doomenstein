@@ -209,7 +209,7 @@
     <ClCompile Include="TileDefinition.cpp" />
     <ClCompile Include="Weapon.cpp" />
     <ClCompile Include="WeaponDefinition.cpp" />
-    <ClCompile Include="Widget.cpp" />
+    <ClCompile Include="WidgetBase.cpp" />
     <ClCompile Include="WidgetSubsystem.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -233,7 +233,7 @@
     <ClInclude Include="TileDefinition.hpp" />
     <ClInclude Include="Weapon.hpp" />
     <ClInclude Include="WeaponDefinition.hpp" />
-    <ClInclude Include="Widget.hpp" />
+    <ClInclude Include="WidgetBase.hpp" />
     <ClInclude Include="WidgetSubsystem.hpp" />
   </ItemGroup>
   <ItemGroup>

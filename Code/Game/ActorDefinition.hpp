@@ -14,6 +14,7 @@
 #include "Engine/Renderer/Shader.hpp"
 #include "Engine/Renderer/SpriteSheet.hpp"
 
+class Sound;
 class AnimationGroup;
 enum class eBillboardType : int8_t;
 
@@ -77,6 +78,9 @@ public:
     Shader*                     m_shader        = nullptr;
     SpriteSheet*                m_spriteSheet   = nullptr;
     std::vector<AnimationGroup> m_animationGroup;
+
+    // Sounds
+    std::vector<Sound>          m_sounds;
 
     // Weapons
     StringList m_inventory;

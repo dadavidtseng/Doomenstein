@@ -43,6 +43,6 @@ public:
     Vec3        m_velocity     = Vec3::ZERO;
     EulerAngles m_orientation  = EulerAngles::ZERO;
     bool        m_isCameraMode = false;
-    Camera*     m_worldCamera  = nullptr;
+    // Camera*     m_worldCamera  = nullptr;
     eDeviceType m_deviceType   = eDeviceType::KEYBOARD_AND_MOUSE;
 };

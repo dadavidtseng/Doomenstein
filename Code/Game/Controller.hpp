@@ -26,17 +26,17 @@ public:
     virtual void   Possess(ActorHandle const& actorHandle);
     virtual Actor* GetActor();
 
-    /// Setter
+    // Setter
     void  SetControllerIndex(int index);
-    AABB2 SetViewport(AABB2 viewPort);
+    AABB2 SetViewport(AABB2 const& viewPort);
 
-    /// Getter
+    // Getter
     int GetControllerIndex() const;
 
     // The reference to controller's actor is by actor handle.
     ActorHandle m_actorHandle;           // Handle of our currently possessed actor or INVALID if no actor is possessed.
-    Map*        m_map = nullptr;    // Reference to the current map for purposes of dereferencing actor handles.
-    int          m_index = -1;
+    Map*        m_map   = nullptr;    // Reference to the current map for purposes of dereferencing actor handles.
+    int         m_index = -1;
 
     Camera* m_viewCamera = nullptr; // Handle screen message and hud
     AABB2   m_screenViewport;

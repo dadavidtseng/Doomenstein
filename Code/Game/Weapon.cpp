@@ -34,7 +34,7 @@ Weapon::Weapon(Actor*                  owner,
 {
     // m_timer              = new Timer(m_definition->m_refireTime, g_theGame->m_gameClock);
     // m_timer->m_startTime = g_theGame->m_gameClock->GetTotalSeconds();
-    m_animationTimer = new Timer(3.f, g_theGame->m_gameClock);
+    m_animationTimer = new Timer(0.f, g_theGame->m_gameClock);
 
     /// Init hud base bound
     if (m_definition->m_hud != nullptr)
@@ -43,11 +43,10 @@ Weapon::Weapon(Actor*                  owner,
         IntVec2  baseDimension = baseTexture->GetDimensions();
         float    multiplier    = g_theGame->m_screenSpace.m_maxs.x / (float)baseDimension.x;
         m_hudBaseBound         = AABB2(Vec2(0.0f, 0.0f), Vec2(g_theGame->m_screenSpace.m_maxs.x, (float)baseDimension.y * multiplier));
-
-  
     }
 }
 
+//----------------------------------------------------------------------------------------------------
 Weapon::~Weapon()
 {
     m_owner = nullptr;
@@ -55,31 +54,16 @@ Weapon::~Weapon()
 
 void Weapon::Update(float const deltaSeconds)
 {
-    // DebuggerPrintf("(%f)Weapon::Update\n", m_currentPlayingAnimation.Get);
-
     UpdateAnimation(deltaSeconds);
-
-    // if (m_owner->m_controller!=nullptr&&
-    //        m_owner->m_controller->GetControllerIndex() == 0)
-    // {
-    //     m_hudBaseBound         = AABB2(Vec2(0.0f, 0.0f), Vec2(1600.f, 400.f));
-    // }
-    //
-    // if (m_owner->m_controller!=nullptr&&
-    //        m_owner->m_controller->GetControllerIndex() == 1)
-    // {
-    //     m_hudBaseBound         = AABB2(Vec2(0.0f, 400.0f), Vec2(1600.f, 800.f));
-    // }
 }
 
 void Weapon::UpdateAnimation(float const deltaSeconds)
 {
     UNUSED(deltaSeconds)
     if (!m_currentPlayingAnimation) return;
-    // DebuggerPrintf("(%f, %f)\n", m_animationTimer->GetElapsedTime(), m_currentPlayingAnimation->GetAnimationLength());
+
     if (m_animationTimer->GetElapsedTime() > m_currentPlayingAnimation->GetAnimationLength())
     {
-        // DebuggerPrintf("(%d, %d)\n",m_animationTimer->GetElapsedTime(), m_currentPlayingAnimation->GetAnimationLength());
         m_currentPlayingAnimation = nullptr;
         m_animationTimer->Stop();
     }
@@ -92,7 +76,7 @@ void Weapon::Render() const
     g_theRenderer->BindShader(m_definition->m_hud->m_shader);
     g_theRenderer->SetBlendMode(eBlendMode::OPAQUE);
     RenderWeaponBase();
-    RenderWeaponReticle();
+    RenderWeaponReticule();
     RenderWeaponAnim();
     RenderWeaponHudText();
 }
@@ -110,7 +94,7 @@ void Weapon::RenderWeaponBase() const
     g_theRenderer->DrawVertexArray(vertexes);
 }
 
-void Weapon::RenderWeaponReticle() const
+void Weapon::RenderWeaponReticule() const
 {
     std::vector<Vertex_PCU> vertexes;
     vertexes.reserve(1024);
@@ -120,16 +104,15 @@ void Weapon::RenderWeaponReticle() const
 
     Vec2 reticleSpriteOffSet = -reticleDimension * m_definition->m_hud->m_spritePivot;
 
-    // AABB2 reticleBound        = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
-    AABB2 reticleBound = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
+    AABB2 reticleBound        = AABB2(Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f), (Vec2(g_theGame->m_screenSpace.m_maxs / 2.0f) + Vec2(reticleDimension)));
 
 
     /// Change the dimension base on split screen y
-    // Vec2  dim            = reticleBound.GetDimensions();
-    // AABB2 screenViewport = m_owner->m_controller->m_screenViewport;
-    // float multiplier     = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
-    // dim.x /= multiplier;
-    // reticleBound.SetDimensions(dim);
+    Vec2  dim            = reticleBound.GetDimensions();
+    AABB2 screenViewport = m_owner->m_controller->m_screenViewport;
+    float multiplier     = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
+    dim.x /= multiplier;
+    reticleBound.SetDimensions(dim);
     /// End of Change
 
     AddVertsForAABB2D(vertexes, reticleBound, Rgba8::WHITE);
@@ -144,17 +127,17 @@ void Weapon::RenderWeaponHudText() const
     if (!player) return;
     std::vector<Vertex_PCU> vertexes;
     vertexes.reserve(1024);
-    BitmapFont* g_testFont     = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont");
-    AABB2       boundingBox    = m_hudBaseBound;
-    Vec2        dim            = boundingBox.GetDimensions();
-    m_owner->m_controller->m_screenViewport = boundingBox;
-    AABB2       screenViewport = m_owner->m_controller->m_screenViewport;
-    float       multiplier     = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
+    BitmapFont* g_testFont                  = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont");
+    AABB2       boundingBox                 = m_hudBaseBound;
+    Vec2        dim                         = boundingBox.GetDimensions();
+    // m_owner->m_controller->m_screenViewport = boundingBox;
+    AABB2 screenViewport                    = m_owner->m_controller->m_screenViewport;
+    float multiplier                        = g_theGame->m_screenSpace.GetDimensions().y / screenViewport.GetDimensions().y;
     g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", (int)m_owner->m_health), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier, Vec2(0.29f, 0.5f));
     // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", PlayerSaveSubsystem::GetPlayerSaveData(player->m_index)->m_numOfKilled), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier,
-                                       // Vec2(0.05f, 0.5f));
+    // Vec2(0.05f, 0.5f));
     // g_testFont->AddVertsForTextInBox2D(vertexes, Stringf("%d", PlayerSaveSubsystem::GetPlayerSaveData(player->m_index)->m_numOfDeaths), boundingBox, 40.f, Rgba8::WHITE, 1 / multiplier,
-                                       // Vec2(0.95f, 0.5f));
+    // Vec2(0.95f, 0.5f));
     g_theRenderer->BindTexture(&g_testFont->GetTexture());
     g_theRenderer->DrawVertexArray(vertexes);
     // g_theRenderer->BindTexture(nullptr);
@@ -172,7 +155,7 @@ void Weapon::RenderWeaponAnim() const
     SpriteAnimDefinition const* anim         = animation->GetAnimationDefinition();
     SpriteDefinition const      spriteAtTime = anim->GetSpriteDefAtTime(m_animationTimer->GetElapsedTime());
     AABB2                       uvAtTime     = spriteAtTime.GetUVs();
-// DebuggerPrintf("(RenderWeaponAnim   %f\n", m_animationTimer->GetElapsedTime());
+    // DebuggerPrintf("(RenderWeaponAnim   %f\n", m_animationTimer->GetElapsedTime());
     Vec2 spriteOffSet = -Vec2(m_definition->m_hud->m_spriteSize) * m_definition->m_hud->m_spritePivot;
 
     IntVec2 boundSize = m_definition->m_hud->m_spriteSize;
@@ -339,7 +322,6 @@ void Weapon::Fire()
 
 Animation* Weapon::PlayAnimationByName(std::string animationName, bool force)
 {
-
     Animation* weaponAnim = m_definition->m_hud->GetAnimationByName(animationName);
     if (weaponAnim)
     {

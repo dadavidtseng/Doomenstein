@@ -105,6 +105,9 @@ void App::Startup()
     g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
     g_theRNG        = new RandomNumberGenerator();
     g_theGame       = new Game();
+    float      x              = (float)g_theWindow->GetClientDimensions().x;
+    float      y              = (float)g_theWindow->GetClientDimensions().y;
+    m_devConsoleCamera->m_viewPort = AABB2(Vec2::ZERO, Vec2(x,y));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -221,9 +224,11 @@ void App::Render() const
     g_theRenderer->ClearScreen(clearColor);
     g_theGame->Render();
 
+    g_theRenderer->BeginCamera(*m_devConsoleCamera);
     AABB2 const box = AABB2(Vec2::ZERO, Vec2(1600.f, 30.f));
 
     g_theDevConsole->Render(box);
+    g_theRenderer->EndCamera(*m_devConsoleCamera);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -242,7 +247,7 @@ void App::EndFrame() const
 void App::UpdateCursorMode()
 {
     bool const doesWindowHasFocus   = GetActiveWindow() == g_theWindow->GetWindowHandle();
-    bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || g_theGame->IsAttractMode();
+    bool const shouldUsePointerMode = !doesWindowHasFocus || g_theDevConsole->IsOpen() || g_theGame->GetGameState() == eGameState::ATTRACT;
 
     if (shouldUsePointerMode == true)
     {

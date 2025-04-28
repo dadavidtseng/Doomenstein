@@ -67,9 +67,6 @@
     <ClCompile Include="AnimationGroup.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
-    <ClCompile Include="Widget.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
     <ClCompile Include="WidgetSubsystem.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
@@ -77,6 +74,9 @@
       <Filter>Gameplay</Filter>
     </ClCompile>
     <ClCompile Include="Sound.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="WidgetBase.cpp">
       <Filter>Gameplay</Filter>
     </ClCompile>
   </ItemGroup>
@@ -135,9 +135,6 @@
     <ClInclude Include="AnimationGroup.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
-    <ClInclude Include="Widget.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
     <ClInclude Include="WidgetSubsystem.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
@@ -145,6 +142,9 @@
       <Filter>Gameplay</Filter>
     </ClInclude>
     <ClInclude Include="Sound.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="WidgetBase.hpp">
       <Filter>Gameplay</Filter>
     </ClInclude>
   </ItemGroup>
