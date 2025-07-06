@@ -9,6 +9,9 @@
     <Game.Common.Audio.ButtonClicked>Data/Audio/Click.mp3</Game.Common.Audio.ButtonClicked>
     <Game.Common.Audio.Volume>0.1</Game.Common.Audio.Volume>
     <Map.DefaultMap>TestMap</Map.DefaultMap>
+
+    <playerSpeed>1</playerSpeed>
+    <playerTurnRate>0.075</playerTurnRate>
 </GameConfig>
 
 

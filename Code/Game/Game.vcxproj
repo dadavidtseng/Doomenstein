@@ -189,55 +189,56 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
-    <ClCompile Include="ActorDefinition.cpp" />
-    <ClCompile Include="ActorHandle.cpp" />
-    <ClCompile Include="AIController.cpp" />
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="AnimationGroup.cpp" />
-    <ClCompile Include="App.cpp" />
-    <ClCompile Include="Controller.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameCommon.cpp" />
-    <ClCompile Include="HUD.cpp" />
-    <ClCompile Include="Main_Windows.cpp" />
-    <ClCompile Include="Map.cpp" />
-    <ClCompile Include="MapDefinition.cpp" />
-    <ClCompile Include="PlayerController.cpp" />
-    <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="Tile.cpp" />
-    <ClCompile Include="TileDefinition.cpp" />
-    <ClCompile Include="Weapon.cpp" />
-    <ClCompile Include="WeaponDefinition.cpp" />
-    <ClCompile Include="WidgetBase.cpp" />
-    <ClCompile Include="WidgetSubsystem.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Actor.hpp" />
-    <ClInclude Include="ActorDefinition.hpp" />
-    <ClInclude Include="ActorHandle.hpp" />
-    <ClInclude Include="AIController.hpp" />
-    <ClInclude Include="Animation.hpp" />
-    <ClInclude Include="AnimationGroup.hpp" />
-    <ClInclude Include="App.hpp" />
-    <ClInclude Include="Controller.hpp" />
-    <ClInclude Include="EngineBuildPreferences.hpp" />
-    <ClInclude Include="Game.hpp" />
-    <ClInclude Include="GameCommon.hpp" />
-    <ClInclude Include="HUD.hpp" />
-    <ClInclude Include="Map.hpp" />
-    <ClInclude Include="MapDefinition.hpp" />
-    <ClInclude Include="PlayerController.hpp" />
-    <ClInclude Include="Sound.hpp" />
-    <ClInclude Include="Tile.hpp" />
-    <ClInclude Include="TileDefinition.hpp" />
-    <ClInclude Include="Weapon.hpp" />
-    <ClInclude Include="WeaponDefinition.hpp" />
-    <ClInclude Include="WidgetBase.hpp" />
-    <ClInclude Include="WidgetSubsystem.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\Docs\README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Definition\ActorDefinition.cpp" />
+    <ClCompile Include="Definition\MapDefinition.cpp" />
+    <ClCompile Include="Definition\TileDefinition.cpp" />
+    <ClCompile Include="Definition\WeaponDefinition.cpp" />
+    <ClCompile Include="Framework\ActorHandle.cpp" />
+    <ClCompile Include="Framework\AIController.cpp" />
+    <ClCompile Include="Framework\Animation.cpp" />
+    <ClCompile Include="Framework\AnimationGroup.cpp" />
+    <ClCompile Include="Framework\App.cpp" />
+    <ClCompile Include="Framework\Controller.cpp" />
+    <ClCompile Include="Framework\GameCommon.cpp" />
+    <ClCompile Include="Framework\Main_Windows.cpp" />
+    <ClCompile Include="Framework\PlayerController.cpp" />
+    <ClCompile Include="Gameplay\Actor.cpp" />
+    <ClCompile Include="Gameplay\Game.cpp" />
+    <ClCompile Include="Gameplay\HUD.cpp" />
+    <ClCompile Include="Gameplay\Map.cpp" />
+    <ClCompile Include="Gameplay\Sound.cpp" />
+    <ClCompile Include="Gameplay\Tile.cpp" />
+    <ClCompile Include="Gameplay\Weapon.cpp" />
+    <ClCompile Include="Subsystem\Light\LightSubsystem.cpp" />
+    <ClCompile Include="Subsystem\Widget\WidgetBase.cpp" />
+    <ClCompile Include="Subsystem\Widget\WidgetSubsystem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Definition\ActorDefinition.hpp" />
+    <ClInclude Include="Definition\MapDefinition.hpp" />
+    <ClInclude Include="Definition\TileDefinition.hpp" />
+    <ClInclude Include="Definition\WeaponDefinition.hpp" />
+    <ClInclude Include="Framework\ActorHandle.hpp" />
+    <ClInclude Include="Framework\AIController.hpp" />
+    <ClInclude Include="Framework\Animation.hpp" />
+    <ClInclude Include="Framework\AnimationGroup.hpp" />
+    <ClInclude Include="Framework\App.hpp" />
+    <ClInclude Include="Framework\Controller.hpp" />
+    <ClInclude Include="Framework\GameCommon.hpp" />
+    <ClInclude Include="Framework\PlayerController.hpp" />
+    <ClInclude Include="Gameplay\Actor.hpp" />
+    <ClInclude Include="Gameplay\Game.hpp" />
+    <ClInclude Include="Gameplay\HUD.hpp" />
+    <ClInclude Include="Gameplay\Map.hpp" />
+    <ClInclude Include="Gameplay\Sound.hpp" />
+    <ClInclude Include="Gameplay\Tile.hpp" />
+    <ClInclude Include="Gameplay\Weapon.hpp" />
+    <ClInclude Include="Subsystem\Light\LightSubsystem.hpp" />
+    <ClInclude Include="Subsystem\Widget\WidgetBase.hpp" />
+    <ClInclude Include="Subsystem\Widget\WidgetSubsystem.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

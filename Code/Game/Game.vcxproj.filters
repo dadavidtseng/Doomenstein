@@ -11,146 +11,161 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Game.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="GameCommon.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Main_Windows.cpp">
-      <Filter>Framework</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="MapDefinition.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Tile.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Actor.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="TileDefinition.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="ActorDefinition.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="ActorHandle.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Controller.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Weapon.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="WeaponDefinition.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="AIController.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerController.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Animation.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimationGroup.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="WidgetSubsystem.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="HUD.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-    <ClCompile Include="WidgetBase.cpp">
-      <Filter>Gameplay</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Game.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="GameCommon.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="App.hpp">
-      <Filter>Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="EngineBuildPreferences.hpp">
-      <Filter>Framework</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="MapDefinition.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Actor.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="TileDefinition.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="ActorDefinition.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="ActorHandle.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Controller.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Weapon.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="WeaponDefinition.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="AIController.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerController.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Animation.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimationGroup.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="WidgetSubsystem.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="HUD.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="Sound.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
-    <ClInclude Include="WidgetBase.hpp">
-      <Filter>Gameplay</Filter>
-    </ClInclude>
+    <Filter Include="Subsystem">
+      <UniqueIdentifier>{db0f11a9-ccf5-4203-9158-3a2ead48d3d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subsystem\Light">
+      <UniqueIdentifier>{f626191b-0bfa-4dfd-8b42-23f9291f5498}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Subsystem\Widget">
+      <UniqueIdentifier>{d0361121-5eb5-489c-8d4b-f2dbbd3d68d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Definition">
+      <UniqueIdentifier>{39a8183f-1c9d-44d9-a715-e9a4b43617e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Docs\README.md">
       <Filter>Document</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Framework\ActorHandle.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\AIController.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Animation.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\AnimationGroup.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\App.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Controller.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\GameCommon.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\Main_Windows.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Framework\PlayerController.cpp">
+      <Filter>Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameplay\Actor.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameplay\Game.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameplay\HUD.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameplay\Map.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameplay\Sound.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameplay\Tile.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Gameplay\Weapon.cpp">
+      <Filter>Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="Subsystem\Light\LightSubsystem.cpp">
+      <Filter>Subsystem\Light</Filter>
+    </ClCompile>
+    <ClCompile Include="Subsystem\Widget\WidgetBase.cpp">
+      <Filter>Subsystem\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="Subsystem\Widget\WidgetSubsystem.cpp">
+      <Filter>Subsystem\Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="Definition\ActorDefinition.cpp">
+      <Filter>Definition</Filter>
+    </ClCompile>
+    <ClCompile Include="Definition\MapDefinition.cpp">
+      <Filter>Definition</Filter>
+    </ClCompile>
+    <ClCompile Include="Definition\TileDefinition.cpp">
+      <Filter>Definition</Filter>
+    </ClCompile>
+    <ClCompile Include="Definition\WeaponDefinition.cpp">
+      <Filter>Definition</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Framework\ActorHandle.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\AIController.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Animation.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\AnimationGroup.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\App.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\Controller.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\GameCommon.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Framework\PlayerController.hpp">
+      <Filter>Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay\Actor.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay\Game.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay\HUD.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay\Map.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay\Sound.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay\Tile.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Gameplay\Weapon.hpp">
+      <Filter>Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="Subsystem\Light\LightSubsystem.hpp">
+      <Filter>Subsystem\Light</Filter>
+    </ClInclude>
+    <ClInclude Include="Subsystem\Widget\WidgetBase.hpp">
+      <Filter>Subsystem\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="Subsystem\Widget\WidgetSubsystem.hpp">
+      <Filter>Subsystem\Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="Definition\ActorDefinition.hpp">
+      <Filter>Definition</Filter>
+    </ClInclude>
+    <ClInclude Include="Definition\MapDefinition.hpp">
+      <Filter>Definition</Filter>
+    </ClInclude>
+    <ClInclude Include="Definition\TileDefinition.hpp">
+      <Filter>Definition</Filter>
+    </ClInclude>
+    <ClInclude Include="Definition\WeaponDefinition.hpp">
+      <Filter>Definition</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
