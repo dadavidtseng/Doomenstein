@@ -1,12 +1,12 @@
 //----------------------------------------------------------------------------------------------------
 struct vs_input_t
 {
-	float3 modelPosition : POSITION;
-	float4 color : COLOR;
-	float2 uv : TEXCOORD;
-	float3 modelTangent : TANGENT;
-	float3 modelBitangent : BITANGENT;
-	float3 modelNormal : NORMAL;
+	float3 modelPosition : VERTEX_POSITION;
+	float4 color : VERTEX_COLOR;
+	float2 uv : VERTEX_UVTEXCOORDS;
+	float3 modelTangent : VERTEX_TANGENT;
+	float3 modelBitangent : VERTEX_BITANGENT;
+	float3 modelNormal : VERTEX_NORMAL;
 };
 
 //----------------------------------------------------------------------------------------------------
@@ -21,7 +21,7 @@ struct v2p_t
 };
 
 //----------------------------------------------------------------------------------------------------
-cbuffer LightConstants : register(b1)
+cbuffer LightConstants : register(b2)
 {
 	float3 SunDirection;
 	float SunIntensity;
@@ -29,7 +29,7 @@ cbuffer LightConstants : register(b1)
 };
 
 //----------------------------------------------------------------------------------------------------
-cbuffer CameraConstants : register(b2)
+cbuffer CameraConstants : register(b3)
 {
 	float4x4 WorldToCameraTransform;	// View transform
 	float4x4 CameraToRenderTransform;	// Non-standard transform from game to DirectX conventions
@@ -37,7 +37,7 @@ cbuffer CameraConstants : register(b2)
 };
 
 //----------------------------------------------------------------------------------------------------
-cbuffer ModelConstants : register(b3)
+cbuffer ModelConstants : register(b4)
 {
 	float4x4 ModelToWorldTransform;		// Model transform
 	float4 ModelColor;
@@ -81,7 +81,8 @@ float4 PixelMain(v2p_t input) : SV_Target0
 	float4 textureColor = diffuseTexture.Sample(samplerState, input.uv);
 	float4 vertexColor = input.color;
 	float4 modelColor = ModelColor;
-	float4 color = lightColor * textureColor * vertexColor * modelColor;
+	//float4 color = lightColor * textureColor * vertexColor * modelColor;
+float4 color = textureColor * vertexColor * modelColor;
 	clip(color.a - 0.01f);
 	return color;
 }

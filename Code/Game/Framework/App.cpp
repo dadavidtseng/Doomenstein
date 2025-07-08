@@ -106,10 +106,11 @@ void App::Startup()
     g_theDevConsole->StartUp();
     g_theInput->Startup();
     g_theAudio->Startup();
+    g_theLightSubsystem->StartUp();
 
-    g_theBitmapFont                = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
-    g_theRNG                       = new RandomNumberGenerator();
-    g_theGame                      = new Game();
+    g_theBitmapFont = g_theRenderer->CreateOrGetBitmapFontFromFile("Data/Fonts/SquirrelFixedFont"); // DO NOT SPECIFY FILE .EXTENSION!!  (Important later on.)
+    g_theRNG        = new RandomNumberGenerator();
+    g_theGame       = new Game();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -127,6 +128,7 @@ void App::Shutdown()
     delete g_theBitmapFont;
     g_theBitmapFont = nullptr;
 
+    g_theLightSubsystem->ShutDown();
     g_theAudio->Shutdown();
     g_theInput->Shutdown();
     g_theDevConsole->Shutdown();
@@ -200,6 +202,7 @@ void App::BeginFrame() const
     g_theDevConsole->BeginFrame();
     g_theInput->BeginFrame();
     g_theAudio->BeginFrame();
+    g_theLightSubsystem->BeginFrame();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -243,6 +246,7 @@ void App::EndFrame() const
     g_theDevConsole->EndFrame();
     g_theInput->EndFrame();
     g_theAudio->EndFrame();
+    g_theLightSubsystem->EndFrame();
 }
 
 //----------------------------------------------------------------------------------------------------
